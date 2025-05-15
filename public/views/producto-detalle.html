@@ -1,0 +1,148 @@
+<section class="container product-detail-page">
+    <!-- Breadcrumbs -->
+    <div class="breadcrumbs">
+        <a href="/">Inicio</a> &gt;
+        <a href="/productos">Productos</a> &gt;
+        <span>{{producto.nombre}}</span>
+    </div>
+    
+    <!-- Contenedor principal del producto -->
+    <div class="product-detail">
+        <!-- Imagen del producto -->
+        <div class="product-image-container">
+            <div class="main-image">
+                <img src="{{producto.imagen}}" alt="{{producto.nombre}}" onerror="this.src='/img/default-product.jpg'">
+            </div>
+        </div>
+        
+        <!-- Información del producto -->
+        <div class="product-info-container">
+            <h1 class="product-title">{{producto.nombre}}</h1>
+            
+            <div class="product-category">
+                <span>Categoría: <a href="/categorias/{{producto.categoria_id}}">{{producto.categoria_nombre}}</a></span>
+            </div>
+            
+            <div class="product-price">
+                <span class="price">${{producto.precio}}</span>
+            </div>
+            
+            <div class="product-availability">
+                <span class="stock in-stock">
+                    {{#if producto.cantidad_disponible}}
+                    En stock ({{producto.cantidad_disponible}} disponibles)
+                    {{else}}
+                    Agotado
+                    {{/if}}
+                </span>
+            </div>
+            
+            <div class="product-description">
+                <h3>Descripción</h3>
+                <p>{{producto.descripcion}}</p>
+            </div>
+            
+            <div class="product-features" id="caracteristicasContainer">
+                <h3>Características</h3>
+                <div class="features-content">
+                    <ul id="caracteristicasList">
+                        {{#each caracteristicasList}}
+                        <li>{{this}}</li>
+                        {{/each}}
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="product-actions">
+                <button class="btn add-to-cart" id="btnAddToCart" 
+                        data-id="{{producto.id}}" 
+                        data-nombre="{{producto.nombre}}" 
+                        data-precio="{{producto.precio}}" 
+                        data-imagen="{{producto.imagen}}">
+                    Añadir al carrito
+                </button>
+                <a href="https://wa.me/573001234567?text=Hola, estoy interesado en el producto: {{producto.nombre}}" 
+                   target="_blank" class="btn btn-secondary">
+                    <i class="fab fa-whatsapp"></i> Consultar por WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Script para manejar funcionalidad del detalle del producto -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Comprobar si hay características y ocultar el contenedor si está vacío
+    const caracteristicasList = document.getElementById('caracteristicasList');
+    const caracteristicasContainer = document.getElementById('caracteristicasContainer');
+    
+    if (caracteristicasList && caracteristicasContainer) {
+        if (caracteristicasList.children.length === 0) {
+            caracteristicasContainer.style.display = 'none';
+        }
+    }
+    
+    // Manejar click en botón de añadir al carrito
+    const btnAddToCart = document.getElementById('btnAddToCart');
+    if (btnAddToCart) {
+        btnAddToCart.addEventListener('click', function() {
+            const productId = this.getAttribute('data-id');
+            const productName = this.getAttribute('data-nombre');
+            const productPrice = this.getAttribute('data-precio');
+            const productImage = this.getAttribute('data-imagen');
+            
+            console.log('Añadiendo al carrito:', {
+                id: productId,
+                nombre: productName,
+                precio: productPrice,
+                imagen: productImage
+            });
+            
+            // Obtener el carrito actual o crear uno nuevo
+            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            
+            // Verificar si el producto ya está en el carrito
+            const existingProductIndex = cart.findIndex(item => item.id === productId);
+            
+            if (existingProductIndex !== -1) {
+                // Si ya existe, incrementar cantidad
+                cart[existingProductIndex].cantidad += 1;
+            } else {
+                // Si no existe, añadir como nuevo
+                cart.push({
+                    id: productId,
+                    nombre: productName,
+                    precio: productPrice,
+                    imagen: productImage,
+                    cantidad: 1
+                });
+            }
+            
+            // Guardar carrito actualizado
+            localStorage.setItem('cart', JSON.stringify(cart));
+            
+            // Actualizar contador del carrito en el header (si existe)
+            const cartCount = document.querySelector('.cart-count');
+            if (cartCount) {
+                const totalItems = cart.reduce((total, item) => total + item.cantidad, 0);
+                cartCount.textContent = totalItems;
+            }
+            
+            // Mostrar mensaje de confirmación
+            alert('¡Producto añadido al carrito!');
+        });
+    }
+    
+    // Depuración para verificar los datos del producto
+    console.log('Datos del producto:', {
+        id: document.querySelector('#btnAddToCart')?.getAttribute('data-id'),
+        nombre: document.querySelector('.product-title')?.textContent,
+        precio: document.querySelector('.price')?.textContent,
+        descripcion: document.querySelector('.product-description p')?.textContent,
+        imagen: document.querySelector('.main-image img')?.getAttribute('src')
+    });
+});
+</script>
+<!-- Agregar al final de la vista producto-detalle.html -->
+<script src="/js/debug.js"></script>

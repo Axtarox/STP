@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{titulo}} | Soluciones Tecnológicas Pradito</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+    <link rel="stylesheet" href="/css/additional-styles.css" />
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="header-top">
+                <a href="/" class="logo">Soluciones <span>Tecnológicas</span> Pradito</a>
+                <div class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </div>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/">Inicio</a></li>
+                    <li><a href="/quienes-somos">Quienes Somos</a></li>
+                    <li><a href="/productos">Productos</a></li>
+                    <li><a href="/servicios">Servicios</a></li>
+                    <li><a href="/categorias">Categorías</a></li>
+                    <li><a href="/contactanos">Contáctanos</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main>
+        {{content}}
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-column">
+                <h3>Navegación</h3>
+                <ul class="footer-links">
+                    <li><a href="/">Inicio</a></li>
+                    <li><a href="/quienes-somos">Quienes Somos</a></li>
+                    <li><a href="/productos">Productos</a></li>
+                    <li><a href="/servicios">Servicios</a></li>
+                    <li><a href="/categorias">Categorías</a></li>
+                    <li><a href="/contactanos">Contáctanos</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h3>Categorías</h3>
+                <ul class="footer-links">
+                    {{#each categorias}}
+                    <li><a href="/categorias/{{id}}">{{nombre}}</a></li>
+                    {{/each}}
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h3>Contacto</h3>
+                <ul class="contact-info">
+                    <li><i class="fas fa-map-marker-alt"></i> Calle 123 #45-67, Medellín</li>
+                    <li><i class="fas fa-phone"></i> (604) 123-4567</li>
+                    <li><i class="fas fa-mobile-alt"></i> +57 300 123 4567</li>
+                    <li><i class="fas fa-envelope"></i> info@pradito.com</li>
+                </ul>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-column">
+                <h3>Síguenos</h3>
+                <p>Mantente al día con nuestras novedades y promociones.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2025 Soluciones Tecnológicas Pradito. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Carrito lateral -->
+    <div class="cart-sidebar">
+        <div class="cart-header">
+            <h3>Tu Carrito</h3>
+            <button class="close-cart">&times;</button>
+        </div>
+        <div class="cart-items">
+            <!-- Aquí se mostrarán los productos del carrito -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total-container">
+                <span>Total:</span>
+                <span class="cart-total">$0</span>
+            </div>
+            <button class="checkout-btn">Proceder al Pago</button>
+        </div>
+    </div>
+    
+    <!-- Overlay para carrito -->
+    <div class="cart-overlay"></div>
+
+    <!-- Scripts globales -->
+    <script src="/js/main.js"></script>
+    
+    <!-- Script para página de detalle de producto -->
+    {{#if isProductoDetalle}}
+    <script src="/js/detalle-producto.js"></script>
+    {{/if}}
+</body>
+</html>

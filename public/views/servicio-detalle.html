@@ -1,0 +1,110 @@
+<section class="container service-detail-page">
+    <div class="breadcrumbs">
+        <a href="/">Inicio</a> &gt;
+        <a href="/servicios">Servicios</a> &gt;
+        <span>{{servicio.nombre}}</span>
+    </div>
+    
+    <div class="service-detail">
+        <div class="service-header">
+            <h1 class="service-title">{{servicio.nombre}}</h1>
+            
+            {{#if servicio.imagen}}
+            <div class="service-image">
+                <img src="{{servicio.imagen}}" alt="{{servicio.nombre}}">
+            </div>
+            {{/if}}
+        </div>
+        
+        <div class="service-content">
+            <div class="service-description">
+                <h2>Descripción del Servicio</h2>
+                <p>{{servicio.descripcion}}</p>
+            </div>
+            
+            <div class="service-benefits">
+                <h2>Beneficios</h2>
+                <ul class="benefits-list">
+                    <li><i class="fas fa-check-circle"></i> Técnicos certificados y con experiencia</li>
+                    <li><i class="fas fa-check-circle"></i> Garantía en todos nuestros servicios</li>
+                    <li><i class="fas fa-check-circle"></i> Precios competitivos</li>
+                    <li><i class="fas fa-check-circle"></i> Atención personalizada</li>
+                    <li><i class="fas fa-check-circle"></i> Rapidez y eficiencia</li>
+                </ul>
+            </div>
+            
+            <div class="service-process">
+                <h2>Proceso de Servicio</h2>
+                <div class="process-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Contacto</h3>
+                            <p>Ponte en contacto con nosotros para solicitar el servicio por WhatsApp, llamada o en nuestra tienda.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Diagnóstico</h3>
+                            <p>Realizamos un diagnóstico completo para identificar el problema o necesidad.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Cotización</h3>
+                            <p>Te proporcionamos una cotización detallada del servicio.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h3>Ejecución</h3>
+                            <p>Una vez aprobada la cotización, procedemos a realizar el servicio.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h3>Entrega</h3>
+                            <p>Entregamos el trabajo finalizado con garantía incluida.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="service-cta">
+            <h2>¿Necesitas este servicio?</h2>
+            <p>Contáctanos ahora para obtener más información o solicitar una cotización.</p>
+            
+            <div class="cta-buttons">
+                <a href="https://wa.me/573001234567?text=Hola, estoy interesado en el servicio: {{servicio.nombre}}" target="_blank" class="btn">
+                    <i class="fab fa-whatsapp"></i> Contactar por WhatsApp
+                </a>
+                <a href="/contactanos" class="btn btn-secondary">Formulario de contacto</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="related-services">
+        <h2 class="section-title">Servicios relacionados</h2>
+        <div class="services">
+            {{#each relacionados}}
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-laptop"></i>
+                </div>
+                <h3 class="service-title">{{nombre}}</h3>
+                <p class="service-description">{{descripcion}}</p>
+                <a href="/servicios/{{id}}" class="service-btn">Ver más</a>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+</section>

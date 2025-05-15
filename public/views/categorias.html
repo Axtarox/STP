@@ -1,0 +1,56 @@
+<section class="hero">
+    <div class="hero-content">
+        <h1>Categorías</h1>
+        <p>Explora nuestros productos por categoría</p>
+    </div>
+</section>
+
+<section class="container">
+    <h2 class="section-title">Nuestras Categorías</h2>
+    
+    <div class="categories-grid">
+        {{#each categorias}}
+        <div class="category-card">
+            <div class="category-icon">
+                {{#if id == 1}}
+                <i class="fas fa-laptop"></i>
+                {{else if id == 2}}
+                <i class="fas fa-keyboard"></i>
+                {{else if id == 3}}
+                <i class="fas fa-headphones"></i>
+                {{else if id == 4}}
+                <i class="fas fa-network-wired"></i>
+                {{else if id == 5}}
+                <i class="fas fa-compact-disc"></i>
+                {{else}}
+                <i class="fas fa-box"></i>
+                {{/if}}
+            </div>
+            <h3 class="category-title">{{nombre}}</h3>
+            <a href="/categorias/{{id}}" class="category-link">Ver productos</a>
+        </div>
+        {{/each}}
+    </div>
+</section>
+
+<section class="container featured-products">
+    <h2 class="section-title">Productos Destacados</h2>
+    
+    <div class="products">
+        {{#each destacados}}
+        <div class="product-card">
+            <div class="product-image">
+                <img src="{{imagen}}" alt="{{nombre}}">
+            </div>
+            <div class="product-info">
+                <h3 class="product-title">{{nombre}}</h3>
+                <p class="product-price">${{precio}}</p>
+                <div class="product-actions">
+                    <a href="/productos/{{id}}" class="btn btn-secondary">Ver detalles</a>
+                    <button class="add-to-cart" data-id="{{id}}">Añadir al carrito</button>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+</section>

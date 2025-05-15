@@ -1,0 +1,71 @@
+<section class="hero">
+    <div class="hero-content">
+        <h1>Resultados de búsqueda</h1>
+        <p>Resultados para: "{{query}}"</p>
+    </div>
+</section>
+
+<section class="container">
+    <div class="products-container">
+        <div class="products-filters">
+            <h3>Filtrar por:</h3>
+            
+            <div class="filter-group">
+                <h4>Categorías</h4>
+                <ul class="filter-list">
+                    {{#each categorias}}
+                    <li>
+                        <a href="/categorias/{{id}}" class="filter-link {{#if selected}}active{{/if}}">
+                            {{nombre}}
+                        </a>
+                    </li>
+                    {{/each}}
+                </ul>
+            </div>
+            
+            <div class="filter-group">
+                <h4>Buscar</h4>
+                <form class="search-form" action="/productos/buscar" method="GET">
+                    <input type="text" name="q" placeholder="¿Qué estás buscando?" class="search-input" value="{{query}}">
+                    <button type="submit" class="search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="products-grid">
+            <div class="products-header">
+                <h2 class="section-title">Resultados para: "{{query}}"</h2>
+                <div class="products-count">
+                    <span>{{productos.length}} productos</span>
+                </div>
+            </div>
+            
+            <div class="products">
+                {{#each productos}}
+                <div class="product-card" data-id="{{id}}">
+                    <div class="product-image">
+                        <img src="{{imagen}}" alt="{{nombre}}">
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">{{nombre}}</h3>
+                        <p class="product-price">${{precio}}</p>
+                        <div class="product-actions">
+                            <a href="/productos/{{id}}" class="btn btn-secondary">Ver detalles</a>
+                            <button class="add-to-cart" data-id="{{id}}">Añadir</button>
+                        </div>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+            
+            {{#if productos.length == 0}}
+            <div class="no-products">
+                <p>No se encontraron productos para "{{query}}".</p>
+                <a href="/productos" class="btn">Ver todos los productos</a>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+</section>

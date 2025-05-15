@@ -1,0 +1,23 @@
+<section class="container py-5">
+    <h2 class="section-title">Página de Error</h2>
+    
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h3>{{titulo}}</h3>
+        </div>
+        <div class="card-body">
+            <p>{{mensaje}}</p>
+            
+            {{#if error}}
+            <div class="mt-4">
+                <h4>Detalles del error:</h4>
+                <pre>{{error}}</pre>
+            </div>
+            {{/if}}
+            
+            <div class="text-center mt-4">
+                <a href="/" class="btn">Volver al inicio</a>
+            </div>
+        </div>
+    </div>
+</section>

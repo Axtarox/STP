@@ -1,0 +1,135 @@
+<section class="hero">
+    <div class="hero-content">
+        <h1>Nuestros Servicios</h1>
+        <p>Soluciones tecnológicas personalizadas para tus necesidades</p>
+    </div>
+</section>
+
+<section class="container">
+    <h2 class="section-title">Servicios que ofrecemos</h2>
+    
+    <div class="services">
+        {{#each servicios}}
+        <div class="service-card">
+            {{#if imagen}}
+            <div class="service-image">
+                <img src="{{imagen}}" alt="{{nombre}}">
+            </div>
+            {{else}}
+            <div class="service-icon">
+                <i class="fas fa-laptop"></i>
+            </div>
+            {{/if}}
+            
+            <h3 class="service-title">{{nombre}}</h3>
+            <p class="service-description">{{descripcion}}</p>
+            <a href="/servicios/{{id}}" class="service-btn">Ver más</a>
+        </div>
+        {{/each}}
+    </div>
+    
+    {{#if servicios.length == 0}}
+    <div class="no-services">
+
+    </div>
+    {{/if}}
+</section>
+
+<section class="container service-banner">
+    <div class="banner-content">
+        <h2>¿Necesitas un servicio personalizado?</h2>
+        <p>Contáctanos para recibir asesoría personalizada y una cotización a medida</p>
+        <div class="banner-actions">
+            <a href="/contactanos" class="btn">Contactar ahora</a>
+            <a href="https://wa.me/573001234567?text=Hola, necesito información sobre sus servicios" class="btn btn-secondary">
+                <i class="fab fa-whatsapp"></i> WhatsApp
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="container advantages-section">
+    <h2 class="section-title">¿Por qué elegirnos?</h2>
+    
+    <div class="advantages">
+        <div class="advantage-card">
+            <div class="advantage-icon">
+                <i class="fas fa-certificate"></i>
+            </div>
+            <h3>Experiencia</h3>
+            <p>Más de 8 años de experiencia en el sector tecnológico, ofreciendo soluciones de calidad.</p>
+        </div>
+        
+        <div class="advantage-card">
+            <div class="advantage-icon">
+                <i class="fas fa-tools"></i>
+            </div>
+            <h3>Técnicos Certificados</h3>
+            <p>Nuestro equipo cuenta con certificaciones y capacitación constante en las últimas tecnologías.</p>
+        </div>
+        
+        <div class="advantage-card">
+            <div class="advantage-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h3>Garantía</h3>
+            <p>Todos nuestros servicios cuentan con garantía, para tu tranquilidad y satisfacción.</p>
+        </div>
+        
+        <div class="advantage-card">
+            <div class="advantage-icon">
+                <i class="fas fa-headset"></i>
+            </div>
+            <h3>Soporte</h3>
+            <p>Ofrecemos soporte técnico y seguimiento después de cada servicio realizado.</p>
+        </div>
+    </div>
+</section>
+
+<section class="container testimonials-section">
+    <h2 class="section-title">Lo que dicen nuestros clientes</h2>
+    
+    <div class="testimonials">
+        <div class="testimonial">
+            <div class="testimonial-rating">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+            </div>
+            <p class="testimonial-text">"Excelente servicio de mantenimiento para mi laptop. Rápido, eficiente y a buen precio. Ahora funciona como nueva."</p>
+            <div class="testimonial-author">
+                <p>- Juan Pérez</p>
+            </div>
+        </div>
+        
+        <div class="testimonial">
+            <div class="testimonial-rating">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star-half-alt"></i>
+            </div>
+            <p class="testimonial-text">"Contratamos su servicio de instalación de redes para nuestra oficina y quedamos muy satisfechos. Profesionales y atentos."</p>
+            <div class="testimonial-author">
+                <p>- Empresa ABC</p>
+            </div>
+        </div>
+        
+        <div class="testimonial">
+            <div class="testimonial-rating">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+            </div>
+            <p class="testimonial-text">"Recuperaron datos importantes de mi disco duro dañado. Pensé que los había perdido para siempre. ¡Gracias!"</p>
+            <div class="testimonial-author">
+                <p>- María González</p>
+            </div>
+        </div>
+    </div>
+</section>

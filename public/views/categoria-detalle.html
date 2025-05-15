@@ -1,0 +1,38 @@
+<section class="hero">
+    <div class="hero-content">
+        <h1>{{categoria.nombre}}</h1>
+        <p>Detalles de la categoría</p>
+    </div>
+</section>
+
+<section class="container">
+    <div class="category-detail">
+        <div class="category-header">
+            <div class="category-icon">
+                {{#if categoria.id == 1}}
+                <i class="fas fa-laptop"></i>
+                {{else if categoria.id == 2}}
+                <i class="fas fa-keyboard"></i>
+                {{else if categoria.id == 3}}
+                <i class="fas fa-headphones"></i>
+                {{else if categoria.id == 4}}
+                <i class="fas fa-network-wired"></i>
+                {{else if categoria.id == 5}}
+                <i class="fas fa-compact-disc"></i>
+                {{else}}
+                <i class="fas fa-box"></i>
+                {{/if}}
+            </div>
+            <h2 class="category-title">{{categoria.nombre}}</h2>
+        </div>
+        
+        <div class="category-description">
+            <p>Descubre todos nuestros productos de la categoría {{categoria.nombre}}. Ofrecemos una amplia variedad de opciones para satisfacer tus necesidades tecnológicas.</p>
+        </div>
+        
+        <div class="category-actions">
+            <a href="/categorias/{{categoria.id}}" class="btn">Ver productos de esta categoría</a>
+            <a href="/categorias" class="btn btn-secondary">Volver a categorías</a>
+        </div>
+    </div>
+</section>

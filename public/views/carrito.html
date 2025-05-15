@@ -1,0 +1,378 @@
+<section class="hero">
+    <div class="hero-content">
+        <h1>Carrito de Compras</h1>
+        <p>Revisa y finaliza tu compra</p>
+    </div>
+</section>
+
+<section class="container">
+    <div class="cart-page">
+        <div class="cart-items-container">
+            <h2 class="section-title">Tus productos</h2>
+            
+            <div id="cart-items-list">
+                <!-- Aquí se mostrarán los productos del carrito -->
+                <div class="empty-cart-message" style="display: none;">
+                    <p>Tu carrito está vacío</p>
+                    <a href="/productos" class="btn">Ver productos</a>
+                </div>
+            </div>
+            
+            <div class="cart-summary">
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span id="cart-total-price">$0</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="checkout-container">
+            <h2 class="section-title">Información de contacto</h2>
+            
+            <form id="checkout-form">
+                <div class="form-group">
+                    <label for="nombre">Nombre completo*</label>
+                    <input type="text" id="nombre" name="nombre" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="telefono">Teléfono*</label>
+                    <input type="tel" id="telefono" name="telefono" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="direccion">Dirección de entrega*</label>
+                    <textarea id="direccion" name="direccion" rows="3" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Correo electrónico</label>
+                    <input type="email" id="email" name="email">
+                </div>
+                
+                <h3>Método de pago</h3>
+                <div class="payment-methods">
+                    <div class="payment-method">
+                        <input type="radio" id="bancolombia" name="metodo_pago" value="Bancolombia" checked>
+                        <label for="bancolombia">
+                            <span class="payment-icon"><i class="fas fa-university"></i></span>
+                            <span class="payment-name">Bancolombia</span>
+                        </label>
+                    </div>
+                    
+                    <div class="payment-method">
+                        <input type="radio" id="nequi" name="metodo_pago" value="Nequi">
+                        <label for="nequi">
+                            <span class="payment-icon"><i class="fas fa-mobile-alt"></i></span>
+                            <span class="payment-name">Nequi</span>
+                        </label>
+                    </div>
+                    
+                    <div class="payment-method">
+                        <input type="radio" id="contraentrega" name="metodo_pago" value="Contra Entrega">
+                        <label for="contraentrega">
+                            <span class="payment-icon"><i class="fas fa-truck"></i></span>
+                            <span class="payment-name">Pago Contra Entrega</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="payment-details" id="payment-details-container">
+                    <!-- Aquí se mostrará la información del pago según el método seleccionado -->
+                </div>
+                
+                <div class="checkout-actions">
+                    <a href="/productos" class="btn btn-secondary">Seguir comprando</a>
+                    <button type="submit" class="btn" id="finalizar-compra-btn">Finalizar compra</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Cargar carrito desde localStorage
+        loadCart();
+        
+        // Inicializar detalles de pago
+        updatePaymentDetails();
+        
+        // Event listeners
+        document.querySelectorAll('input[name="metodo_pago"]').forEach(radio => {
+            radio.addEventListener('change', updatePaymentDetails);
+        });
+        
+        // Event listener para el formulario de checkout
+        const checkoutForm = document.getElementById('checkout-form');
+        if (checkoutForm) {
+            checkoutForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const carrito = getCarritoFromStorage();
+                
+                if (carrito.items.length === 0) {
+                    alert('No puedes finalizar una compra con el carrito vacío');
+                    return;
+                }
+                
+                // Enviar pedido a WhatsApp
+                enviarPedidoWhatsApp();
+            });
+        }
+    });
+    
+    function loadCart() {
+        const cartItemsList = document.getElementById('cart-items-list');
+        const emptyCartMessage = document.querySelector('.empty-cart-message');
+        const carrito = getCarritoFromStorage();
+        
+        if (carrito.items.length === 0) {
+            // Mostrar mensaje de carrito vacío
+            if (emptyCartMessage) {
+                emptyCartMessage.style.display = 'block';
+            }
+            return;
+        }
+        
+        // Ocultar mensaje de carrito vacío
+        if (emptyCartMessage) {
+            emptyCartMessage.style.display = 'none';
+        }
+        
+        // Limpiar lista actual
+        if (cartItemsList) {
+            // Mantener el mensaje de carrito vacío
+            const message = cartItemsList.querySelector('.empty-cart-message');
+            cartItemsList.innerHTML = '';
+            
+            if (message) {
+                cartItemsList.appendChild(message);
+            }
+            
+            // Crear elementos para cada item
+            carrito.items.forEach(item => {
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.innerHTML = `
+                    <div class="cart-item-img">
+                        <img src="${item.imagen}" alt="${item.nombre}">
+                    </div>
+                    <div class="cart-item-details">
+                        <h3>${item.nombre}</h3>
+                        <p class="item-price">$${item.precio.toLocaleString('es-CO')}</p>
+                        <div class="item-quantity">
+                            <button class="quantity-btn minus" data-id="${item.id}">-</button>
+                            <span>${item.cantidad}</span>
+                            <button class="quantity-btn plus" data-id="${item.id}">+</button>
+                        </div>
+                    </div>
+                    <div class="cart-item-subtotal">
+                        <p>$${(item.precio * item.cantidad).toLocaleString('es-CO')}</p>
+                        <button class="remove-item" data-id="${item.id}">×</button>
+                    </div>
+                `;
+                
+                cartItemsList.appendChild(cartItem);
+            });
+            
+            // Actualizar total
+            updateCartTotal(carrito.total);
+            
+            // Agregar event listeners para los botones
+            addCartItemEventListeners();
+        }
+    }
+    
+    function addCartItemEventListeners() {
+        // Botones de cantidad
+        document.querySelectorAll('.quantity-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const productId = this.dataset.id;
+                const isIncrement = this.classList.contains('plus');
+                
+                updateProductQuantity(productId, isIncrement);
+                loadCart(); // Recargar carrito
+            });
+        });
+        
+        // Botones de eliminar
+        document.querySelectorAll('.remove-item').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const productId = this.dataset.id;
+                
+                if (confirm('¿Estás seguro de querer eliminar este producto del carrito?')) {
+                    removeProductFromCart(productId);
+                    loadCart(); // Recargar carrito
+                }
+            });
+        });
+    }
+    
+    function updateCartTotal(total) {
+        const cartTotalElement = document.getElementById('cart-total-price');
+        if (cartTotalElement) {
+            cartTotalElement.textContent = `$${total.toLocaleString('es-CO')}`;
+        }
+    }
+    
+    function getCarritoFromStorage() {
+        const carritoJSON = localStorage.getItem('carrito');
+        
+        if (carritoJSON) {
+            try {
+                return JSON.parse(carritoJSON);
+            } catch (e) {
+                console.error('Error al parsear carrito:', e);
+            }
+        }
+        
+        // Carrito por defecto
+        return {
+            items: [],
+            total: 0
+        };
+    }
+    
+    function updateProductQuantity(id, isIncrement) {
+        const carrito = getCarritoFromStorage();
+        const index = carrito.items.findIndex(item => item.id === id);
+        
+        if (index === -1) return;
+        
+        if (isIncrement) {
+            carrito.items[index].cantidad += 1;
+        } else {
+            carrito.items[index].cantidad -= 1;
+            
+            // Si la cantidad llega a 0, eliminar el producto
+            if (carrito.items[index].cantidad <= 0) {
+                carrito.items.splice(index, 1);
+            }
+        }
+        
+        // Recalcular total
+        carrito.total = calculateCartTotal(carrito.items);
+        
+        // Guardar carrito actualizado
+        saveCarritoToStorage(carrito);
+    }
+    
+    function removeProductFromCart(id) {
+        const carrito = getCarritoFromStorage();
+        const index = carrito.items.findIndex(item => item.id === id);
+        
+        if (index === -1) return;
+        
+        carrito.items.splice(index, 1);
+        
+        // Recalcular total
+        carrito.total = calculateCartTotal(carrito.items);
+        
+        // Guardar carrito actualizado
+        saveCarritoToStorage(carrito);
+    }
+    
+    function calculateCartTotal(items) {
+        return items.reduce((total, item) => {
+            return total + (item.precio * item.cantidad);
+        }, 0);
+    }
+    
+    function saveCarritoToStorage(carrito) {
+        localStorage.setItem('carrito', JSON.stringify(carrito));
+    }
+    
+    function updatePaymentDetails() {
+        const container = document.getElementById('payment-details-container');
+        const paymentMethod = document.querySelector('input[name="metodo_pago"]:checked').value;
+        
+        if (!container) return;
+        
+        let content = '';
+        
+        switch (paymentMethod) {
+            case 'Bancolombia':
+                content = `
+                    <div class="payment-info">
+                        <p><strong>Cuenta de Ahorros Bancolombia</strong></p>
+                        <p>Número: 123-456789-00</p>
+                        <p>Titular: Soluciones Tecnológicas Pradito S.A.S</p>
+                        <p>NIT: 900.123.456-7</p>
+                        <p class="payment-note">Una vez realices la transferencia, envíanos el comprobante por WhatsApp para agilizar tu pedido.</p>
+                    </div>
+                `;
+                break;
+                
+            case 'Nequi':
+                content = `
+                    <div class="payment-info">
+                        <p><strong>Pago con Nequi</strong></p>
+                        <p>Número: 300 123 4567</p>
+                        <p>Nombre: Soluciones Tecnológicas Pradito</p>
+                        <p class="payment-note">Una vez realices el pago, envíanos la captura de pantalla por WhatsApp para agilizar tu pedido.</p>
+                    </div>
+                `;
+                break;
+                
+            case 'Contra Entrega':
+                content = `
+                    <div class="payment-info">
+                        <p><strong>Pago Contra Entrega</strong></p>
+                        <p>Pagarás cuando recibas tu pedido.</p>
+                        <p>Puedes pagar en efectivo o con tarjeta al momento de la entrega.</p>
+                        <p class="payment-note">Este método tiene un recargo adicional de $5.000 por gastos de envío.</p>
+                    </div>
+                `;
+                break;
+        }
+        
+        container.innerHTML = content;
+    }
+    
+    function enviarPedidoWhatsApp() {
+        // Obtener datos del formulario
+        const nombre = document.getElementById('nombre').value;
+        const telefono = document.getElementById('telefono').value;
+        const direccion = document.getElementById('direccion').value;
+        const metodoPago = document.querySelector('input[name="metodo_pago"]:checked').value;
+        
+        // Obtener carrito
+        const carrito = getCarritoFromStorage();
+        
+        if (carrito.items.length === 0) {
+            alert('El carrito está vacío');
+            return;
+        }
+        
+        // Crear mensaje de WhatsApp
+        let mensaje = `*Nuevo Pedido*%0A%0A`;
+        mensaje += `*Cliente:* ${nombre}%0A`;
+        mensaje += `*Teléfono:* ${telefono}%0A`;
+        mensaje += `*Dirección:* ${direccion}%0A`;
+        mensaje += `*Método de Pago:* ${metodoPago}%0A%0A`;
+        mensaje += `*Productos:*%0A`;
+        
+        carrito.items.forEach(item => {
+            mensaje += `- ${item.cantidad}x ${item.nombre} - $${(item.precio * item.cantidad).toLocaleString('es-CO')}%0A`;
+        });
+        
+        mensaje += `%0A*Total:* $${carrito.total.toLocaleString('es-CO')}`;
+        
+        // Número de WhatsApp de la empresa (cambiar por el real)
+        const whatsappNumber = '573001234567';
+        
+        // Crear URL de WhatsApp y redirigir
+        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${mensaje}`;
+        window.open(whatsappUrl, '_blank');
+        
+        // Limpiar carrito después de enviar
+        localStorage.removeItem('carrito');
+        
+        // Mostrar mensaje de confirmación
+        alert('¡Pedido enviado correctamente!');
+        
+        // Redirigir a la página de confirmación
+        window.location.href = '/pedidos/confirmacion';
+    }
+</script>

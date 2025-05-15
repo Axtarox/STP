@@ -1,0 +1,41 @@
+<section class="hero">
+    <div class="hero-content">
+        <h1>Tecnología para todos tus proyectos</h1>
+        <p>Encuentra las mejores soluciones tecnológicas para tu hogar o empresa</p>
+        <a href="/productos" class="btn">Ver Ofertas</a>
+    </div>
+</section>
+
+<section class="container">
+    <h2 class="section-title">Productos Destacados</h2>
+    <div class="products">
+        {{#each productos}}
+        <div class="product-card">
+            <div class="product-image">
+                <img src="{{imagen}}" alt="{{nombre}}">
+            </div>
+            <div class="product-info">
+                <h3 class="product-title">{{nombre}}</h3>
+                <p class="product-price">${{precio}}</p>
+                <button class="add-to-cart" data-id="{{id}}">Añadir al carrito</button>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+</section>
+
+<section class="container">
+    <h2 class="section-title">Servicios Populares</h2>
+    <div class="services">
+        {{#each servicios}}
+        <div class="service-card">
+            <div class="service-icon">
+                <i class="fas fa-laptop"></i>
+            </div>
+            <h3 class="service-title">{{nombre}}</h3>
+            <p class="service-description">{{descripcion}}</p>
+            <a href="/servicios/{{id}}" class="service-btn">Solicitar</a>
+        </div>
+        {{/each}}
+    </div>
+</section>
