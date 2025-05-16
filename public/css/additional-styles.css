@@ -1062,3 +1062,79 @@
         gap: 1rem;
     }
 }
+/* Estilos adicionales para los nuevos formularios */
+
+/* Estilos para select y campos de fecha */
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--color-accent);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 1rem;
+    background-color: var(--color-white);
+}
+
+.form-group select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.form-group input[type="date"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--color-accent);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.form-group input[type="date"]:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+/* Estilos para campos con error */
+.form-group input.error,
+.form-group select.error,
+.form-group textarea.error {
+    border-color: var(--color-danger);
+    background-color: rgba(231, 76, 60, 0.05);
+}
+
+.form-error {
+    color: var(--color-danger);
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+/* Estilos para campos requeridos */
+.form-group label.required:after {
+    content: " *";
+    color: var(--color-danger);
+}
+
+/* Estilos para secciones del formulario */
+.form-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-accent);
+}
+
+.form-section h3 {
+    margin-bottom: 1rem;
+    color: var(--color-dark);
+    font-size: 1.2rem;
+}
+
+/* Estilos para nota de campos obligatorios */
+.required-note {
+    font-size: 0.85rem;
+    color: var(--color-secondary);
+    margin-bottom: 1.5rem;
+    font-style: italic;
+}
+
+.required-note span {
+    color: var(--color-danger);
+}

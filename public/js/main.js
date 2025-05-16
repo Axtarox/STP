@@ -415,11 +415,48 @@ function enviarPedidoWhatsApp() {
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         
+        // Validar campos requeridos
+        const camposRequeridos = [
+            'nombres', 'apellidos', 'tipo_documento', 'num_documento',
+            'fecha_nacimiento', 'ciudad', 'direccion', 'telefono_movil', 'email'
+        ];
+        
+        let formularioValido = true;
+        camposRequeridos.forEach(campo => {
+            const input = form.querySelector(`[name="${campo}"]`);
+            if (!input || !input.value.trim()) {
+                if (input) {
+                    input.classList.add('error');
+                }
+                formularioValido = false;
+            } else {
+                if (input) {
+                    input.classList.remove('error');
+                }
+            }
+        });
+        
+        if (!formularioValido) {
+            showToast('Por favor, completa todos los campos obligatorios');
+            return;
+        }
+        
         // Obtener datos del formulario
-        const nombre = form.querySelector('[name="nombre"]').value;
-        const telefono = form.querySelector('[name="telefono"]').value;
+        const nombres = form.querySelector('[name="nombres"]').value;
+        const apellidos = form.querySelector('[name="apellidos"]').value;
+        const tipoDocumento = form.querySelector('[name="tipo_documento"]').value;
+        const numDocumento = form.querySelector('[name="num_documento"]').value;
+        const fechaNacimiento = form.querySelector('[name="fecha_nacimiento"]').value;
+        const ciudad = form.querySelector('[name="ciudad"]').value;
         const direccion = form.querySelector('[name="direccion"]').value;
+        const telefonoMovil = form.querySelector('[name="telefono_movil"]').value;
+        const email = form.querySelector('[name="email"]').value;
         const metodoPago = form.querySelector('[name="metodo_pago"]:checked').value;
+        
+        // Campos opcionales
+        const sexo = form.querySelector('[name="sexo"]')?.value || '';
+        const estadoCivil = form.querySelector('[name="estado_civil"]')?.value || '';
+        const telefonoFijo = form.querySelector('[name="telefono_fijo"]')?.value || '';
         
         // Obtener carrito
         const carrito = getCarritoFromStorage();
@@ -431,9 +468,27 @@ function enviarPedidoWhatsApp() {
         
         // Crear mensaje de WhatsApp
         let mensaje = `*Nuevo Pedido*%0A%0A`;
-        mensaje += `*Cliente:* ${nombre}%0A`;
-        mensaje += `*Teléfono:* ${telefono}%0A`;
+        mensaje += `*Nombres:* ${nombres}%0A`;
+        mensaje += `*Apellidos:* ${apellidos}%0A`;
+        mensaje += `*Documento:* ${tipoDocumento} ${numDocumento}%0A`;
+        mensaje += `*Fecha Nacimiento:* ${fechaNacimiento}%0A`;
+        mensaje += `*Ciudad:* ${ciudad}%0A`;
         mensaje += `*Dirección:* ${direccion}%0A`;
+        mensaje += `*Teléfono Móvil:* ${telefonoMovil}%0A`;
+        mensaje += `*Email:* ${email}%0A`;
+        
+        if (telefonoFijo) {
+            mensaje += `*Teléfono Fijo:* ${telefonoFijo}%0A`;
+        }
+        
+        if (sexo) {
+            mensaje += `*Sexo:* ${sexo}%0A`;
+        }
+        
+        if (estadoCivil) {
+            mensaje += `*Estado Civil:* ${estadoCivil}%0A`;
+        }
+        
         mensaje += `*Método de Pago:* ${metodoPago}%0A%0A`;
         mensaje += `*Productos:*%0A`;
         
@@ -443,11 +498,11 @@ function enviarPedidoWhatsApp() {
         
         mensaje += `%0A*Total:* $${carrito.total.toLocaleString('es-CO')}`;
         
-        // Número de WhatsApp de la empresa (cambiar por el real)
-        const whatsappNumber = '573001234567';
+        // Número de WhatsApp de la empresa
+        const whatsappNumber = '573126421560';
         
         // Crear URL de WhatsApp y redirigir
-        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${mensaje}`;
+        const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${mensaje}`;
         window.open(whatsappUrl, '_blank');
         
         // Limpiar carrito después de enviar

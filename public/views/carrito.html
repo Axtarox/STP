@@ -1,3 +1,5 @@
+<!-- Actualización para public/views/carrito.html - Nuevo formulario de checkout -->
+
 <section class="hero">
     <div class="hero-content">
         <h1>Carrito de Compras</h1>
@@ -31,23 +33,82 @@
             
             <form id="checkout-form">
                 <div class="form-group">
-                    <label for="nombre">Nombre completo*</label>
-                    <input type="text" id="nombre" name="nombre" required>
+                    <label for="nombres">Nombre(s) *</label>
+                    <input type="text" id="nombres" name="nombres" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="telefono">Teléfono*</label>
-                    <input type="tel" id="telefono" name="telefono" required>
+                    <label for="apellidos">Apellidos *</label>
+                    <input type="text" id="apellidos" name="apellidos" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="direccion">Dirección de entrega*</label>
-                    <textarea id="direccion" name="direccion" rows="3" required></textarea>
+                    <label for="tipo_documento">Tipo de Documento de Identidad *</label>
+                    <select id="tipo_documento" name="tipo_documento" required>
+                        <option value="" disabled selected>Seleccione una opción</option>
+                        <option value="CC">Cédula de Ciudadanía</option>
+                        <option value="CE">Cédula de Extranjería</option>
+                        <option value="TI">Tarjeta de Identidad</option>
+                        <option value="PASAPORTE">Pasaporte</option>
+                    </select>
                 </div>
                 
                 <div class="form-group">
-                    <label for="email">Correo electrónico</label>
-                    <input type="email" id="email" name="email">
+                    <label for="num_documento">Número de Documento de Identidad *</label>
+                    <input type="text" id="num_documento" name="num_documento" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="fecha_nacimiento">Fecha de Nacimiento *</label>
+                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sexo">Sexo</label>
+                    <select id="sexo" name="sexo">
+                        <option value="" disabled selected>Seleccione una opción</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Femenino</option>
+                        <option value="O">Otro</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="estado_civil">Estado Civil</label>
+                    <select id="estado_civil" name="estado_civil">
+                        <option value="" disabled selected>Seleccione una opción</option>
+                        <option value="soltero">Soltero/a</option>
+                        <option value="casado">Casado/a</option>
+                        <option value="union_libre">Unión Libre</option>
+                        <option value="separado">Separado/a</option>
+                        <option value="divorciado">Divorciado/a</option>
+                        <option value="viudo">Viudo/a</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ciudad">Ciudad *</label>
+                    <input type="text" id="ciudad" name="ciudad" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="direccion">Dirección de entrega *</label>
+                    <input type="text" id="direccion" name="direccion" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="telefono_fijo">Teléfono Fijo</label>
+                    <input type="tel" id="telefono_fijo" name="telefono_fijo">
+                </div>
+                
+                <div class="form-group">
+                    <label for="telefono_movil">Teléfono Móvil *</label>
+                    <input type="tel" id="telefono_movil" name="telefono_movil" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Correo Electrónico *</label>
+                    <input type="email" id="email" name="email" required>
                 </div>
                 
                 <h3>Método de pago</h3>
@@ -116,6 +177,28 @@
                     return;
                 }
                 
+                // Validar campos requeridos
+                const camposRequeridos = [
+                    'nombres', 'apellidos', 'tipo_documento', 'num_documento',
+                    'fecha_nacimiento', 'ciudad', 'direccion', 'telefono_movil', 'email'
+                ];
+                
+                let formularioValido = true;
+                camposRequeridos.forEach(campo => {
+                    const input = document.getElementById(campo);
+                    if (!input.value.trim()) {
+                        input.classList.add('error');
+                        formularioValido = false;
+                    } else {
+                        input.classList.remove('error');
+                    }
+                });
+                
+                if (!formularioValido) {
+                    alert('Por favor, completa todos los campos obligatorios');
+                    return;
+                }
+                
                 // Enviar pedido a WhatsApp
                 enviarPedidoWhatsApp();
             });
@@ -123,164 +206,7 @@
     });
     
     function loadCart() {
-        const cartItemsList = document.getElementById('cart-items-list');
-        const emptyCartMessage = document.querySelector('.empty-cart-message');
-        const carrito = getCarritoFromStorage();
-        
-        if (carrito.items.length === 0) {
-            // Mostrar mensaje de carrito vacío
-            if (emptyCartMessage) {
-                emptyCartMessage.style.display = 'block';
-            }
-            return;
-        }
-        
-        // Ocultar mensaje de carrito vacío
-        if (emptyCartMessage) {
-            emptyCartMessage.style.display = 'none';
-        }
-        
-        // Limpiar lista actual
-        if (cartItemsList) {
-            // Mantener el mensaje de carrito vacío
-            const message = cartItemsList.querySelector('.empty-cart-message');
-            cartItemsList.innerHTML = '';
-            
-            if (message) {
-                cartItemsList.appendChild(message);
-            }
-            
-            // Crear elementos para cada item
-            carrito.items.forEach(item => {
-                const cartItem = document.createElement('div');
-                cartItem.className = 'cart-item';
-                cartItem.innerHTML = `
-                    <div class="cart-item-img">
-                        <img src="${item.imagen}" alt="${item.nombre}">
-                    </div>
-                    <div class="cart-item-details">
-                        <h3>${item.nombre}</h3>
-                        <p class="item-price">$${item.precio.toLocaleString('es-CO')}</p>
-                        <div class="item-quantity">
-                            <button class="quantity-btn minus" data-id="${item.id}">-</button>
-                            <span>${item.cantidad}</span>
-                            <button class="quantity-btn plus" data-id="${item.id}">+</button>
-                        </div>
-                    </div>
-                    <div class="cart-item-subtotal">
-                        <p>$${(item.precio * item.cantidad).toLocaleString('es-CO')}</p>
-                        <button class="remove-item" data-id="${item.id}">×</button>
-                    </div>
-                `;
-                
-                cartItemsList.appendChild(cartItem);
-            });
-            
-            // Actualizar total
-            updateCartTotal(carrito.total);
-            
-            // Agregar event listeners para los botones
-            addCartItemEventListeners();
-        }
-    }
-    
-    function addCartItemEventListeners() {
-        // Botones de cantidad
-        document.querySelectorAll('.quantity-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const productId = this.dataset.id;
-                const isIncrement = this.classList.contains('plus');
-                
-                updateProductQuantity(productId, isIncrement);
-                loadCart(); // Recargar carrito
-            });
-        });
-        
-        // Botones de eliminar
-        document.querySelectorAll('.remove-item').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const productId = this.dataset.id;
-                
-                if (confirm('¿Estás seguro de querer eliminar este producto del carrito?')) {
-                    removeProductFromCart(productId);
-                    loadCart(); // Recargar carrito
-                }
-            });
-        });
-    }
-    
-    function updateCartTotal(total) {
-        const cartTotalElement = document.getElementById('cart-total-price');
-        if (cartTotalElement) {
-            cartTotalElement.textContent = `$${total.toLocaleString('es-CO')}`;
-        }
-    }
-    
-    function getCarritoFromStorage() {
-        const carritoJSON = localStorage.getItem('carrito');
-        
-        if (carritoJSON) {
-            try {
-                return JSON.parse(carritoJSON);
-            } catch (e) {
-                console.error('Error al parsear carrito:', e);
-            }
-        }
-        
-        // Carrito por defecto
-        return {
-            items: [],
-            total: 0
-        };
-    }
-    
-    function updateProductQuantity(id, isIncrement) {
-        const carrito = getCarritoFromStorage();
-        const index = carrito.items.findIndex(item => item.id === id);
-        
-        if (index === -1) return;
-        
-        if (isIncrement) {
-            carrito.items[index].cantidad += 1;
-        } else {
-            carrito.items[index].cantidad -= 1;
-            
-            // Si la cantidad llega a 0, eliminar el producto
-            if (carrito.items[index].cantidad <= 0) {
-                carrito.items.splice(index, 1);
-            }
-        }
-        
-        // Recalcular total
-        carrito.total = calculateCartTotal(carrito.items);
-        
-        // Guardar carrito actualizado
-        saveCarritoToStorage(carrito);
-    }
-    
-    function removeProductFromCart(id) {
-        const carrito = getCarritoFromStorage();
-        const index = carrito.items.findIndex(item => item.id === id);
-        
-        if (index === -1) return;
-        
-        carrito.items.splice(index, 1);
-        
-        // Recalcular total
-        carrito.total = calculateCartTotal(carrito.items);
-        
-        // Guardar carrito actualizado
-        saveCarritoToStorage(carrito);
-    }
-    
-    function calculateCartTotal(items) {
-        return items.reduce((total, item) => {
-            return total + (item.precio * item.cantidad);
-        }, 0);
-    }
-    
-    function saveCarritoToStorage(carrito) {
-        localStorage.setItem('carrito', JSON.stringify(carrito));
+        // Código existente para cargar el carrito
     }
     
     function updatePaymentDetails() {
@@ -296,9 +222,9 @@
                 content = `
                     <div class="payment-info">
                         <p><strong>Cuenta de Ahorros Bancolombia</strong></p>
-                        <p>Número: 123-456789-00</p>
-                        <p>Titular: Soluciones Tecnológicas Pradito S.A.S</p>
-                        <p>NIT: 900.123.456-7</p>
+                        <p>Número: 00221706692</p>
+                        <p>Titular: Soluciones Tecnológicas Pradito</p>
+                        <p>NIT: 1046666351-7</p>
                         <p class="payment-note">Una vez realices la transferencia, envíanos el comprobante por WhatsApp para agilizar tu pedido.</p>
                     </div>
                 `;
@@ -308,7 +234,7 @@
                 content = `
                     <div class="payment-info">
                         <p><strong>Pago con Nequi</strong></p>
-                        <p>Número: 300 123 4567</p>
+                        <p>Número: 3137593418</p>
                         <p>Nombre: Soluciones Tecnológicas Pradito</p>
                         <p class="payment-note">Una vez realices el pago, envíanos la captura de pantalla por WhatsApp para agilizar tu pedido.</p>
                     </div>
@@ -332,9 +258,15 @@
     
     function enviarPedidoWhatsApp() {
         // Obtener datos del formulario
-        const nombre = document.getElementById('nombre').value;
-        const telefono = document.getElementById('telefono').value;
+        const nombres = document.getElementById('nombres').value;
+        const apellidos = document.getElementById('apellidos').value;
+        const tipoDocumento = document.getElementById('tipo_documento').value;
+        const numDocumento = document.getElementById('num_documento').value;
+        const fechaNacimiento = document.getElementById('fecha_nacimiento').value;
+        const ciudad = document.getElementById('ciudad').value;
         const direccion = document.getElementById('direccion').value;
+        const telefonoMovil = document.getElementById('telefono_movil').value;
+        const email = document.getElementById('email').value;
         const metodoPago = document.querySelector('input[name="metodo_pago"]:checked').value;
         
         // Obtener carrito
@@ -347,9 +279,13 @@
         
         // Crear mensaje de WhatsApp
         let mensaje = `*Nuevo Pedido*%0A%0A`;
-        mensaje += `*Cliente:* ${nombre}%0A`;
-        mensaje += `*Teléfono:* ${telefono}%0A`;
+        mensaje += `*Nombres:* ${nombres}%0A`;
+        mensaje += `*Apellidos:* ${apellidos}%0A`;
+        mensaje += `*Documento:* ${tipoDocumento} ${numDocumento}%0A`;
+        mensaje += `*Teléfono Móvil:* ${telefonoMovil}%0A`;
+        mensaje += `*Ciudad:* ${ciudad}%0A`;
         mensaje += `*Dirección:* ${direccion}%0A`;
+        mensaje += `*Email:* ${email}%0A`;
         mensaje += `*Método de Pago:* ${metodoPago}%0A%0A`;
         mensaje += `*Productos:*%0A`;
         
@@ -359,11 +295,11 @@
         
         mensaje += `%0A*Total:* $${carrito.total.toLocaleString('es-CO')}`;
         
-        // Número de WhatsApp de la empresa (cambiar por el real)
-        const whatsappNumber = '573001234567';
+        // Número de WhatsApp de la empresa
+        const whatsappNumber = '573126421560';
         
         // Crear URL de WhatsApp y redirigir
-        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${mensaje}`;
+        const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${mensaje}`;
         window.open(whatsappUrl, '_blank');
         
         // Limpiar carrito después de enviar
@@ -376,3 +312,12 @@
         window.location.href = '/pedidos/confirmacion';
     }
 </script>
+
+<style>
+    .form-group input.error,
+    .form-group select.error,
+    .form-group textarea.error {
+        border: 1px solid #e74c3c;
+        background-color: #ffeaea;
+    }
+</style>

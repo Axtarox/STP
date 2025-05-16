@@ -1,5 +1,5 @@
 /**
- * Controlador para el manejo de pedidos
+ * Controlador para el manejo de pedidos completo
  */
 
 /**
@@ -28,15 +28,25 @@ exports.createPedido = async (req, res) => {
   try {
     // Obtener datos del formulario
     const { 
-      nombre, 
-      telefono, 
-      direccion, 
-      email = '', 
+      nombres, 
+      apellidos,
+      tipo_documento,
+      num_documento,
+      fecha_nacimiento,
+      sexo = '',
+      estado_civil = '',
+      ciudad,
+      direccion,
+      telefono_fijo = '',
+      telefono_movil,
+      email, 
       metodoPago 
     } = req.body;
     
     // Validaciones básicas
-    if (!nombre || !telefono || !direccion || !metodoPago) {
+    if (!nombres || !apellidos || !tipo_documento || !num_documento || 
+        !fecha_nacimiento || !ciudad || !direccion || !telefono_movil || 
+        !email || !metodoPago) {
       return res.status(400).json({
         success: false,
         message: 'Todos los campos marcados con * son obligatorios'
@@ -55,10 +65,17 @@ exports.createPedido = async (req, res) => {
     // Ejemplo pseudocódigo:
     /*
     const formularioId = await Formulario.create({
-      nombres: nombre.split(' ')[0],
-      apellidos: nombre.split(' ').slice(1).join(' '),
-      telefono_movil: telefono,
+      nombres,
+      apellidos,
+      tipo_documento,
+      num_documento,
+      fecha_nacimiento,
+      sexo,
+      estado_civil,
+      ciudad,
       direccion,
+      telefono_fijo,
+      telefono_movil,
       correo_electronico: email,
       opcion_pago: metodoPago
     });
@@ -100,16 +117,26 @@ exports.generateWhatsAppMessage = (req, res) => {
   try {
     // Obtener datos del formulario
     const { 
-      nombre, 
-      telefono, 
-      direccion, 
-      email = '', 
+      nombres, 
+      apellidos,
+      tipo_documento,
+      num_documento,
+      fecha_nacimiento,
+      sexo = '',
+      estado_civil = '',
+      ciudad,
+      direccion,
+      telefono_fijo = '',
+      telefono_movil,
+      email, 
       metodoPago,
       carrito
     } = req.body;
     
     // Validaciones básicas
-    if (!nombre || !telefono || !direccion || !metodoPago || !carrito) {
+    if (!nombres || !apellidos || !tipo_documento || !num_documento || 
+        !fecha_nacimiento || !ciudad || !direccion || !telefono_movil || 
+        !email || !metodoPago || !carrito) {
       return res.status(400).json({
         success: false,
         message: 'Faltan datos requeridos'
@@ -118,12 +145,25 @@ exports.generateWhatsAppMessage = (req, res) => {
     
     // Crear mensaje de WhatsApp
     let mensaje = `*Nuevo Pedido*%0A%0A`;
-    mensaje += `*Cliente:* ${nombre}%0A`;
-    mensaje += `*Teléfono:* ${telefono}%0A`;
+    mensaje += `*Nombres:* ${nombres}%0A`;
+    mensaje += `*Apellidos:* ${apellidos}%0A`;
+    mensaje += `*Documento:* ${tipo_documento} ${num_documento}%0A`;
+    mensaje += `*Fecha Nacimiento:* ${fecha_nacimiento}%0A`;
+    mensaje += `*Ciudad:* ${ciudad}%0A`;
     mensaje += `*Dirección:* ${direccion}%0A`;
+    mensaje += `*Teléfono Móvil:* ${telefono_movil}%0A`;
+    mensaje += `*Email:* ${email}%0A`;
     
-    if (email) {
-      mensaje += `*Email:* ${email}%0A`;
+    if (telefono_fijo) {
+      mensaje += `*Teléfono Fijo:* ${telefono_fijo}%0A`;
+    }
+    
+    if (sexo) {
+      mensaje += `*Sexo:* ${sexo}%0A`;
+    }
+    
+    if (estado_civil) {
+      mensaje += `*Estado Civil:* ${estado_civil}%0A`;
     }
     
     mensaje += `*Método de Pago:* ${metodoPago}%0A%0A`;
@@ -140,11 +180,11 @@ exports.generateWhatsAppMessage = (req, res) => {
     
     mensaje += `%0A*Total:* $${total.toLocaleString('es-CO')}`;
     
-    // Número de WhatsApp de la empresa (cambiar por el real)
-    const whatsappNumber = '573001234567';
+    // Número de WhatsApp de la empresa
+    const whatsappNumber = '573126421560';
     
     // Crear URL de WhatsApp
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${mensaje}`;
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${mensaje}`;
     
     res.json({
       success: true,
