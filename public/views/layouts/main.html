@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="/css/responsive.css" />
     <link rel="stylesheet" href="/css/additional-styles.css" />
+     <link rel="stylesheet" href="/css/backgrounds.css" />
+    <link rel="stylesheet" href="/css/custom.css" />
 </head>
 <body>
 
@@ -15,12 +17,8 @@
     <header>
         <div class="header-container">
             <div class="header-top">
-                <a href="/" class="logo">Soluciones <span>Tecnológicas</span> Pradito</a>
-                <div class="cart-icon">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span class="cart-count">0</span>
-                </div>
-            </div>
+            <a href="/" class="logo">Soluciones <span>Tecnológicas</span> Pradito</a>
+        </div>
             <nav class="main-nav">
                 <ul>
                     <li><a href="/">Inicio</a></li>
@@ -73,22 +71,13 @@
                 <li><i class="fas fa-clock"></i> Sábado: 10:00 AM - 3:00 PM</li>
                 <li><i class="fas fa-clock"></i> Domingo: Cerrado</li>
             </ul>
-            <div class="social-links">
-                <a href="https://www.facebook.com/people/solucionestecnologicaspradito/100063951556990/" target="_blank"><i class="fab fa-facebook"></i></a>
-                <a href="https://www.instagram.com/solucionestecnologicaspradito/" target="_blank"><i class="fab fa-instagram"></i></a>
-                <a href="https://api.whatsapp.com/send?phone=573126421560" target="_blank"><i class="fab fa-whatsapp"></i></a>
-            </div>
         </div>
 
-        <div class="footer-column">
-            <h3>Síguenos</h3>
-            <p>Mantente al día con nuestras novedades y promociones.</p>
             <div class="social-links">
                 <a href="https://www.facebook.com/people/solucionestecnologicaspradito/100063951556990/" target="_blank"><i class="fab fa-facebook"></i></a>
                 <a href="https://www.instagram.com/solucionestecnologicaspradito/" target="_blank"><i class="fab fa-instagram"></i></a>
                 <a href="https://api.whatsapp.com/send?phone=573126421560" target="_blank"><i class="fab fa-whatsapp"></i></a>
             </div>
-        </div>
     </div>
 
     <div class="footer-bottom">
@@ -124,5 +113,12 @@
     {{#if isProductoDetalle}}
     <script src="/js/detalle-producto.js"></script>
     {{/if}}
+    <!-- Botón flotante del carrito -->
+<div class="cart-icon" id="floating-cart">
+    <i class="fas fa-shopping-cart"></i>
+    <span class="cart-count">0</span>
+</div>
+
+
 </body>
 </html>

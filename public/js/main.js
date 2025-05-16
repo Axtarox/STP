@@ -67,7 +67,7 @@ function initCarrito() {
     });
     
     // Botón para mostrar el carrito
-    const cartIcon = document.querySelector('.cart-icon');
+    const cartIcon = document.getElementById('floating-cart');
     const cartSidebar = document.querySelector('.cart-sidebar');
     const cartOverlay = document.querySelector('.cart-overlay') || createCartOverlay();
     
@@ -184,6 +184,15 @@ function addProductToCart(producto) {
     
     // Actualizar vista del carrito si está abierta
     updateCartView();
+    // Añadir el efecto de rebote
+    const floatingCart = document.getElementById('floating-cart');
+    floatingCart.classList.add('cart-bounce');
+    
+    // Remover la clase después de la animación
+    setTimeout(() => {
+        floatingCart.classList.remove('cart-bounce');
+    }, 750);
+
 }
 
 /**

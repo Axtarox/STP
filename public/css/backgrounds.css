@@ -1,0 +1,31 @@
+/* Estilos para el fondo de imagen con mayor visibilidad */
+.hero {
+    position: relative;
+    color: var(--color-white);
+    padding: 3rem 0;
+    text-align: center;
+    margin-bottom: 2rem;
+    background-image: linear-gradient(rgba(52, 73, 94, 0.4), rgba(52, 73, 94, 0.4)), url('/img/backgrounds/hero-bg.jpg') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+}
+
+.hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: rgba(52, 73, 94, 0.6);
+    border-radius: 8px;
+    /* Añadir sombra para mejor legibilidad */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.hero h1 {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    margin-bottom: 1rem;
+}
+
+.hero p {
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}

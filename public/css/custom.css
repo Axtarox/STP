@@ -1,0 +1,52 @@
+/* Botón flotante para el carrito */
+.cart-icon {
+    position: fixed;
+    right: 20px;
+    bottom: 30px;
+    width: 60px;
+    height: 60px;
+    background-color: var(--color-primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.cart-icon:hover {
+    transform: scale(1.1);
+    background-color: #23ad5c; /* Un poco más oscuro que el color primario */
+}
+
+.cart-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #e74c3c; /* Rojo para llamar la atención */
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    min-width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Efecto de rebote cuando se añade un producto */
+@keyframes cartBounce {
+    0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+    40% {transform: translateY(-10px);}
+    60% {transform: translateY(-5px);}
+}
+
+.cart-bounce {
+    animation: cartBounce 0.75s;
+}

@@ -37,8 +37,9 @@ const serviciosEjemplo = [
 ];
 
 /**
- * Controladores para páginas públicas
+ * Controlador para la gestión de servicios
  */
+const Servicio = require('../models/Servicio');
 
 /**
  * Obtiene todos los servicios
@@ -47,8 +48,8 @@ const serviciosEjemplo = [
  */
 exports.getAllServicios = async (req, res) => {
   try {
-    // En producción, aquí se obtendrían los servicios de la base de datos
-    const servicios = serviciosEjemplo;
+    // Obtener servicios desde la base de datos
+    const servicios = await Servicio.getAll();
     
     res.render('servicios', {
       servicios,
@@ -78,8 +79,8 @@ exports.getServicioById = async (req, res) => {
       });
     }
     
-    // En producción, aquí se obtendría el servicio de la base de datos
-    const servicio = serviciosEjemplo.find(s => s.id === id);
+    // Obtener el servicio desde la base de datos
+    const servicio = await Servicio.getById(id);
     
     if (!servicio) {
       return res.status(404).render('error', {
@@ -87,8 +88,13 @@ exports.getServicioById = async (req, res) => {
       });
     }
     
+    // Obtener servicios relacionados (excluyendo el actual)
+    const serviciosRelacionados = await Servicio.getAll(4);
+    const relacionados = serviciosRelacionados.filter(s => s.id !== id).slice(0, 3);
+    
     res.render('servicio-detalle', {
       servicio,
+      relacionados,
       titulo: `Servicio: ${servicio.nombre}`
     });
   } catch (error) {
@@ -107,8 +113,8 @@ exports.getServicioById = async (req, res) => {
  */
 exports.getServiciosDestacados = async (req, res) => {
   try {
-    // En producción, aquí se obtendrían los servicios destacados de la base de datos
-    const servicios = serviciosEjemplo.slice(0, 3);
+    // Obtener servicios destacados desde la base de datos
+    const servicios = await Servicio.getFeatured(3);
     
     res.render('servicios-destacados', {
       servicios,
