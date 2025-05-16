@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initCarrito();
     initSearchForm();
     initMobileMenu();
+    initQuantitySelectors();
 });
 
 /**
@@ -44,13 +45,17 @@ function initCarrito() {
             const productImgElement = productCard.querySelector('img');
             const productImg = productImgElement ? productImgElement.src : '';
             
+            // Obtener la cantidad seleccionada
+            const quantityInput = productCard.querySelector('.quantity-input');
+            const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
+            
             // Crear objeto de producto
             const producto = {
                 id: productId,
                 nombre: productName,
                 precio: productPrice,
                 imagen: productImg,
-                cantidad: 1
+                cantidad: quantity
             };
             
             // Añadir el producto al carrito
@@ -104,6 +109,41 @@ function initCarrito() {
 }
 
 /**
+ * Inicializa los selectores de cantidad en los productos
+ */
+function initQuantitySelectors() {
+    // Manejar botones de cantidad
+    document.querySelectorAll('.quantity-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const isPlus = this.classList.contains('plus');
+            const input = this.parentElement.querySelector('.quantity-input');
+            let value = parseInt(input.value) || 1;
+            const max = parseInt(input.getAttribute('max')) || 99;
+            
+            if (isPlus && value < max) {
+                input.value = value + 1;
+            } else if (!isPlus && value > 1) {
+                input.value = value - 1;
+            }
+        });
+    });
+
+    // Validar entrada directa en campos de cantidad
+    document.querySelectorAll('.quantity-input').forEach(input => {
+        input.addEventListener('change', function() {
+            let value = parseInt(this.value);
+            const max = parseInt(this.getAttribute('max')) || 99;
+            
+            if (isNaN(value) || value < 1) {
+                this.value = 1;
+            } else if (value > max) {
+                this.value = max;
+            }
+        });
+    });
+}
+
+/**
  * Crea el overlay para el carrito si no existe
  * @returns {HTMLDivElement} El elemento overlay creado
  */
@@ -127,7 +167,7 @@ function addProductToCart(producto) {
     
     if (existingProductIndex !== -1) {
         // Incrementar cantidad
-        carrito.items[existingProductIndex].cantidad += 1;
+        carrito.items[existingProductIndex].cantidad += producto.cantidad;
     } else {
         // Añadir nuevo producto
         carrito.items.push(producto);

@@ -1,4 +1,3 @@
-
 /**
  * Controlador principal optimizado (homeController.js)
  */
@@ -23,10 +22,10 @@ exports.getIndex = async (req, res) => {
       productos = [];
     }
     
-    // Obtener 3 servicios destacados sin logs excesivos
+    // Obtener 5 servicios destacados sin logs excesivos
     let servicios = [];
     try {
-      servicios = await Servicio.getFeatured(3);
+      servicios = await Servicio.getFeatured(5);
       
       // Si no hay servicios, usar un array vacío
       if (!servicios || servicios.length === 0) {

@@ -23,6 +23,10 @@
                 <span>Categoría: <a href="/categorias/{{producto.categoria_id}}">{{producto.categoria_nombre}}</a></span>
             </div>
             
+            <div class="product-condition">
+                <span class="condition-badge">{{producto.condicion}}</span>
+            </div>
+            
             <div class="product-price">
                 <span class="price">${{producto.precio}}</span>
             </div>
@@ -54,6 +58,12 @@
             </div>
             
             <div class="product-actions">
+                <div class="quantity-selector">
+                    <button class="quantity-btn minus" id="quantity-minus">-</button>
+                    <input type="number" id="product-quantity" class="quantity-input" value="1" min="1" max="{{producto.cantidad_disponible}}">
+                    <button class="quantity-btn plus" id="quantity-plus">+</button>
+                </div>
+                
                 <button class="btn add-to-cart" id="btnAddToCart" 
                         data-id="{{producto.id}}" 
                         data-nombre="{{producto.nombre}}" 
@@ -61,7 +71,7 @@
                         data-imagen="{{producto.imagen}}">
                     Añadir al carrito
                 </button>
-                <a href="https://wa.me/573001234567?text=Hola, estoy interesado en el producto: {{producto.nombre}}" 
+                <a href="https://wa.me/573126421560?text=Hola, estoy interesado en el producto: {{producto.nombre}}" 
                    target="_blank" class="btn btn-secondary">
                     <i class="fab fa-whatsapp"></i> Consultar por WhatsApp
                 </a>
@@ -83,6 +93,40 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Manejar los botones de cantidad
+    const quantityMinus = document.getElementById('quantity-minus');
+    const quantityPlus = document.getElementById('quantity-plus');
+    const quantityInput = document.getElementById('product-quantity');
+
+    if (quantityMinus && quantityPlus && quantityInput) {
+        quantityMinus.addEventListener('click', function() {
+            let value = parseInt(quantityInput.value);
+            if (value > 1) {
+                quantityInput.value = value - 1;
+            }
+        });
+        
+        quantityPlus.addEventListener('click', function() {
+            let value = parseInt(quantityInput.value);
+            const max = parseInt(quantityInput.getAttribute('max'));
+            if (value < max) {
+                quantityInput.value = value + 1;
+            }
+        });
+        
+        // Validar entrada directa
+        quantityInput.addEventListener('change', function() {
+            let value = parseInt(this.value);
+            const max = parseInt(this.getAttribute('max'));
+            
+            if (isNaN(value) || value < 1) {
+                this.value = 1;
+            } else if (value > max) {
+                this.value = max;
+            }
+        });
+    }
+    
     // Manejar click en botón de añadir al carrito
     const btnAddToCart = document.getElementById('btnAddToCart');
     if (btnAddToCart) {
@@ -92,11 +136,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const productPrice = this.getAttribute('data-precio');
             const productImage = this.getAttribute('data-imagen');
             
+            // Obtener la cantidad seleccionada
+            const quantity = parseInt(document.getElementById('product-quantity').value) || 1;
+            
             console.log('Añadiendo al carrito:', {
                 id: productId,
                 nombre: productName,
                 precio: productPrice,
-                imagen: productImage
+                imagen: productImage,
+                cantidad: quantity
             });
             
             // Obtener el carrito actual o crear uno nuevo
@@ -107,7 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (existingProductIndex !== -1) {
                 // Si ya existe, incrementar cantidad
-                cart[existingProductIndex].cantidad += 1;
+                cart[existingProductIndex].cantidad += quantity;
             } else {
                 // Si no existe, añadir como nuevo
                 cart.push({
@@ -115,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     nombre: productName,
                     precio: productPrice,
                     imagen: productImage,
-                    cantidad: 1
+                    cantidad: quantity
                 });
             }
             

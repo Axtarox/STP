@@ -1,9 +1,11 @@
-
 /**
  * Funcionalidad específica para la página de detalle de producto
  * con mensajes mejorados
  */
 document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar selector de cantidad
+    initQuantitySelector();
+    
     // Botón de añadir al carrito
     const addToCartBtn = document.getElementById('btnAddToCart');
     
@@ -14,13 +16,17 @@ document.addEventListener('DOMContentLoaded', function() {
             const productPrice = this.getAttribute('data-precio');
             const productImg = this.getAttribute('data-imagen');
             
+            // Obtener la cantidad seleccionada
+            const quantityInput = document.getElementById('product-quantity');
+            const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
+            
             // Crear el objeto de producto
             const producto = {
                 id: productId,
                 nombre: productName,
                 precio: parseFloat(productPrice.replace(/\./g, '').replace(/,/g, '.')) || 0,
                 imagen: productImg,
-                cantidad: 1
+                cantidad: quantity
             };
             
             // Añadir al carrito
@@ -34,6 +40,44 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+/**
+ * Inicializa el selector de cantidad
+ */
+function initQuantitySelector() {
+    const quantityMinus = document.getElementById('quantity-minus');
+    const quantityPlus = document.getElementById('quantity-plus');
+    const quantityInput = document.getElementById('product-quantity');
+    
+    if (!quantityMinus || !quantityPlus || !quantityInput) return;
+    
+    quantityMinus.addEventListener('click', function() {
+        let value = parseInt(quantityInput.value);
+        if (value > 1) {
+            quantityInput.value = value - 1;
+        }
+    });
+    
+    quantityPlus.addEventListener('click', function() {
+        let value = parseInt(quantityInput.value);
+        const max = parseInt(quantityInput.getAttribute('max'));
+        if (value < max) {
+            quantityInput.value = value + 1;
+        }
+    });
+    
+    // Validar entrada directa
+    quantityInput.addEventListener('change', function() {
+        let value = parseInt(this.value);
+        const max = parseInt(this.getAttribute('max'));
+        
+        if (isNaN(value) || value < 1) {
+            this.value = 1;
+        } else if (value > max) {
+            this.value = max;
+        }
+    });
+}
 
 /**
  * Muestra una notificación tipo toast
@@ -107,7 +151,7 @@ function addProductToCart(producto) {
     
     if (index !== -1) {
         // Incrementar cantidad
-        carrito.items[index].cantidad += 1;
+        carrito.items[index].cantidad += producto.cantidad;
     } else {
         // Añadir nuevo producto
         carrito.items.push(producto);
@@ -135,8 +179,11 @@ function updateCartCount() {
     try {
         const carrito = JSON.parse(localStorage.getItem('carrito')) || { items: [] };
         
+        // Calcular número total de ítems (sumando las cantidades)
+        const totalItems = carrito.items.reduce((sum, item) => sum + item.cantidad, 0);
+        
         // Actualizar número
-        cartCount.textContent = carrito.items.length;
+        cartCount.textContent = totalItems;
         
         // Mostrar contador si hay elementos
         if (carrito.items.length > 0) {
