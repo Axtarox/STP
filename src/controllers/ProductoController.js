@@ -1,18 +1,10 @@
-/**
- * Controlador mejorado de Productos (ProductoController.js)
- */
+
 const path = require('path');
 const { formatPrice } = require('../helpers/formatHelper');
 const Producto = require('../models/Producto');
 const Categoria = require('../models/Categoria');
 
-/**
- * Controladores para páginas públicas
- */
 
-/**
- * Obtiene todos los productos
- */
 exports.getAllProductos = async (req, res) => {
     try {
         // Obtener los productos de la base de datos
@@ -45,15 +37,7 @@ exports.getAllProductos = async (req, res) => {
     }
 };
 
-/**
- * Obtiene un producto por su ID
- */
-/**
- * Obtiene un producto por su ID
- */
-/**
- * Obtiene un producto por su ID
- */
+
 exports.getProductoById = async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
@@ -125,9 +109,6 @@ exports.getProductoById = async (req, res) => {
     }
 };
 
-/**
- * Obtiene productos por categoría
- */
 exports.getProductosByCategoria = async (req, res) => {
     try {
         const categoriaId = parseInt(req.params.id, 10);
@@ -186,9 +167,7 @@ exports.getProductosByCategoria = async (req, res) => {
     }
 };
 
-/**
- * Busca productos
- */
+
 exports.searchProductos = async (req, res) => {
     try {
         const query = req.query.q || '';
@@ -228,9 +207,7 @@ exports.searchProductos = async (req, res) => {
     }
 };
 
-/**
- * Muestra productos destacados
- */
+
 exports.getProductosDestacados = async (req, res) => {
     try {
         // Obtener los productos destacados

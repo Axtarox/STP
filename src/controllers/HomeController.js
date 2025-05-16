@@ -1,5 +1,6 @@
+
 /**
- * Controlador principal (homeController.js)
+ * Controlador principal optimizado (homeController.js)
  */
 const Producto = require('../models/Producto');
 const Servicio = require('../models/Servicio');
@@ -9,43 +10,37 @@ const Servicio = require('../models/Servicio');
  */
 exports.getIndex = async (req, res) => {
   try {
-    // Obtener 5 productos aleatorios de la base de datos
+    // Obtener 5 productos destacados sin logs excesivos
     let productos = [];
     try {
-      console.log('Intentando obtener productos aleatorios...');
-      productos = await Producto.getRandom(5);
-      console.log(`Productos obtenidos: ${productos.length}`);
+      productos = await Producto.getFeatured(5);
       
-      if (productos.length === 0) {
-        console.log('No se encontraron productos aleatorios, obteniendo los más recientes...');
-        productos = await Producto.getFeatured(5);
-        console.log(`Productos destacados obtenidos: ${productos.length}`);
+      // Si no hay productos, usar un array vacío
+      if (!productos || productos.length === 0) {
+        productos = [];
       }
     } catch (error) {
-      console.error('Error al obtener productos:', error);
       productos = [];
     }
     
-    // Obtener 5 servicios de la base de datos
+    // Obtener 3 servicios destacados sin logs excesivos
     let servicios = [];
     try {
-      console.log('Intentando obtener servicios destacados...');
-      servicios = await Servicio.getFeatured(5);
-      console.log(`Servicios obtenidos: ${servicios.length}`);
+      servicios = await Servicio.getFeatured(3);
+      
+      // Si no hay servicios, usar un array vacío
+      if (!servicios || servicios.length === 0) {
+        servicios = [];
+      }
     } catch (error) {
-      console.error('Error al obtener servicios:', error);
       servicios = [];
     }
 
-    // Formatear precios de productos para mostrar con comas
+    // Formatear precios de productos
     productos = productos.map(producto => ({
       ...producto,
       precio: producto.precio ? producto.precio.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0
     }));
-    
-    console.log('Datos para renderizar:');
-    console.log(`- Productos: ${productos.length}`);
-    console.log(`- Servicios: ${servicios.length}`);
     
     // Renderizar la vista con los datos obtenidos
     res.render('index', {
@@ -54,7 +49,7 @@ exports.getIndex = async (req, res) => {
       servicios
     });
   } catch (error) {
-    console.error('Error al cargar la página principal:', error);
+    // Manejar error general
     res.status(500).render('error', {
       titulo: 'Error',
       mensaje: 'Error al cargar la página principal',

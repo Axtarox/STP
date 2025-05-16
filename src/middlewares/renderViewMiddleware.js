@@ -1,5 +1,8 @@
+
 /**
- * Middleware mejorado para renderizar vistas HTML
+ * Middleware optimizado para renderizar vistas HTML
+ * - Elimina logs innecesarios
+ * - Mejora el rendimiento
  */
 const fs = require('fs');
 const path = require('path');
@@ -11,9 +14,6 @@ module.exports = function renderViewMiddleware(req, res, next) {
     // Reemplazar el método render
     res.render = function(view, data = {}) {
         try {
-            console.log(`Renderizando vista: ${view}`);
-            console.log('Datos para renderizar:', JSON.stringify(data, null, 2));
-            
             // Rutas de archivos
             const layoutPath = path.join(__dirname, '../../public/views/layouts/main.html');
             let viewPath;
@@ -23,9 +23,6 @@ module.exports = function renderViewMiddleware(req, res, next) {
             } else {
                 viewPath = path.join(__dirname, '../../public/views', `${view}.html`);
             }
-            
-            console.log(`Layout: ${layoutPath}`);
-            console.log(`Vista: ${viewPath}`);
             
             // Verificar si existen los archivos
             if (!fs.existsSync(layoutPath)) {
@@ -57,9 +54,6 @@ module.exports = function renderViewMiddleware(req, res, next) {
             
             // Combinar datos
             const allData = { ...helpers, ...data, ...res.locals };
-            
-            // Depuración de datos
-            console.log('Datos completos para renderizar:', Object.keys(allData));
             
             // Reemplazar variables simples primero para evitar conflictos
             Object.keys(allData).forEach(key => {
@@ -122,18 +116,12 @@ module.exports = function renderViewMiddleware(req, res, next) {
  * Procesa bloques {{#each}}
  */
 function processEachBlocks(html, data) {
-    console.log('Procesando bloques {{#each}}');
-    
     const eachRegex = /{{#each\s+([a-zA-Z0-9_\.]+)}}\s*([\s\S]*?)\s*{{\/each}}/g;
     
     return html.replace(eachRegex, (match, key, template) => {
-        console.log(`Procesando {{#each ${key}}}`);
-        
         const array = getNestedValue(data, key);
-        console.log(`Valor de ${key}:`, array);
         
         if (!array || !Array.isArray(array)) {
-            console.log(`${key} no es un array o no existe`);
             return '';
         }
         
@@ -166,8 +154,6 @@ function processEachBlocks(html, data) {
  * Procesa bloques {{#if}}
  */
 function processIfBlocks(html, data) {
-    console.log('Procesando bloques {{#if}}');
-    
     // Expresión regular mejorada para capturar correctamente bloques if/else
     const ifRegex = /{{#if\s+([a-zA-Z0-9_\.]+)}}\s*([\s\S]*?)\s*(?:{{else}}\s*([\s\S]*?)\s*)?{{\/if}}/g;
     
@@ -181,18 +167,11 @@ function processIfBlocks(html, data) {
         iterations++;
         
         result = result.replace(ifRegex, (match, key, trueBlock, falseBlock = '') => {
-            console.log(`Evaluando condición: ${key}`);
-            
             const value = getNestedValue(data, key);
-            console.log(`Valor de ${key}:`, value);
             
             // Considerar valores falsy: null, undefined, false, 0, "", NaN
             return value ? trueBlock : falseBlock;
         });
-    }
-    
-    if (iterations >= MAX_ITERATIONS) {
-        console.warn('Se alcanzó el máximo número de iteraciones al procesar bloques if');
     }
     
     return result;

@@ -1,15 +1,12 @@
-/**
- * Configuración de la base de datos
- * Adaptado para funcionar con WAMP Server
- */
+
 const mysql = require('mysql2/promise');
 require('dotenv').config();
 
-// Obtener valores de configuración del entorno o usar valores predeterminados para WAMP
+
 const dbConfig = {
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',  // WAMP suele usar contraseña vacía por defecto
+  password: process.env.DB_PASSWORD || '',  
   database: process.env.DB_NAME || 'pradito_tech',
   port: process.env.DB_PORT || 3306,
   waitForConnections: true,
@@ -17,7 +14,7 @@ const dbConfig = {
   queueLimit: 0
 };
 
-// Crear el pool de conexiones
+
 const pool = mysql.createPool(dbConfig);
 
 /**
