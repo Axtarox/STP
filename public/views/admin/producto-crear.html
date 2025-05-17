@@ -7,390 +7,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/admin.css">
-    <style>
-        :root {
-            --sidebar-width: 250px;
-            --header-height: 60px;
-            --admin-primary: #2ecc71;
-            --admin-dark: #34495e;
-            --admin-light: #f5f5f5;
-        }
-        
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            background-color: #f9f9f9;
-        }
-        
-        /* Admin Layout */
-        .admin-layout {
-            display: flex;
-            flex: 1;
-        }
-        
-        /* Sidebar */
-        .admin-sidebar {
-            width: var(--sidebar-width);
-            background-color: var(--admin-secondary);
-            color: white;
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 100;
-            overflow-y: auto;
-        }
-        
-        .admin-sidebar-header {
-            padding: 1rem;
-            text-align: center;
-            background-color: rgba(0, 0, 0, 0.2);
-        }
-        
-        .admin-logo {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: white;
-            text-decoration: none;
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-        
-        .admin-logo span {
-            color: var(--admin-primary);
-        }
-        
-        .admin-nav {
-            padding: 1rem 0;
-        }
-        
-        .admin-nav-title {
-            padding: 0.5rem 1rem;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.5);
-            letter-spacing: 1px;
-        }
-        
-        .admin-nav-menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .admin-nav-item {
-            margin-bottom: 0.25rem;
-        }
-        
-        .admin-nav-link {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1rem;
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-        
-        .admin-nav-link:hover,
-        .admin-nav-link.active {
-            background-color: rgba(0, 0, 0, 0.1);
-            color: white;
-        }
-        
-        .admin-nav-icon {
-            margin-right: 0.75rem;
-            width: 20px;
-            text-align: center;
-        }
-        
-        /* Main Content */
-        .admin-main {
-            flex: 1;
-            margin-left: var(--sidebar-width);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .admin-header {
-            height: var(--header-height);
-            background-color: white;
-            border-bottom: 1px solid #e0e0e0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 1.5rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            position: sticky;
-            top: 0;
-            z-index: 99;
-        }
-        
-        .admin-page-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--admin-secondary);
-        }
-        
-        .admin-user-menu {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-        
-        .admin-user-info {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-        }
-        
-        .admin-user-avatar {
-            width: 36px;
-            height: 36px;
-            background-color: var(--admin-primary);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
-            margin-right: 0.75rem;
-        }
-        
-        .admin-user-name {
-            font-weight: 500;
-            font-size: 0.9rem;
-        }
-        
-        .admin-user-role {
-            font-size: 0.75rem;
-            color: var(--color-secondary);
-        }
-        
-        .admin-user-dropdown {
-            display: none;
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background-color: white;
-            border-radius: 4px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 0.5rem 0;
-            min-width: 150px;
-            z-index: 100;
-        }
-        
-        .admin-user-menu:hover .admin-user-dropdown {
-            display: block;
-        }
-        
-        .admin-dropdown-item {
-            padding: 0.5rem 1rem;
-            display: block;
-            color: var(--color-secondary);
-            text-decoration: none;
-            transition: background-color 0.3s;
-        }
-        
-        .admin-dropdown-item:hover {
-            background-color: var(--color-light);
-        }
-        
-        .admin-content {
-            padding: 1.5rem;
-            flex: 1;
-        }
-        
-        /* Form Styles */
-        .admin-form {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .admin-form-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--admin-dark);
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .admin-form-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .admin-form-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        .admin-form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--admin-dark);
-            font-weight: 500;
-        }
-        
-        .admin-form-control {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            font-family: inherit;
-            font-size: 0.9rem;
-        }
-        
-        .admin-form-control:focus {
-            outline: none;
-            border-color: var(--admin-primary);
-        }
-        
-        .admin-form-control textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-        
-        .admin-form-control select {
-            background-color: white;
-        }
-        
-        .admin-form-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
-            margin-top: 2rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid #e0e0e0;
-        }
-        
-        .admin-form-preview {
-            width: 100%;
-            max-width: 200px;
-            margin-top: 1rem;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        
-        .admin-form-preview img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-        
-        .admin-btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 4px;
-            font-family: inherit;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            text-decoration: none;
-        }
-        
-        .admin-btn-primary {
-            background-color: var(--admin-primary);
-            color: white;
-        }
-        
-        .admin-btn-secondary {
-            background-color: var(--admin-secondary);
-            color: white;
-        }
-        
-        .admin-btn:hover {
-            opacity: 0.9;
-        }
-        
-        .admin-alert {
-            padding: 1rem;
-            border-radius: 4px;
-            margin-bottom: 1.5rem;
-        }
-        
-        .admin-alert-success {
-            background-color: rgba(46, 204, 113, 0.1);
-            border-left: 4px solid var(--admin-primary);
-            color: var(--admin-primary);
-        }
-        
-        .admin-alert-danger {
-            background-color: rgba(231, 76, 60, 0.1);
-            border-left: 4px solid #e74c3c;
-            color: #e74c3c;
-        }
-        
-        /* Media Queries */
-        @media (max-width: 992px) {
-            .admin-sidebar {
-                width: 70px;
-                overflow: visible;
-            }
-            
-            .admin-sidebar-header {
-                padding: 0.5rem;
-            }
-            
-            .admin-logo {
-                font-size: 0;
-            }
-            
-            .admin-logo::first-letter {
-                font-size: 1.5rem;
-            }
-            
-            .admin-nav-title,
-            .admin-nav-text {
-                display: none;
-            }
-            
-            .admin-main {
-                margin-left: 70px;
-            }
-            
-            .admin-form-row {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        @media (max-width: 576px) {
-            .admin-header {
-                padding: 0 1rem;
-            }
-            
-            .admin-user-name,
-            .admin-user-role {
-                display: none;
-            }
-            
-            .admin-content {
-                padding: 1rem;
-            }
-            
-            .admin-form-actions {
-                flex-direction: column;
-            }
-            
-            .admin-btn {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-    </style>
 </head>
 <body>
     <div class="admin-layout">
@@ -477,7 +93,7 @@
                 </div>
                 {{/if}}
                 
-                <form class="admin-form" action="/admin/productos/crear" method="POST" enctype="multipart/form-data">
+                <form class="admin-form" action="/admin/productos/crear" method="POST" enctype="multipart/form-data" id="createProductForm">
                     <h2 class="admin-form-title">Crear Nuevo Producto</h2>
                     
                     <div class="admin-form-row">
@@ -499,8 +115,10 @@
                     
                     <div class="admin-form-row">
                         <div class="admin-form-group">
-                            <label for="precio">Precio *</label>
-                            <input type="number" id="precio" name="precio" class="admin-form-control" min="0" step="1000" required>
+                            <label for="precio_display">Precio *</label>
+                            <input type="text" id="precio_display" class="admin-form-control" required>
+                            <input type="hidden" id="precio" name="precio" value="0">
+                            <small>Puede usar puntos como separadores de miles (Ej: 1.500.000)</small>
                         </div>
                         
                         <div class="admin-form-group">
@@ -559,7 +177,8 @@
     </div>
     
     <script>
-        // Script para previsualizar la imagen seleccionada
+    document.addEventListener('DOMContentLoaded', function() {
+        // Previsualización de imagen
         document.getElementById('imagen').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
@@ -573,6 +192,52 @@
                 reader.readAsDataURL(file);
             }
         });
+        
+        // Formateo de precio con separadores de miles
+        const precioDisplay = document.getElementById('precio_display');
+        const precioHidden = document.getElementById('precio');
+        const form = document.getElementById('createProductForm');
+        
+        // Manejar cambios en el campo de precio visible
+        if (precioDisplay) {
+            precioDisplay.addEventListener('input', function(e) {
+                // Permitir solo números y puntos
+                let value = e.target.value.replace(/[^\d.]/g, '');
+                // Formatear con separadores de miles
+                if (value) {
+                    const numericValue = parseFloat(value.replace(/\./g, ''));
+                    if (!isNaN(numericValue)) {
+                        e.target.value = formatNumber(numericValue);
+                        if (precioHidden) {
+                            precioHidden.value = numericValue;
+                        }
+                    }
+                } else {
+                    if (precioHidden) {
+                        precioHidden.value = '0';
+                    }
+                }
+            });
+        }
+        
+        // Procesar el formulario antes de enviarlo
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                if (precioDisplay && precioHidden) {
+                    // Convertir el precio formateado a un número
+                    const numericValue = parseFloat(precioDisplay.value.replace(/\./g, ''));
+                    if (!isNaN(numericValue)) {
+                        precioHidden.value = numericValue;
+                    }
+                }
+            });
+        }
+        
+        // Función para formatear números con separadores de miles
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+    });
     </script>
 </body>
 </html>

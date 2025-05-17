@@ -1,10 +1,15 @@
+/**
+ * Controlador optimizado para productos con soporte para precios formateados
+ */
 
 const path = require('path');
 const { formatPrice } = require('../helpers/formatHelper');
 const Producto = require('../models/Producto');
 const Categoria = require('../models/Categoria');
 
-
+/**
+ * Obtiene todos los productos
+ */
 exports.getAllProductos = async (req, res) => {
     try {
         // Obtener los productos de la base de datos
@@ -37,7 +42,9 @@ exports.getAllProductos = async (req, res) => {
     }
 };
 
-
+/**
+ * Obtiene un producto por su ID
+ */
 exports.getProductoById = async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
@@ -59,8 +66,6 @@ exports.getProductoById = async (req, res) => {
             });
         }
         
-        console.log('Producto obtenido:', producto);
-        
         // Extraer características y limpiar la lista
         let caracteristicasList = [];
         if (producto.caracteristicas) {
@@ -71,33 +76,18 @@ exports.getProductoById = async (req, res) => {
                 .filter(item => item.length > 0);
         }
         
-        console.log('Lista de características procesada:', caracteristicasList);
+        // Formatear el precio para visualización
+        producto.precio = formatPrice(producto.precio);
         
-        // Garantizar que todos los campos existan y tengan valores predeterminados
-        const productData = {
-            id: producto.id,
-            nombre: producto.nombre || 'Producto sin nombre',
-            precio: typeof producto.precio === 'number' 
-                ? producto.precio.toLocaleString('es-CO') 
-                : '0',
-            descripcion: producto.descripcion || 'Sin descripción disponible',
-            imagen: producto.imagen || '/img/default-product.jpg',
-            categoria_id: producto.categoria_id || 1,
-            categoria_nombre: producto.categoria_nombre || 'Sin categoría',
-            condicion: producto.condicion || 'Nuevo',
-            cantidad_disponible: producto.cantidad_disponible || 0,
-            disponible: producto.disponible !== undefined ? Boolean(producto.disponible) : true
-        };
+        // Agregar función de formateo para la vista
+        res.locals.formatPrice = formatPrice;
         
-        console.log('Datos del producto a renderizar:', productData);
-        console.log('Cantidad de características:', caracteristicasList.length);
-        
-        // Renderizar vista con datos simplificados
+        // Renderizar vista con datos
         return res.render('producto-detalle', {
             titulo: producto.nombre || 'Detalle de Producto',
             isProductoDetalle: true,
-            producto: productData,
-            caracteristicasList: caracteristicasList
+            producto,
+            caracteristicasList
         });
     } catch (error) {
         console.error('Error en getProductoById:', error);
@@ -109,6 +99,9 @@ exports.getProductoById = async (req, res) => {
     }
 };
 
+/**
+ * Obtiene productos por categoría
+ */
 exports.getProductosByCategoria = async (req, res) => {
     try {
         const categoriaId = parseInt(req.params.id, 10);
@@ -167,7 +160,9 @@ exports.getProductosByCategoria = async (req, res) => {
     }
 };
 
-
+/**
+ * Busca productos por términos
+ */
 exports.searchProductos = async (req, res) => {
     try {
         const query = req.query.q || '';
@@ -207,7 +202,9 @@ exports.searchProductos = async (req, res) => {
     }
 };
 
-
+/**
+ * Obtiene productos destacados
+ */
 exports.getProductosDestacados = async (req, res) => {
     try {
         // Obtener los productos destacados

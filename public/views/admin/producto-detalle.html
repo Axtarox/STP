@@ -81,6 +81,18 @@
             </header>
             
             <div class="admin-content">
+                {{#if success}}
+                <div class="admin-alert admin-alert-success">
+                    <i class="fas fa-check-circle"></i> {{success}}
+                </div>
+                {{/if}}
+                
+                {{#if error}}
+                <div class="admin-alert admin-alert-danger">
+                    <i class="fas fa-exclamation-circle"></i> {{error}}
+                </div>
+                {{/if}}
+                
                 <div class="admin-actions">
                     <a href="/admin/productos" class="admin-btn admin-btn-secondary">
                         <i class="fas fa-arrow-left"></i> Volver a Productos
@@ -88,9 +100,12 @@
                     <a href="/admin/productos/editar/{{producto.id}}" class="admin-btn admin-btn-primary">
                         <i class="fas fa-edit"></i> Editar Producto
                     </a>
-                    <button class="admin-btn admin-btn-danger" onclick="confirmarEliminar({{producto.id}})">
-                        <i class="fas fa-trash"></i> Eliminar Producto
-                    </button>
+                    <form id="deleteForm" method="POST" action="/admin/productos/eliminar/{{producto.id}}" style="display:inline;">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button type="button" id="deleteBtn" class="admin-btn admin-btn-danger">
+                            <i class="fas fa-trash"></i> Eliminar Producto
+                        </button>
+                    </form>
                 </div>
                 
                 <div class="admin-card">
@@ -161,12 +176,50 @@
         </main>
     </div>
     
+    <!-- Modal de confirmación para eliminar -->
+    <div id="deleteModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+        <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+            <h3 style="margin-top: 0;">Confirmar eliminación</h3>
+            <p>¿Está seguro de que desea eliminar el producto "{{producto.nombre}}"? Esta acción no se puede deshacer.</p>
+            <div style="text-align: right; margin-top: 20px;">
+                <button id="cancelDelete" class="admin-btn admin-btn-secondary" style="margin-right: 10px;">Cancelar</button>
+                <button id="confirmDelete" class="admin-btn admin-btn-danger">Eliminar</button>
+            </div>
+        </div>
+    </div>
+    
     <script>
-        function confirmarEliminar(id) {
-            if (confirm('¿Está seguro de que desea eliminar este producto?')) {
-                window.location.href = '/admin/productos/eliminar/' + id;
+    document.addEventListener('DOMContentLoaded', function() {
+        // Referencia al modal y sus elementos
+        const deleteModal = document.getElementById('deleteModal');
+        const confirmDeleteBtn = document.getElementById('confirmDelete');
+        const cancelDeleteBtn = document.getElementById('cancelDelete');
+        const deleteBtn = document.getElementById('deleteBtn');
+        const deleteForm = document.getElementById('deleteForm');
+        
+        // Mostrar el modal al hacer clic en el botón de eliminar
+        deleteBtn.addEventListener('click', function() {
+            deleteModal.style.display = 'block';
+        });
+        
+        // Confirmar eliminación
+        confirmDeleteBtn.addEventListener('click', function() {
+            deleteForm.submit();
+            deleteModal.style.display = 'none';
+        });
+        
+        // Cancelar eliminación
+        cancelDeleteBtn.addEventListener('click', function() {
+            deleteModal.style.display = 'none';
+        });
+        
+        // Cerrar el modal si se hace clic fuera de él
+        window.addEventListener('click', function(event) {
+            if (event.target === deleteModal) {
+                deleteModal.style.display = 'none';
             }
-        }
+        });
+    });
     </script>
 </body>
 </html>

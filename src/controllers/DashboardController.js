@@ -1,12 +1,13 @@
 /**
  * Controlador optimizado para el panel de administración
- * - Incluye funciones para gestionar productos sin errores de bucle
+ * - Con soporte mejorado para precios formateados
  */
 const Producto = require('../models/Producto');
 const Categoria = require('../models/Categoria');
 const Servicio = require('../models/Servicio');
 const path = require('path');
 const fs = require('fs');
+const { formatPrice } = require('../helpers/formatHelper');
 
 /**
  * Muestra el dashboard principal
@@ -48,13 +49,19 @@ exports.getProductos = async (req, res) => {
     // Obtener todos los productos
     const productos = await Producto.getAll();
     
+    // Formatear precios para visualización
+    const productosFormateados = productos.map(producto => ({
+      ...producto,
+      precio: formatPrice(producto.precio)
+    }));
+    
     // Obtener categorías para el formulario
     const categorias = await Categoria.getAll();
     
     res.render('admin/productos', {
       titulo: 'Gestión de Productos',
       admin: req.session.adminData,
-      productos,
+      productos: productosFormateados,
       categorias,
       current_page: { productos: true },
       standalone: true // Esta opción evita usar el layout principal
@@ -142,11 +149,14 @@ exports.crearProducto = async (req, res) => {
       imagenUrl = `/uploads/${req.file.filename}`;
     }
     
+    // Convertir el precio a número limpiando separadores
+    const precioNumerico = parseFloat(String(precio).replace(/\./g, '').replace(/,/g, '.')) || 0;
+    
     // Crear objeto de producto
     const productoData = {
       nombre,
       categoria_id: parseInt(categoria_id),
-      precio: parseFloat(precio),
+      precio: precioNumerico,
       condicion,
       descripcion,
       caracteristicas,
@@ -215,6 +225,9 @@ exports.getProductoById = async (req, res) => {
         .filter(item => item.length > 0);
     }
     
+    // Formatear el precio para visualización
+    producto.precio = formatPrice(producto.precio);
+    
     res.render('admin/producto-detalle', {
       titulo: `Producto: ${producto.nombre}`,
       admin: req.session.adminData,
@@ -234,7 +247,7 @@ exports.getProductoById = async (req, res) => {
 };
 
 /**
- * Muestra el formulario para editar un producto - CORREGIDO PARA EVITAR BUCLE INFINITO
+ * Muestra el formulario para editar un producto
  */
 exports.getEditarProductoForm = async (req, res) => {
   try {
@@ -260,6 +273,9 @@ exports.getEditarProductoForm = async (req, res) => {
       });
     }
     
+    // Formatear el precio para visualización
+    producto.precio = formatPrice(producto.precio);
+    
     // Renderizar la vista con los datos completos
     res.render('admin/producto-editar', {
       titulo: 'Editar Producto',
@@ -280,7 +296,7 @@ exports.getEditarProductoForm = async (req, res) => {
 };
 
 /**
- * Actualiza un producto existente - CORREGIDO
+ * Actualiza un producto existente
  */
 exports.editarProducto = async (req, res) => {
   try {
@@ -359,11 +375,14 @@ exports.editarProducto = async (req, res) => {
       }
     }
     
+    // Convertir precio formateado a número
+    const precioNumerico = parseFloat(String(precio).replace(/\./g, '').replace(/,/g, '.')) || 0;
+    
     // Crear objeto de producto actualizado
     const productoData = {
       nombre,
       categoria_id: parseInt(categoria_id),
-      precio: parseFloat(precio),
+      precio: precioNumerico,
       condicion,
       descripcion,
       caracteristicas,
