@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{titulo}} | Soluciones Tecnológicas Pradito</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-sidebar-header">
+                <a href="/admin" class="admin-logo">Soluciones <span>Tecnológicas</span> Pradito</a>
+                <p>Panel de Administración</p>
+            </div>
+            
+            <nav class="admin-nav">
+                <div class="admin-nav-title">Principal</div>
+                <ul class="admin-nav-menu">
+                    <li class="admin-nav-item">
+                        <a href="/admin/dashboard" class="admin-nav-link {{#if current_page.dashboard}}active{{/if}}">
+                            <span class="admin-nav-icon"><i class="fas fa-tachometer-alt"></i></span>
+                            <span class="admin-nav-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="admin-nav-item">
+                        <a href="/admin/productos" class="admin-nav-link {{#if current_page.productos}}active{{/if}}">
+                            <span class="admin-nav-icon"><i class="fas fa-box"></i></span>
+                            <span class="admin-nav-text">Productos</span>
+                        </a>
+                    </li>
+                    <li class="admin-nav-item">
+                        <a href="/admin/categorias" class="admin-nav-link {{#if current_page.categorias}}active{{/if}}">
+                            <span class="admin-nav-icon"><i class="fas fa-tags"></i></span>
+                            <span class="admin-nav-text">Categorías</span>
+                        </a>
+                    </li>
+                    <li class="admin-nav-item">
+                        <a href="/admin/servicios" class="admin-nav-link {{#if current_page.servicios}}active{{/if}}">
+                            <span class="admin-nav-icon"><i class="fas fa-cogs"></i></span>
+                            <span class="admin-nav-text">Servicios</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="admin-nav-title">Cuenta</div>
+                <ul class="admin-nav-menu">
+                    <li class="admin-nav-item">
+                        <a href="/admin/logout" class="admin-nav-link">
+                            <span class="admin-nav-icon"><i class="fas fa-sign-out-alt"></i></span>
+                            <span class="admin-nav-text">Cerrar Sesión</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1 class="admin-page-title">{{titulo}}</h1>
+                <div class="admin-user-menu">
+                    <div class="admin-user-info">
+                        <div class="admin-user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div>
+                            <div class="admin-user-name">{{admin.nombre}}</div>
+                            <div class="admin-user-role">Administrador</div>
+                        </div>
+                    </div>
+                    <div class="admin-user-dropdown">
+                        <a href="/admin/logout" class="admin-dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                        </a>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="admin-content">
+                {{#if success}}
+                <div class="admin-alert admin-alert-success">
+                    <i class="fas fa-check-circle"></i> {{success}}
+                </div>
+                {{/if}}
+                
+                {{#if error}}
+                <div class="admin-alert admin-alert-danger">
+                    <i class="fas fa-exclamation-circle"></i> {{error}}
+                </div>
+                {{/if}}
+                
+                <form class="admin-form" action="/admin/productos/editar/{{producto.id}}" method="POST" enctype="multipart/form-data">
+                    <h2 class="admin-form-title">Editar Producto</h2>
+                    
+                    <div class="admin-form-row">
+                        <div class="admin-form-group">
+                            <label for="nombre">Nombre del Producto *</label>
+                            <input type="text" id="nombre" name="nombre" class="admin-form-control" value="{{producto.nombre}}" required>
+                        </div>
+                        
+                        <div class="admin-form-group">
+                            <label for="categoria_id">Categoría *</label>
+                            <select id="categoria_id" name="categoria_id" class="admin-form-control" required>
+                                <option value="">-- Seleccione una categoría --</option>
+                                {{#each categorias}}
+                                <option value="{{id}}" {{#if (id == ../producto.categoria_id)}}selected{{/if}}>{{nombre}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="admin-form-row">
+                        <div class="admin-form-group">
+                            <label for="precio">Precio *</label>
+                            <input type="number" id="precio" name="precio" class="admin-form-control" value="{{producto.precio}}" min="0" step="1000" required>
+                        </div>
+                        
+                        <div class="admin-form-group">
+                            <label for="condicion">Condición</label>
+                            <select id="condicion" name="condicion" class="admin-form-control">
+                                <option value="Nuevo" {{#if (producto.condicion == 'Nuevo')}}selected{{/if}}>Nuevo</option>
+                                <option value="Usado" {{#if (producto.condicion == 'Usado')}}selected{{/if}}>Usado</option>
+                                <option value="Reacondicionado" {{#if (producto.condicion == 'Reacondicionado')}}selected{{/if}}>Reacondicionado</option>
+                                <option value="Digital" {{#if (producto.condicion == 'Digital')}}selected{{/if}}>Digital</option>
+                            </select>
+                        </div>
+                        
+                        <div class="admin-form-group">
+                            <label for="cantidad_disponible">Cantidad Disponible *</label>
+                            <input type="number" id="cantidad_disponible" name="cantidad_disponible" class="admin-form-control" value="{{producto.cantidad_disponible}}" min="0" required>
+                        </div>
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="descripcion">Descripción *</label>
+                        <textarea id="descripcion" name="descripcion" class="admin-form-control" rows="4" required>{{producto.descripcion}}</textarea>
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="caracteristicas">Características (una por línea)</label>
+                        <textarea id="caracteristicas" name="caracteristicas" class="admin-form-control" rows="6">{{producto.caracteristicas}}</textarea>
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="imagen">Imagen del Producto</label>
+                        <input type="file" id="imagen" name="imagen" class="admin-form-control" accept="image/*">
+                        
+                        {{#if producto.imagen}}
+                        <div class="admin-form-preview">
+                            <img src="{{producto.imagen}}" alt="{{producto.nombre}}" onerror="this.src='/img/default-product.jpg'">
+                        </div>
+                        <small>Deje este campo vacío para mantener la imagen actual</small>
+                        {{/if}}
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="disponible">Disponibilidad</label>
+                        <div style="margin-top: 0.5rem;">
+                            <input type="checkbox" id="disponible" name="disponible" {{#if producto.disponible}}checked{{/if}}>
+                            <label for="disponible" style="display: inline-block; margin-left: 0.5rem; font-weight: normal;">Mostrar en tienda</label>
+                        </div>
+                    </div>
+                    
+                    <div class="admin-form-actions">
+                        <a href="/admin/productos" class="admin-btn admin-btn-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                        <button type="submit" class="admin-btn admin-btn-primary">
+                            <i class="fas fa-save"></i> Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // Script para previsualizar la imagen seleccionada
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('imagen').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        // Si ya existe una previsualización, actualizarla
+                        let preview = document.querySelector('.admin-form-preview');
+                        
+                        // Si no existe, crear una nueva
+                        if (!preview) {
+                            preview = document.createElement('div');
+                            preview.className = 'admin-form-preview';
+                            const img = document.createElement('img');
+                            preview.appendChild(img);
+                            e.target.parentNode.appendChild(preview);
+                        }
+                        
+                        // Actualizar la imagen
+                        const img = preview.querySelector('img');
+                        img.src = event.target.result;
+                        img.alt = 'Vista previa';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

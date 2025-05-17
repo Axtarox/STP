@@ -1,6 +1,5 @@
-
 /**
- * Modelo de Producto optimizado para evitar bucles y logs excesivos
+ * Modelo de Producto optimizado con todas las operaciones CRUD
  */
 const { pool } = require('../config/database');
 
@@ -15,12 +14,12 @@ class Producto {
                 SELECT p.*, c.nombre as categoria_nombre 
                 FROM producto p 
                 LEFT JOIN categoria c ON p.categoria_id = c.id
-                WHERE p.disponible = true
                 ORDER BY p.id DESC
             `);
             
             return rows;
         } catch (error) {
+            console.error('Error en Producto.getAll:', error);
             return [];
         }
     }
@@ -65,6 +64,7 @@ class Producto {
             
             return producto;
         } catch (error) {
+            console.error(`Error en Producto.getById(${id}):`, error);
             return null;
         }
     }
@@ -86,6 +86,7 @@ class Producto {
             
             return rows;
         } catch (error) {
+            console.error(`Error en Producto.getByCategoria(${categoriaId}):`, error);
             return [];
         }
     }
@@ -111,6 +112,7 @@ class Producto {
             
             return rows;
         } catch (error) {
+            console.error(`Error en Producto.search("${query}"):`, error);
             return [];
         }
     }
@@ -133,40 +135,129 @@ class Producto {
             
             return rows;
         } catch (error) {
+            console.error(`Error en Producto.getFeatured(${limit}):`, error);
             return [];
         }
     }
 
     /**
-     * Obtiene productos aleatorios
-     * @param {number} limit - Número máximo de productos a retornar
-     * @returns {Promise<Array>} Lista de productos aleatorios
+     * Crea un nuevo producto
+     * @param {Object} producto - Datos del producto a crear
+     * @returns {Promise<number|null>} ID del producto creado o null en caso de error
      */
-    static async getRandom(limit = 5) {
+    static async create(producto) {
         try {
-            // Verificar rápidamente si hay productos
-            const [countResult] = await pool.query(`
-                SELECT COUNT(*) as total FROM producto WHERE disponible = true
-            `);
+            const {
+                nombre,
+                categoria_id,
+                precio,
+                descripcion,
+                caracteristicas,
+                imagen,
+                condicion = 'Nuevo',
+                cantidad_disponible = 0,
+                disponible = true
+            } = producto;
             
-            const totalProductos = countResult[0].total;
+            const [result] = await pool.query(`
+                INSERT INTO producto (
+                    categoria_id, 
+                    nombre, 
+                    descripcion, 
+                    caracteristicas, 
+                    precio, 
+                    imagen, 
+                    condicion, 
+                    cantidad_disponible,
+                    disponible
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `, [
+                categoria_id,
+                nombre,
+                descripcion,
+                caracteristicas,
+                precio,
+                imagen,
+                condicion,
+                cantidad_disponible,
+                disponible ? 1 : 0
+            ]);
             
-            if (totalProductos === 0) {
-                return [];
-            }
-            
-            const [rows] = await pool.query(`
-                SELECT p.*, c.nombre as categoria_nombre 
-                FROM producto p 
-                LEFT JOIN categoria c ON p.categoria_id = c.id
-                WHERE p.disponible = true 
-                ORDER BY RAND() 
-                LIMIT ?
-            `, [limit]);
-            
-            return rows;
+            return result.insertId;
         } catch (error) {
-            return [];
+            console.error('Error en Producto.create:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Actualiza un producto existente
+     * @param {number} id - ID del producto a actualizar
+     * @param {Object} producto - Datos actualizados del producto
+     * @returns {Promise<boolean>} true si se actualizó correctamente, false en caso contrario
+     */
+    static async update(id, producto) {
+        try {
+            const {
+                nombre,
+                categoria_id,
+                precio,
+                descripcion,
+                caracteristicas,
+                imagen,
+                condicion,
+                cantidad_disponible,
+                disponible
+            } = producto;
+            
+            const [result] = await pool.query(`
+                UPDATE producto SET
+                    categoria_id = ?,
+                    nombre = ?,
+                    descripcion = ?,
+                    caracteristicas = ?,
+                    precio = ?,
+                    imagen = ?,
+                    condicion = ?,
+                    cantidad_disponible = ?,
+                    disponible = ?
+                WHERE id = ?
+            `, [
+                categoria_id,
+                nombre,
+                descripcion,
+                caracteristicas,
+                precio,
+                imagen,
+                condicion,
+                cantidad_disponible,
+                disponible ? 1 : 0,
+                id
+            ]);
+            
+            return result.affectedRows > 0;
+        } catch (error) {
+            console.error(`Error en Producto.update(${id}):`, error);
+            return false;
+        }
+    }
+
+    /**
+     * Elimina un producto
+     * @param {number} id - ID del producto a eliminar
+     * @returns {Promise<boolean>} true si se eliminó correctamente, false en caso contrario
+     */
+    static async delete(id) {
+        try {
+            const [result] = await pool.query(`
+                DELETE FROM producto
+                WHERE id = ?
+            `, [id]);
+            
+            return result.affectedRows > 0;
+        } catch (error) {
+            console.error(`Error en Producto.delete(${id}):`, error);
+            return false;
         }
     }
 }

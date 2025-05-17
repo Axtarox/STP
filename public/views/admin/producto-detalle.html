@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{titulo}} | Soluciones Tecnológicas Pradito</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-sidebar-header">
+                <a href="/admin" class="admin-logo">Soluciones <span>Tecnológicas</span> Pradito</a>
+                <p>Panel de Administración</p>
+            </div>
+            
+            <nav class="admin-nav">
+                <div class="admin-nav-title">Principal</div>
+                <ul class="admin-nav-menu">
+                    <li class="admin-nav-item">
+                        <a href="/admin/dashboard" class="admin-nav-link {{#if current_page.dashboard}}active{{/if}}">
+                            <span class="admin-nav-icon"><i class="fas fa-tachometer-alt"></i></span>
+                            <span class="admin-nav-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="admin-nav-item">
+                        <a href="/admin/productos" class="admin-nav-link {{#if current_page.productos}}active{{/if}}">
+                            <span class="admin-nav-icon"><i class="fas fa-box"></i></span>
+                            <span class="admin-nav-text">Productos</span>
+                        </a>
+                    </li>
+                    <li class="admin-nav-item">
+                        <a href="/admin/categorias" class="admin-nav-link {{#if current_page.categorias}}active{{/if}}">
+                            <span class="admin-nav-icon"><i class="fas fa-tags"></i></span>
+                            <span class="admin-nav-text">Categorías</span>
+                        </a>
+                    </li>
+                    <li class="admin-nav-item">
+                        <a href="/admin/servicios" class="admin-nav-link {{#if current_page.servicios}}active{{/if}}">
+                            <span class="admin-nav-icon"><i class="fas fa-cogs"></i></span>
+                            <span class="admin-nav-text">Servicios</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="admin-nav-title">Cuenta</div>
+                <ul class="admin-nav-menu">
+                    <li class="admin-nav-item">
+                        <a href="/admin/logout" class="admin-nav-link">
+                            <span class="admin-nav-icon"><i class="fas fa-sign-out-alt"></i></span>
+                            <span class="admin-nav-text">Cerrar Sesión</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1 class="admin-page-title">{{titulo}}</h1>
+                <div class="admin-user-menu">
+                    <div class="admin-user-info">
+                        <div class="admin-user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div>
+                            <div class="admin-user-name">{{admin.nombre}}</div>
+                            <div class="admin-user-role">Administrador</div>
+                        </div>
+                    </div>
+                    <div class="admin-user-dropdown">
+                        <a href="/admin/logout" class="admin-dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                        </a>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="admin-content">
+                <div class="admin-actions">
+                    <a href="/admin/productos" class="admin-btn admin-btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver a Productos
+                    </a>
+                    <a href="/admin/productos/editar/{{producto.id}}" class="admin-btn admin-btn-primary">
+                        <i class="fas fa-edit"></i> Editar Producto
+                    </a>
+                    <button class="admin-btn admin-btn-danger" onclick="confirmarEliminar({{producto.id}})">
+                        <i class="fas fa-trash"></i> Eliminar Producto
+                    </button>
+                </div>
+                
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <h2 class="admin-card-title">Detalles del Producto</h2>
+                    </div>
+                    
+                    <div class="product-details">
+                        <div class="product-image">
+                            <img src="{{producto.imagen}}" alt="{{producto.nombre}}" onerror="this.src='/img/default-product.jpg'">
+                        </div>
+                        
+                        <div class="product-info">
+                            <div class="product-info-item">
+                                <div class="info-label">ID:</div>
+                                <div>{{producto.id}}</div>
+                            </div>
+                            
+                            <div class="product-info-item">
+                                <div class="info-label">Nombre:</div>
+                                <div>{{producto.nombre}}</div>
+                            </div>
+                            
+                            <div class="product-info-item">
+                                <div class="info-label">Categoría:</div>
+                                <div>{{producto.categoria_nombre}}</div>
+                            </div>
+                            
+                            <div class="product-info-item">
+                                <div class="info-label">Precio:</div>
+                                <div>${{producto.precio}}</div>
+                            </div>
+                            
+                            <div class="product-info-item">
+                                <div class="info-label">Condición:</div>
+                                <div>{{producto.condicion}}</div>
+                            </div>
+                            
+                            <div class="product-info-item">
+                                <div class="info-label">Cantidad Disponible:</div>
+                                <div>{{producto.cantidad_disponible}} unidades</div>
+                            </div>
+                            
+                            <div class="product-info-item">
+                                <div class="info-label">Disponible:</div>
+                                <div>
+                                    {{#if producto.disponible}}
+                                    <span style="color: var(--admin-primary);">✓ Sí</span>
+                                    {{else}}
+                                    <span style="color: #e74c3c;">✗ No</span>
+                                    {{/if}}
+                                </div>
+                            </div>
+                            
+                            <h3>Descripción</h3>
+                            <p>{{producto.descripcion}}</p>
+                            
+                            <h3>Características</h3>
+                            <ul class="characteristics-list">
+                                {{#each caracteristicasList}}
+                                <li>{{this}}</li>
+                                {{/each}}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        function confirmarEliminar(id) {
+            if (confirm('¿Está seguro de que desea eliminar este producto?')) {
+                window.location.href = '/admin/productos/eliminar/' + id;
+            }
+        }
+    </script>
+</body>
+</html>

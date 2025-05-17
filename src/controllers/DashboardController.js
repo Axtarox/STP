@@ -1,10 +1,12 @@
 /**
- * Controlador actualizado para el dashboard de administración
- * - Con soporte para renderizado standalone (sin header/footer)
+ * Controlador optimizado para el panel de administración
+ * - Incluye funciones para gestionar productos sin errores de bucle
  */
 const Producto = require('../models/Producto');
 const Categoria = require('../models/Categoria');
 const Servicio = require('../models/Servicio');
+const path = require('path');
+const fs = require('fs');
 
 /**
  * Muestra el dashboard principal
@@ -63,6 +65,396 @@ exports.getProductos = async (req, res) => {
       titulo: 'Error',
       mensaje: 'Error al cargar los productos',
       error: process.env.NODE_ENV === 'development' ? error.message : null
+    });
+  }
+};
+
+/**
+ * Muestra la página para crear un nuevo producto
+ */
+exports.getCrearProductoForm = async (req, res) => {
+  try {
+    // Obtener categorías para el formulario
+    const categorias = await Categoria.getAll();
+    
+    res.render('admin/producto-crear', {
+      titulo: 'Crear Nuevo Producto',
+      admin: req.session.adminData,
+      categorias,
+      current_page: { productos: true },
+      standalone: true
+    });
+  } catch (error) {
+    console.error('Error al cargar formulario de creación:', error);
+    res.status(500).render('error', {
+      titulo: 'Error',
+      mensaje: 'Error al cargar el formulario',
+      error: process.env.NODE_ENV === 'development' ? error.message : null
+    });
+  }
+};
+
+/**
+ * Crea un nuevo producto
+ */
+exports.crearProducto = async (req, res) => {
+  try {
+    // Obtener datos del formulario
+    const { 
+      nombre, 
+      categoria_id, 
+      precio, 
+      condicion = 'Nuevo', 
+      descripcion, 
+      caracteristicas,
+      cantidad_disponible,
+      disponible 
+    } = req.body;
+    
+    // Verificar campos requeridos
+    if (!nombre || !categoria_id || !precio || !descripcion) {
+      // Obtener categorías para el formulario
+      const categorias = await Categoria.getAll();
+      
+      return res.render('admin/producto-crear', {
+        titulo: 'Crear Nuevo Producto',
+        admin: req.session.adminData,
+        categorias,
+        error: 'Por favor complete todos los campos obligatorios',
+        current_page: { productos: true },
+        standalone: true
+      });
+    }
+    
+    // Procesar imagen si se ha subido
+    let imagenUrl = '/img/default-product.jpg'; // Imagen por defecto
+    
+    if (req.file) {
+      // Si existe una carpeta para subir imágenes, usar esa ruta
+      const uploadsDir = path.join(__dirname, '../../public/uploads');
+      
+      // Crear directorio si no existe
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+      
+      // URL relativa para la base de datos
+      imagenUrl = `/uploads/${req.file.filename}`;
+    }
+    
+    // Crear objeto de producto
+    const productoData = {
+      nombre,
+      categoria_id: parseInt(categoria_id),
+      precio: parseFloat(precio),
+      condicion,
+      descripcion,
+      caracteristicas,
+      cantidad_disponible: parseInt(cantidad_disponible) || 0,
+      disponible: disponible === 'on' || disponible === true,
+      imagen: imagenUrl
+    };
+    
+    // Guardar producto en la base de datos
+    const productoId = await Producto.create(productoData);
+    
+    if (!productoId) {
+      throw new Error('No se pudo crear el producto');
+    }
+    
+    // Redirigir a la lista de productos con mensaje de éxito
+    req.session.successMessage = 'Producto creado correctamente';
+    res.redirect('/admin/productos');
+  } catch (error) {
+    console.error('Error al crear producto:', error);
+    
+    // Obtener categorías para mostrar el formulario nuevamente
+    const categorias = await Categoria.getAll();
+    
+    res.render('admin/producto-crear', {
+      titulo: 'Crear Nuevo Producto',
+      admin: req.session.adminData,
+      categorias,
+      error: `Error al crear el producto: ${error.message}`,
+      current_page: { productos: true },
+      standalone: true
+    });
+  }
+};
+
+/**
+ * Muestra un producto específico
+ */
+exports.getProductoById = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    
+    if (isNaN(id)) {
+      return res.status(400).render('error', {
+        titulo: 'Error',
+        mensaje: 'ID de producto inválido'
+      });
+    }
+    
+    // Obtener producto
+    const producto = await Producto.getById(id);
+    
+    if (!producto) {
+      return res.status(404).render('error', {
+        titulo: 'Error',
+        mensaje: 'Producto no encontrado'
+      });
+    }
+    
+    // Procesar características
+    let caracteristicasList = [];
+    if (producto.caracteristicas) {
+      caracteristicasList = producto.caracteristicas
+        .split(/\n|\r|\r\n|-|•|\\n/)
+        .map(item => item.trim())
+        .filter(item => item.length > 0);
+    }
+    
+    res.render('admin/producto-detalle', {
+      titulo: `Producto: ${producto.nombre}`,
+      admin: req.session.adminData,
+      producto,
+      caracteristicasList,
+      current_page: { productos: true },
+      standalone: true
+    });
+  } catch (error) {
+    console.error('Error al obtener producto:', error);
+    res.status(500).render('error', {
+      titulo: 'Error',
+      mensaje: 'Error al cargar el producto',
+      error: process.env.NODE_ENV === 'development' ? error.message : null
+    });
+  }
+};
+
+/**
+ * Muestra el formulario para editar un producto - CORREGIDO PARA EVITAR BUCLE INFINITO
+ */
+exports.getEditarProductoForm = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    
+    if (isNaN(id)) {
+      return res.status(400).render('error', {
+        titulo: 'Error',
+        mensaje: 'ID de producto inválido'
+      });
+    }
+    
+    // Obtener producto y categorías en paralelo para optimizar
+    const [producto, categorias] = await Promise.all([
+      Producto.getById(id),
+      Categoria.getAll()
+    ]);
+    
+    if (!producto) {
+      return res.status(404).render('error', {
+        titulo: 'Error',
+        mensaje: 'Producto no encontrado'
+      });
+    }
+    
+    // Renderizar la vista con los datos completos
+    res.render('admin/producto-editar', {
+      titulo: 'Editar Producto',
+      admin: req.session.adminData,
+      producto,
+      categorias,
+      current_page: { productos: true },
+      standalone: true
+    });
+  } catch (error) {
+    console.error('Error al cargar formulario de edición:', error);
+    res.status(500).render('error', {
+      titulo: 'Error',
+      mensaje: 'Error al cargar el formulario de edición',
+      error: process.env.NODE_ENV === 'development' ? error.message : null
+    });
+  }
+};
+
+/**
+ * Actualiza un producto existente - CORREGIDO
+ */
+exports.editarProducto = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    
+    if (isNaN(id)) {
+      return res.status(400).render('error', {
+        titulo: 'Error',
+        mensaje: 'ID de producto inválido'
+      });
+    }
+    
+    // Obtener producto actual para usar su imagen si no se sube una nueva
+    const productoActual = await Producto.getById(id);
+    
+    if (!productoActual) {
+      return res.status(404).render('error', {
+        titulo: 'Error',
+        mensaje: 'Producto no encontrado'
+      });
+    }
+    
+    // Obtener datos del formulario
+    const { 
+      nombre, 
+      categoria_id, 
+      precio, 
+      condicion, 
+      descripcion, 
+      caracteristicas,
+      cantidad_disponible,
+      disponible 
+    } = req.body;
+    
+    // Verificar campos requeridos
+    if (!nombre || !categoria_id || !precio || !descripcion) {
+      // Obtener categorías para el formulario
+      const categorias = await Categoria.getAll();
+      
+      return res.render('admin/producto-editar', {
+        titulo: 'Editar Producto',
+        admin: req.session.adminData,
+        producto: productoActual,
+        categorias,
+        error: 'Por favor complete todos los campos obligatorios',
+        current_page: { productos: true },
+        standalone: true
+      });
+    }
+    
+    // Procesar imagen si se ha subido una nueva
+    let imagenUrl = productoActual.imagen; // Mantener imagen actual por defecto
+    
+    if (req.file) {
+      // Si existe una carpeta para subir imágenes, usar esa ruta
+      const uploadsDir = path.join(__dirname, '../../public/uploads');
+      
+      // Crear directorio si no existe
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+      
+      // URL relativa para la base de datos
+      imagenUrl = `/uploads/${req.file.filename}`;
+      
+      // Eliminar imagen anterior si no es la predeterminada
+      if (productoActual.imagen && !productoActual.imagen.includes('default-product.jpg')) {
+        try {
+          const imagePath = path.join(__dirname, '../../public', productoActual.imagen);
+          if (fs.existsSync(imagePath)) {
+            fs.unlinkSync(imagePath);
+          }
+        } catch (err) {
+          console.error('Error al eliminar imagen anterior:', err);
+        }
+      }
+    }
+    
+    // Crear objeto de producto actualizado
+    const productoData = {
+      nombre,
+      categoria_id: parseInt(categoria_id),
+      precio: parseFloat(precio),
+      condicion,
+      descripcion,
+      caracteristicas,
+      cantidad_disponible: parseInt(cantidad_disponible) || 0,
+      disponible: disponible === 'on' || disponible === true,
+      imagen: imagenUrl
+    };
+    
+    // Actualizar producto en la base de datos
+    const success = await Producto.update(id, productoData);
+    
+    if (!success) {
+      throw new Error('No se pudo actualizar el producto');
+    }
+    
+    // Redirigir a la lista de productos con mensaje de éxito
+    req.session.successMessage = 'Producto actualizado correctamente';
+    res.redirect('/admin/productos');
+  } catch (error) {
+    console.error('Error al actualizar producto:', error);
+    
+    // Obtener categorías y producto actual para mostrar el formulario nuevamente
+    const [productoActual, categorias] = await Promise.all([
+      Producto.getById(parseInt(req.params.id)),
+      Categoria.getAll()
+    ]);
+    
+    res.render('admin/producto-editar', {
+      titulo: 'Editar Producto',
+      admin: req.session.adminData,
+      producto: productoActual,
+      categorias,
+      error: `Error al actualizar el producto: ${error.message}`,
+      current_page: { productos: true },
+      standalone: true
+    });
+  }
+};
+
+/**
+ * Elimina un producto
+ */
+exports.eliminarProducto = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    
+    if (isNaN(id)) {
+      return res.status(400).render('error', {
+        titulo: 'Error',
+        mensaje: 'ID de producto inválido'
+      });
+    }
+    
+    // Obtener producto para eliminar su imagen
+    const producto = await Producto.getById(id);
+    
+    if (!producto) {
+      return res.status(404).render('error', {
+        titulo: 'Error',
+        mensaje: 'Producto no encontrado'
+      });
+    }
+    
+    // Eliminar imagen si no es la predeterminada
+    if (producto.imagen && !producto.imagen.includes('default-product.jpg')) {
+      try {
+        const imgPath = path.join(__dirname, '../../public', producto.imagen);
+        if (fs.existsSync(imgPath)) {
+          fs.unlinkSync(imgPath);
+        }
+      } catch (err) {
+        console.error('Error al eliminar imagen:', err);
+      }
+    }
+    
+    // Eliminar producto de la base de datos
+    const success = await Producto.delete(id);
+    
+    if (!success) {
+      throw new Error('No se pudo eliminar el producto');
+    }
+    
+    // Redirigir a la lista de productos con mensaje de éxito
+    req.session.successMessage = 'Producto eliminado correctamente';
+    res.redirect('/admin/productos');
+  } catch (error) {
+    console.error('Error al eliminar producto:', error);
+    res.status(500).render('error', {
+      titulo: 'Error',
+      mensaje: `Error al eliminar el producto: ${error.message}`,
+      error: process.env.NODE_ENV === 'development' ? error.stack : null
     });
   }
 };
