@@ -2,7 +2,8 @@
 .cart-icon {
     position: fixed;
     right: 20px;
-    bottom: 30px;
+    bottom: auto; /* Quitamos bottom para usar top */
+    top: 100px; /* Posición desde la parte superior */
     width: 60px;
     height: 60px;
     background-color: var(--color-primary);
@@ -18,11 +19,12 @@
     transition: all 0.3s ease;
 }
 
+/* Cursor estilo "mover" para indicar que es arrastrable */
 .cart-icon:hover {
     transform: scale(1.1);
-    background-color: #23ad5c; /* Un poco más oscuro que el color primario */
+    background-color: #23ad5c;
+    cursor: move;
 }
-
 .cart-count {
     position: absolute;
     top: -8px;

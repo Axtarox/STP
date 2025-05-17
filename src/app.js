@@ -50,7 +50,8 @@ app.use(dbDebugMiddleware);
  * Middleware para renderizar vistas HTML
  */
 app.use(renderViewMiddleware);
-
+// Middleware para adjuntar datos del administrador a todas las vistas
+app.use(require('./middlewares/authMiddleware').attachAdminData);
 /**
  * Variables globales (usadas desde scripts o apis)
  */
@@ -97,7 +98,7 @@ const serviciosRoutes = require('./routes/servicios');
 const carritoRoutes = require('./routes/carrito');
 const pedidosRoutes = require('./routes/pedidos');
 const contactoRoutes = require('./routes/contacto');
-
+const adminRoutes = require('./routes/admin');
 /**
  * Configurar rutas
  */
@@ -107,7 +108,7 @@ app.use('/productos', productosRoutes);
 app.use('/servicios', serviciosRoutes);
 app.use('/carrito', carritoRoutes);
 app.use('/pedidos', pedidosRoutes);
-
+app.use('/admin', adminRoutes);
 /**
  * Ruta Quiénes Somos
  */

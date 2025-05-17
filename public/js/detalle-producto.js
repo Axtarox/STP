@@ -1,6 +1,5 @@
 /**
  * Funcionalidad específica para la página de detalle de producto
- * con mensajes mejorados
  */
 document.addEventListener('DOMContentLoaded', function() {
     // Inicializar selector de cantidad
@@ -35,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Mostrar confirmación con el toast mejorado
             showToast(productName + ' ha sido añadido al carrito');
             
-            // Animar el icono del carrito para dar feedback visual
+            // Animar el botón flotante del carrito
             animateCartIcon();
         });
     }
@@ -121,16 +120,20 @@ function showToast(mensaje, tipo = 'success') {
 }
 
 /**
- * Anima el icono del carrito
+ * Anima el icono del carrito con rebote
  */
 function animateCartIcon() {
-    const cartIcon = document.querySelector('.cart-icon');
-    if (cartIcon) {
-        cartIcon.classList.add('cart-icon-animate');
+    // Buscar el carrito flotante por su ID
+    const floatingCart = document.getElementById('floating-cart');
+    
+    if (floatingCart) {
+        // Añadir clase de animación
+        floatingCart.classList.add('cart-bounce');
         
+        // Quitar la clase después de que termine la animación
         setTimeout(function() {
-            cartIcon.classList.remove('cart-icon-animate');
-        }, 500);
+            floatingCart.classList.remove('cart-bounce');
+        }, 750);
     }
 }
 

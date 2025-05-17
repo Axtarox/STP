@@ -1,8 +1,6 @@
-
 /**
  * Middleware optimizado para renderizar vistas HTML
- * - Elimina logs innecesarios
- * - Mejora el rendimiento
+ * - Ahora con soporte para páginas sin layout (standalone)
  */
 const fs = require('fs');
 const path = require('path');
@@ -14,6 +12,9 @@ module.exports = function renderViewMiddleware(req, res, next) {
     // Reemplazar el método render
     res.render = function(view, data = {}) {
         try {
+            // Verificar si es una página standalone (sin layout)
+            const isStandalone = data.standalone === true;
+            
             // Rutas de archivos
             const layoutPath = path.join(__dirname, '../../public/views/layouts/main.html');
             let viewPath;
@@ -25,7 +26,7 @@ module.exports = function renderViewMiddleware(req, res, next) {
             }
             
             // Verificar si existen los archivos
-            if (!fs.existsSync(layoutPath)) {
+            if (!isStandalone && !fs.existsSync(layoutPath)) {
                 throw new Error(`Layout no encontrado: ${layoutPath}`);
             }
             
@@ -34,11 +35,19 @@ module.exports = function renderViewMiddleware(req, res, next) {
             }
             
             // Leer archivos
-            let layoutContent = fs.readFileSync(layoutPath, 'utf8');
-            let viewContent = fs.readFileSync(viewPath, 'utf8');
+            let html;
             
-            // Reemplazar {{content}} en el layout con el contenido de la vista
-            let html = layoutContent.replace('{{content}}', viewContent);
+            if (isStandalone) {
+                // Para páginas standalone, usamos directamente el contenido de la vista
+                html = fs.readFileSync(viewPath, 'utf8');
+            } else {
+                // Para páginas normales, combinamos layout y vista
+                let layoutContent = fs.readFileSync(layoutPath, 'utf8');
+                let viewContent = fs.readFileSync(viewPath, 'utf8');
+                
+                // Reemplazar {{content}} en el layout con el contenido de la vista
+                html = layoutContent.replace('{{content}}', viewContent);
+            }
             
             // Funciones de ayuda para la vista
             const helpers = {

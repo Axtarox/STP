@@ -169,44 +169,147 @@
         if (checkoutForm) {
             checkoutForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                
-                const carrito = getCarritoFromStorage();
-                
-                if (carrito.items.length === 0) {
-                    alert('No puedes finalizar una compra con el carrito vacío');
-                    return;
-                }
-                
-                // Validar campos requeridos
-                const camposRequeridos = [
-                    'nombres', 'apellidos', 'tipo_documento', 'num_documento',
-                    'fecha_nacimiento', 'ciudad', 'direccion', 'telefono_movil', 'email'
-                ];
-                
-                let formularioValido = true;
-                camposRequeridos.forEach(campo => {
-                    const input = document.getElementById(campo);
-                    if (!input.value.trim()) {
-                        input.classList.add('error');
-                        formularioValido = false;
-                    } else {
-                        input.classList.remove('error');
-                    }
-                });
-                
-                if (!formularioValido) {
-                    alert('Por favor, completa todos los campos obligatorios');
-                    return;
-                }
-                
-                // Enviar pedido a WhatsApp
+                // Validar campos y enviar pedido
                 enviarPedidoWhatsApp();
             });
         }
     });
     
+    // Función mejorada para cargar el carrito
     function loadCart() {
-        // Código existente para cargar el carrito
+        // Obtener elementos del DOM
+        const cartItemsList = document.getElementById('cart-items-list');
+        const emptyCartMessage = document.querySelector('.empty-cart-message');
+        const cartTotalPrice = document.getElementById('cart-total-price');
+        const finalizarCompraBtn = document.getElementById('finalizar-compra-btn');
+        
+        if (!cartItemsList || !cartTotalPrice) return;
+        
+        // Obtener carrito desde localStorage
+        let carrito;
+        try {
+            carrito = JSON.parse(localStorage.getItem('carrito')) || { items: [], total: 0 };
+        } catch (e) {
+            carrito = { items: [], total: 0 };
+            console.error('Error al parsear carrito:', e);
+        }
+        
+        // Mostrar mensaje si el carrito está vacío
+        if (carrito.items.length === 0) {
+            if (emptyCartMessage) emptyCartMessage.style.display = 'block';
+            if (finalizarCompraBtn) finalizarCompraBtn.disabled = true;
+            cartItemsList.innerHTML = '';
+            cartTotalPrice.textContent = '$0';
+            return;
+        }
+        
+        // Ocultar mensaje de carrito vacío
+        if (emptyCartMessage) emptyCartMessage.style.display = 'none';
+        if (finalizarCompraBtn) finalizarCompraBtn.disabled = false;
+        
+        // Limpiar la lista de productos
+        cartItemsList.innerHTML = '';
+        
+        // Variables para calcular el total
+        let total = 0;
+        
+        // Mostrar cada producto en el carrito
+        carrito.items.forEach(item => {
+            const subtotal = item.precio * item.cantidad;
+            total += subtotal;
+            
+            // Crear elemento para el producto
+            const cartItem = document.createElement('div');
+            cartItem.className = 'cart-item';
+            cartItem.innerHTML = `
+                <div class="cart-item-img">
+                    <img src="${item.imagen || '/img/default-product.jpg'}" alt="${item.nombre}">
+                </div>
+                <div class="cart-item-details">
+                    <h3>${item.nombre}</h3>
+                    <p class="item-price">$${formatNumber(item.precio)}</p>
+                    <div class="item-quantity">
+                        <button class="quantity-btn minus" data-id="${item.id}">-</button>
+                        <span>${item.cantidad}</span>
+                        <button class="quantity-btn plus" data-id="${item.id}">+</button>
+                    </div>
+                </div>
+                <div class="cart-item-subtotal">
+                    <p>$${formatNumber(subtotal)}</p>
+                    <button class="remove-item" data-id="${item.id}">×</button>
+                </div>
+            `;
+            
+            cartItemsList.appendChild(cartItem);
+        });
+        
+        // Actualizar total en la interfaz
+        cartTotalPrice.textContent = `$${formatNumber(total)}`;
+        
+        // Guardar total en el carrito
+        carrito.total = total;
+        localStorage.setItem('carrito', JSON.stringify(carrito));
+        
+        // Añadir event listeners a los botones
+        addCartEventListeners();
+    }
+
+    // Función para formatear números con separadores de miles
+    function formatNumber(number) {
+        return number.toLocaleString('es-CO');
+    }
+
+    // Añadir event listeners a los botones del carrito
+    function addCartEventListeners() {
+        // Botones de incremento y decremento de cantidad
+        document.querySelectorAll('.quantity-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const productId = this.getAttribute('data-id');
+                const isPlus = this.classList.contains('plus');
+                
+                // Obtener carrito
+                let carrito = JSON.parse(localStorage.getItem('carrito')) || { items: [], total: 0 };
+                
+                // Encontrar el producto
+                const productIndex = carrito.items.findIndex(item => item.id === productId);
+                
+                if (productIndex !== -1) {
+                    if (isPlus) {
+                        // Incrementar cantidad
+                        carrito.items[productIndex].cantidad += 1;
+                    } else {
+                        // Decrementar cantidad
+                        carrito.items[productIndex].cantidad -= 1;
+                        
+                        // Remover si la cantidad llega a 0
+                        if (carrito.items[productIndex].cantidad <= 0) {
+                            carrito.items.splice(productIndex, 1);
+                        }
+                    }
+                    
+                    // Guardar carrito y recargar
+                    localStorage.setItem('carrito', JSON.stringify(carrito));
+                    loadCart();
+                }
+            });
+        });
+        
+        // Botones para eliminar productos
+        document.querySelectorAll('.remove-item').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const productId = this.getAttribute('data-id');
+                
+                // Obtener carrito
+                let carrito = JSON.parse(localStorage.getItem('carrito')) || { items: [], total: 0 };
+                
+                // Filtrar el producto
+                carrito.items = carrito.items.filter(item => item.id !== productId);
+                
+                // Guardar carrito y recargar
+                localStorage.setItem('carrito', JSON.stringify(carrito));
+                loadCart();
+            });
+        });
     }
     
     function updatePaymentDetails() {
@@ -257,7 +360,53 @@
     }
     
     function enviarPedidoWhatsApp() {
+        // Obtener carrito
+        let carrito;
+        try {
+            carrito = JSON.parse(localStorage.getItem('carrito')) || { items: [], total: 0 };
+        } catch (e) {
+            console.error('Error al parsear carrito:', e);
+            alert('Ocurrió un error al procesar el carrito');
+            return;
+        }
+        
+        // Verificar si hay productos en el carrito
+        if (carrito.items.length === 0) {
+            alert('No puedes finalizar una compra con el carrito vacío');
+            return;
+        }
+        
         // Obtener datos del formulario
+        const form = document.getElementById('checkout-form');
+        
+        if (!form) {
+            alert('Error al procesar el formulario');
+            return;
+        }
+        
+        // Validar campos requeridos
+        const camposRequeridos = [
+            'nombres', 'apellidos', 'tipo_documento', 'num_documento',
+            'fecha_nacimiento', 'ciudad', 'direccion', 'telefono_movil', 'email'
+        ];
+        
+        let formularioValido = true;
+        camposRequeridos.forEach(campo => {
+            const input = document.getElementById(campo);
+            if (!input.value.trim()) {
+                input.classList.add('error');
+                formularioValido = false;
+            } else {
+                input.classList.remove('error');
+            }
+        });
+        
+        if (!formularioValido) {
+            alert('Por favor, completa todos los campos obligatorios');
+            return;
+        }
+        
+        // Obtener valores del formulario
         const nombres = document.getElementById('nombres').value;
         const apellidos = document.getElementById('apellidos').value;
         const tipoDocumento = document.getElementById('tipo_documento').value;
@@ -269,47 +418,59 @@
         const email = document.getElementById('email').value;
         const metodoPago = document.querySelector('input[name="metodo_pago"]:checked').value;
         
-        // Obtener carrito
-        const carrito = getCarritoFromStorage();
-        
-        if (carrito.items.length === 0) {
-            alert('El carrito está vacío');
-            return;
-        }
+        // Campos opcionales
+        const sexo = document.getElementById('sexo')?.value || '';
+        const estadoCivil = document.getElementById('estado_civil')?.value || '';
+        const telefonoFijo = document.getElementById('telefono_fijo')?.value || '';
         
         // Crear mensaje de WhatsApp
         let mensaje = `*Nuevo Pedido*%0A%0A`;
         mensaje += `*Nombres:* ${nombres}%0A`;
         mensaje += `*Apellidos:* ${apellidos}%0A`;
         mensaje += `*Documento:* ${tipoDocumento} ${numDocumento}%0A`;
-        mensaje += `*Teléfono Móvil:* ${telefonoMovil}%0A`;
+        mensaje += `*Fecha Nacimiento:* ${fechaNacimiento}%0A`;
         mensaje += `*Ciudad:* ${ciudad}%0A`;
         mensaje += `*Dirección:* ${direccion}%0A`;
+        mensaje += `*Teléfono Móvil:* ${telefonoMovil}%0A`;
         mensaje += `*Email:* ${email}%0A`;
+        
+        if (telefonoFijo) {
+            mensaje += `*Teléfono Fijo:* ${telefonoFijo}%0A`;
+        }
+        
+        if (sexo) {
+            mensaje += `*Sexo:* ${sexo}%0A`;
+        }
+        
+        if (estadoCivil) {
+            mensaje += `*Estado Civil:* ${estadoCivil}%0A`;
+        }
+        
         mensaje += `*Método de Pago:* ${metodoPago}%0A%0A`;
         mensaje += `*Productos:*%0A`;
         
+        // Añadir productos al mensaje
         carrito.items.forEach(item => {
-            mensaje += `- ${item.cantidad}x ${item.nombre} - $${(item.precio * item.cantidad).toLocaleString('es-CO')}%0A`;
+            const subtotal = item.precio * item.cantidad;
+            mensaje += `- ${item.cantidad}x ${item.nombre} - $${formatNumber(subtotal)}%0A`;
         });
         
-        mensaje += `%0A*Total:* $${carrito.total.toLocaleString('es-CO')}`;
+        mensaje += `%0A*Total:* $${formatNumber(carrito.total)}`;
         
         // Número de WhatsApp de la empresa
         const whatsappNumber = '573126421560';
         
-        // Crear URL de WhatsApp y redirigir
+        // Crear URL de WhatsApp y abrir en nueva ventana
         const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${mensaje}`;
         window.open(whatsappUrl, '_blank');
         
         // Limpiar carrito después de enviar
         localStorage.removeItem('carrito');
         
-        // Mostrar mensaje de confirmación
-        alert('¡Pedido enviado correctamente!');
-        
         // Redirigir a la página de confirmación
-        window.location.href = '/pedidos/confirmacion';
+        setTimeout(() => {
+            window.location.href = '/pedidos/confirmacion';
+        }, 1000);
     }
 </script>
 

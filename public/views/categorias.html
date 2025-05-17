@@ -33,24 +33,3 @@
     </div>
 </section>
 
-<section class="container featured-products">
-    <h2 class="section-title">Productos Destacados</h2>
-    
-    <div class="products">
-        {{#each destacados}}
-        <div class="product-card">
-            <div class="product-image">
-                <img src="{{imagen}}" alt="{{nombre}}">
-            </div>
-            <div class="product-info">
-                <h3 class="product-title">{{nombre}}</h3>
-                <p class="product-price">${{precio}}</p>
-                <div class="product-actions">
-                    <a href="/productos/{{id}}" class="btn btn-secondary">Ver detalles</a>
-                    <button class="add-to-cart" data-id="{{id}}">Añadir al carrito</button>
-                </div>
-            </div>
-        </div>
-        {{/each}}
-    </div>
-</section>

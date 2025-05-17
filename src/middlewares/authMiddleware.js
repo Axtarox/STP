@@ -1,25 +1,27 @@
 /**
- * Middleware de autenticación para proteger rutas del panel de administración
- * Nota: Este es un middleware temporal básico hasta implementar la autenticación completa
+ * Middleware de autenticación mejorado para proteger rutas del panel de administración
  */
 
 /**
  * Verifica si el usuario está autenticado como administrador
- * En esta versión inicial, permite el acceso a todas las rutas mientras
- * se implementa el sistema de autenticación completo
  */
 exports.isAdmin = (req, res, next) => {
-  // TEMP: Por ahora permitimos el acceso a todas las rutas admin
-  // TODO: Implementar verificación real de autenticación
-  next();
-  
-  // Cuando se implemente la autenticación, se usará código como este:
-  /*
-  if (req.session && req.session.user && req.session.user.isAdmin) {
+  // Verificar si hay una sesión de administrador activa
+  if (req.session && req.session.adminLoggedIn) {
     next();
   } else {
-    req.flash('error', 'Acceso no autorizado');
-    res.redirect('/login');
+    // Redirigir a la página de login
+    res.redirect('/admin/login');
   }
-  */
+};
+
+/**
+ * Middleware para adjuntar datos del administrador a las vistas
+ */
+exports.attachAdminData = (req, res, next) => {
+  if (req.session && req.session.adminLoggedIn) {
+    res.locals.adminLoggedIn = true;
+    res.locals.adminData = req.session.adminData;
+  }
+  next();
 };
