@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{titulo}} | Soluciones Tecnológicas Pradito</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .category-icon {
+            font-size: 3rem;
+            color: #2ecc71;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        
+        .category-products {
+            margin-top: 2rem;
+        }
+        
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .product-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .product-image {
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .product-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .product-info {
+            flex: 1;
+        }
+        
+        .product-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--admin-dark);
+        }
+        
+        .product-price {
+            color: var(--admin-primary);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .no-products {
+            text-align: center;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-sidebar-header">
+                <a href="/admin" class="admin-logo">Soluciones <span>Tecnológicas</span> Pradito</a>
+                <p>Panel de Administración</p>
+            </div>
+            
+            <nav class="admin-nav">
+                <div class="admin-nav-title">Principal</div>
+                <ul class="admin-nav-menu">
+                    <li class="admin-nav-item">
+                        <a href="/admin/dashboard" class="admin-nav-link {{#if current_page.dashboard}}active{{/if}}">
+                            <span class="admin-nav-icon"><i class="fas fa-tachometer-alt"></i></span>
+                            <span class="admin-nav-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="admin-nav-item">
+                        <a href="/admin/productos" class="admin-nav-link {{#if current_page.productos}}active{{/if}}">
+                            <span class="admin-nav-icon"><i class="fas fa-box"></i></span>
+                            <span class="admin-nav-text">Productos</span>
+                        </a>
+                    </li>
+                    <li class="admin-nav-item">
+                        <a href="/admin/categorias" class="admin-nav-link {{#if current_page.categorias}}active{{/if}}">
+                            <span class="admin-nav-icon"><i class="fas fa-tags"></i></span>
+                            <span class="admin-nav-text">Categorías</span>
+                        </a>
+                    </li>
+                    <li class="admin-nav-item">
+                        <a href="/admin/servicios" class="admin-nav-link {{#if current_page.servicios}}active{{/if}}">
+                            <span class="admin-nav-icon"><i class="fas fa-cogs"></i></span>
+                            <span class="admin-nav-text">Servicios</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="admin-nav-title">Cuenta</div>
+                <ul class="admin-nav-menu">
+                    <li class="admin-nav-item">
+                        <a href="/admin/logout" class="admin-nav-link">
+                            <span class="admin-nav-icon"><i class="fas fa-sign-out-alt"></i></span>
+                            <span class="admin-nav-text">Cerrar Sesión</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1 class="admin-page-title">{{titulo}}</h1>
+                <div class="admin-user-menu">
+                    <div class="admin-user-info">
+                        <div class="admin-user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div>
+                            <div class="admin-user-name">{{admin.nombre}}</div>
+                            <div class="admin-user-role">Administrador</div>
+                        </div>
+                    </div>
+                    <div class="admin-user-dropdown">
+                        <a href="/admin/logout" class="admin-dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                        </a>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="admin-content">
+                {{#if success}}
+                <div class="admin-alert admin-alert-success">
+                    <i class="fas fa-check-circle"></i> {{success}}
+                </div>
+                {{/if}}
+                
+                {{#if error}}
+                <div class="admin-alert admin-alert-danger">
+                    <i class="fas fa-exclamation-circle"></i> {{error}}
+                </div>
+                {{/if}}
+                
+                <div class="admin-actions">
+                    <a href="/admin/categorias" class="admin-btn admin-btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver a Categorías
+                    </a>
+                    <a href="/admin/categorias/editar/{{categoria.id}}" class="admin-btn admin-btn-primary">
+                        <i class="fas fa-edit"></i> Editar Categoría
+                    </a>
+                    <button id="deleteBtn" class="admin-btn admin-btn-danger">
+                        <i class="fas fa-trash"></i> Eliminar Categoría
+                    </button>
+                </div>
+                
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <h2 class="admin-card-title">Detalles de la Categoría</h2>
+                    </div>
+                    
+                    <div class="admin-card-body">
+                        <div class="category-icon">
+                            <i class="fas fa-tag"></i>
+                        </div>
+                        
+                        <h3>{{categoria.nombre}}</h3>
+                        
+                        {{#if categoria.descripcion}}
+                        <div class="category-description">
+                            <p>{{categoria.descripcion}}</p>
+                        </div>
+                        {{else}}
+                        <div class="category-description">
+                            <p><em>Sin descripción</em></p>
+                        </div>
+                        {{/if}}
+                        
+                        <div class="category-products">
+                            <h3>Productos en esta categoría ({{productos.length}})</h3>
+                            
+                            {{#if productos.length}}
+                            <div class="product-grid">
+                                {{#each productos}}
+                                <div class="product-card">
+                                    <div class="product-image">
+                                        <img src="{{imagen}}" alt="{{nombre}}" onerror="this.src='/img/default-product.jpg'">
+                                    </div>
+                                    <div class="product-info">
+                                        <h4 class="product-title">{{nombre}}</h4>
+                                        <div class="product-price">${{precio}}</div>
+                                        <a href="/admin/productos/{{id}}" class="admin-btn admin-btn-outline admin-btn-sm">
+                                            Ver detalle
+                                        </a>
+                                    </div>
+                                </div>
+                                {{/each}}
+                            </div>
+                            {{else}}
+                            <div class="no-products">
+                                <p>No hay productos en esta categoría.</p>
+                                <a href="/admin/productos/crear" class="admin-btn admin-btn-primary">
+                                    <i class="fas fa-plus"></i> Crear Producto
+                                </a>
+                            </div>
+                            {{/if}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Modal de confirmación para eliminar -->
+    <div id="deleteModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+        <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+            <h3 style="margin-top: 0;">Confirmar eliminación</h3>
+            <p>¿Está seguro de que desea eliminar la categoría "{{categoria.nombre}}"? Esta acción no se puede deshacer.</p>
+            
+            {{#if productos.length}}
+            <div class="admin-alert admin-alert-warning" style="margin-top: 1rem;">
+                <i class="fas fa-exclamation-triangle"></i> Esta categoría tiene {{productos.length}} productos asociados. Eliminarla podría afectar a estos productos.
+            </div>
+            {{/if}}
+            
+            <div style="text-align: right; margin-top: 20px;">
+                <button id="cancelDelete" class="admin-btn admin-btn-secondary" style="margin-right: 10px;">Cancelar</button>
+                <button id="confirmDelete" class="admin-btn admin-btn-danger">Eliminar</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Referencia al modal y sus elementos
+        const deleteModal = document.getElementById('deleteModal');
+        const confirmDeleteBtn = document.getElementById('confirmDelete');
+        const cancelDeleteBtn = document.getElementById('cancelDelete');
+        const deleteBtn = document.getElementById('deleteBtn');
+        
+        // Mostrar el modal al hacer clic en el botón de eliminar
+        deleteBtn.addEventListener('click', function() {
+            deleteModal.style.display = 'block';
+        });
+        
+        // Confirmar eliminación
+        confirmDeleteBtn.addEventListener('click', function() {
+            window.location.href = '/admin/categorias/eliminar/{{categoria.id}}';
+        });
+        
+        // Cancelar eliminación
+        cancelDeleteBtn.addEventListener('click', function() {
+            deleteModal.style.display = 'none';
+        });
+        
+        // Cerrar el modal si se hace clic fuera de él
+        window.addEventListener('click', function(event) {
+            if (event.target === deleteModal) {
+                deleteModal.style.display = 'none';
+            }
+        });
+    });
+    </script>
+</body>
+</html>

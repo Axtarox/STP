@@ -1,12 +1,12 @@
 /**
- * Rutas para el panel de administración actualizadas
- * - Usa el middleware de carga de archivos
+ * Rutas actualizadas para el panel de administración
  */
 
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/AuthController');
 const dashboardController = require('../controllers/DashboardController');
+const categoriaController = require('../controllers/CategoriaController');
 const authMiddleware = require('../middlewares/authMiddleware');
 const upload = require('../middlewares/uploadMiddleware');
 
@@ -16,6 +16,12 @@ router.use((req, res, next) => {
   if (req.session.successMessage) {
     res.locals.success = req.session.successMessage;
     delete req.session.successMessage;
+  }
+  
+  // Pasar mensaje de error a la vista y luego eliminarlo de la sesión
+  if (req.session.error) {
+    res.locals.error = req.session.error;
+    delete req.session.error;
   }
   
   next();
@@ -43,7 +49,13 @@ router.post('/productos/editar/:id', upload.single('imagen'), dashboardControlle
 router.get('/productos/eliminar/:id', dashboardController.eliminarProducto);
 
 // Gestión de categorías
-router.get('/categorias', dashboardController.getCategorias);
+router.get('/categorias', categoriaController.getAdminCategorias);
+router.get('/categorias/crear', categoriaController.getCrearCategoriaForm);
+router.post('/categorias/crear', categoriaController.crearCategoria);
+router.get('/categorias/:id', categoriaController.getCategoriaById);
+router.get('/categorias/editar/:id', categoriaController.getEditarCategoriaForm);
+router.post('/categorias/editar/:id', categoriaController.editarCategoria);
+router.get('/categorias/eliminar/:id', categoriaController.eliminarCategoria);
 
 // Gestión de servicios
 router.get('/servicios', dashboardController.getServicios);

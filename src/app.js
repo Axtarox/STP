@@ -87,7 +87,6 @@ app.use(async (req, res, next) => {
     next();
   }
 });
-
 /**
  * Importar rutas
  */
@@ -99,6 +98,7 @@ const carritoRoutes = require('./routes/carrito');
 const pedidosRoutes = require('./routes/pedidos');
 const contactoRoutes = require('./routes/contacto');
 const adminRoutes = require('./routes/admin');
+
 /**
  * Configurar rutas
  */
@@ -108,6 +108,7 @@ app.use('/productos', productosRoutes);
 app.use('/servicios', serviciosRoutes);
 app.use('/carrito', carritoRoutes);
 app.use('/pedidos', pedidosRoutes);
+app.use('/contactanos', contactoRoutes);
 app.use('/admin', adminRoutes);
 /**
  * Ruta Quiénes Somos

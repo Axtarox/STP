@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{titulo}} | Soluciones Tecnológicas Pradito</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-sidebar-header">
+                <a href="/admin" class="admin-logo">Soluciones <span>Tecnológicas</span> Pradito</a>
+                <p>Panel de Administración</p>
+            </div>
+            
+            <nav class="admin-nav">
+                <div class="admin-nav-title">Principal</div>
+                <ul class="admin-nav-menu">
+                    <li class="admin-nav-item">
+                        <a href="/admin/dashboard" class="admin-nav-link {{#if current_page.dashboard}}active{{/if}}">
+                            <span class="admin-nav-icon"><i class="fas fa-tachometer-alt"></i></span>
+                            <span class="admin-nav-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="admin-nav-item">
+                        <a href="/admin/productos" class="admin-nav-link {{#if current_page.productos}}active{{/if}}">
+                            <span class="admin-nav-icon"><i class="fas fa-box"></i></span>
+                            <span class="admin-nav-text">Productos</span>
+                        </a>
+                    </li>
+                    <li class="admin-nav-item">
+                        <a href="/admin/categorias" class="admin-nav-link {{#if current_page.categorias}}active{{/if}}">
+                            <span class="admin-nav-icon"><i class="fas fa-tags"></i></span>
+                            <span class="admin-nav-text">Categorías</span>
+                        </a>
+                    </li>
+                    <li class="admin-nav-item">
+                        <a href="/admin/servicios" class="admin-nav-link {{#if current_page.servicios}}active{{/if}}">
+                            <span class="admin-nav-icon"><i class="fas fa-cogs"></i></span>
+                            <span class="admin-nav-text">Servicios</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="admin-nav-title">Cuenta</div>
+                <ul class="admin-nav-menu">
+                    <li class="admin-nav-item">
+                        <a href="/admin/logout" class="admin-nav-link">
+                            <span class="admin-nav-icon"><i class="fas fa-sign-out-alt"></i></span>
+                            <span class="admin-nav-text">Cerrar Sesión</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1 class="admin-page-title">{{titulo}}</h1>
+                <div class="admin-user-menu">
+                    <div class="admin-user-info">
+                        <div class="admin-user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div>
+                            <div class="admin-user-name">{{admin.nombre}}</div>
+                            <div class="admin-user-role">Administrador</div>
+                        </div>
+                    </div>
+                    <div class="admin-user-dropdown">
+                        <a href="/admin/logout" class="admin-dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                        </a>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="admin-content">
+                {{#if success}}
+                <div class="admin-alert admin-alert-success">
+                    <i class="fas fa-check-circle"></i> {{success}}
+                </div>
+                {{/if}}
+                
+                {{#if error}}
+                <div class="admin-alert admin-alert-danger">
+                    <i class="fas fa-exclamation-circle"></i> {{error}}
+                </div>
+                {{/if}}
+                
+                <form class="admin-form" action="/admin/categorias/editar/{{categoria.id}}" method="POST" id="editCategoryForm">
+                    <h2 class="admin-form-title">Editar Categoría</h2>
+                    
+                    <div class="admin-form-group">
+                        <label for="nombre">Nombre de la Categoría *</label>
+                        <input type="text" id="nombre" name="nombre" class="admin-form-control" value="{{categoria.nombre}}" required>
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="descripcion">Descripción</label>
+                        <textarea id="descripcion" name="descripcion" class="admin-form-control" rows="4">{{categoria.descripcion}}</textarea>
+                    </div>
+                    
+                    {{#if productsCount}}
+                    <div class="admin-alert admin-alert-info">
+                        <i class="fas fa-info-circle"></i> Esta categoría tiene {{productsCount}} productos asociados.
+                    </div>
+                    {{/if}}
+                    
+                    <div class="admin-form-actions">
+                        <a href="/admin/categorias" class="admin-btn admin-btn-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                        <button type="submit" class="admin-btn admin-btn-primary">
+                            <i class="fas fa-save"></i> Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('editCategoryForm');
+        
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const nombreInput = document.getElementById('nombre');
+                
+                // Validación básica del formulario
+                if (!nombreInput.value.trim()) {
+                    e.preventDefault();
+                    nombreInput.classList.add('error');
+                    alert('Por favor, ingrese un nombre para la categoría');
+                }
+            });
+        }
+    });
+    </script>
+</body>
+</html>

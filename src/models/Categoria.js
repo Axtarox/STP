@@ -1,5 +1,5 @@
 /**
- * Modelo para la entidad Categoria
+ * Modelo mejorado para la entidad Categoria
  */
 
 const { pool } = require('../config/database');
@@ -18,7 +18,7 @@ class Categoria {
       return rows;
     } catch (error) {
       console.error('Error en Categoria.getAll:', error);
-      throw error;
+      return [];
     }
   }
 
@@ -36,25 +36,26 @@ class Categoria {
       return rows.length > 0 ? rows[0] : null;
     } catch (error) {
       console.error(`Error en Categoria.getById(${id}):`, error);
-      throw error;
+      return null;
     }
   }
 
   /**
    * Crea una nueva categoría
    * @param {string} nombre - Nombre de la categoría
-   * @returns {Promise<number>} ID de la categoría creada
+   * @param {string} descripcion - Descripción de la categoría
+   * @returns {Promise<number|null>} ID de la categoría creada o null en caso de error
    */
-  static async create(nombre) {
+  static async create(nombre, descripcion = '') {
     try {
       const [result] = await pool.query(`
-        INSERT INTO categoria (nombre) 
-        VALUES (?)
-      `, [nombre]);
+        INSERT INTO categoria (nombre, descripcion) 
+        VALUES (?, ?)
+      `, [nombre, descripcion]);
       return result.insertId;
     } catch (error) {
       console.error(`Error en Categoria.create("${nombre}"):`, error);
-      throw error;
+      return null;
     }
   }
 
@@ -62,19 +63,20 @@ class Categoria {
    * Actualiza una categoría existente
    * @param {number} id - ID de la categoría
    * @param {string} nombre - Nuevo nombre de la categoría
+   * @param {string} descripcion - Nueva descripción de la categoría
    * @returns {Promise<boolean>} Resultado de la operación
    */
-  static async update(id, nombre) {
+  static async update(id, nombre, descripcion = '') {
     try {
       const [result] = await pool.query(`
         UPDATE categoria 
-        SET nombre = ?
+        SET nombre = ?, descripcion = ?
         WHERE id = ?
-      `, [nombre, id]);
+      `, [nombre, descripcion, id]);
       return result.affectedRows > 0;
     } catch (error) {
       console.error(`Error en Categoria.update(${id}, "${nombre}"):`, error);
-      throw error;
+      return false;
     }
   }
 
@@ -92,7 +94,7 @@ class Categoria {
       return result.affectedRows > 0;
     } catch (error) {
       console.error(`Error en Categoria.delete(${id}):`, error);
-      throw error;
+      return false;
     }
   }
 
@@ -111,7 +113,24 @@ class Categoria {
       return rows[0].count > 0;
     } catch (error) {
       console.error(`Error en Categoria.hasProducts(${id}):`, error);
-      throw error;
+      return false;
+    }
+  }
+  
+  /**
+   * Obtiene el total de categorías en la base de datos
+   * @returns {Promise<number>} Total de categorías
+   */
+  static async getCount() {
+    try {
+      const [result] = await pool.query(`
+        SELECT COUNT(*) as total 
+        FROM categoria
+      `);
+      return result[0].total;
+    } catch (error) {
+      console.error('Error en Categoria.getCount:', error);
+      return 0;
     }
   }
 }

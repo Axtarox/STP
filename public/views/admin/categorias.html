@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{titulo}} | Soluciones Tecnológicas Pradito</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        /* Estilos mejorados para los botones de acción */
+        .admin-table-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+        }
+        
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .action-btn.view {
+            background-color: #2ecc71;
+        }
+        
+        .action-btn.edit {
+            background-color: #2ecc71;
+        }
+        
+        .action-btn.delete {
+            background-color: #2ecc71;
+        }
+        
+        .action-btn:hover {
+            opacity: 0.85;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Estilo de conteo de productos por categoría */
+        .product-count {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            background-color: #f1f1f1;
+            color: #666;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-sidebar-header">
+                <a href="/admin" class="admin-logo">Soluciones <span>Tecnológicas</span> Pradito</a>
+                <p>Panel de Administración</p>
+            </div>
+            
+            <nav class="admin-nav">
+                <div class="admin-nav-title">Principal</div>
+                <ul class="admin-nav-menu">
+                    <li class="admin-nav-item">
+                        <a href="/admin/dashboard" class="admin-nav-link {{#if current_page.dashboard}}active{{/if}}">
+                            <span class="admin-nav-icon"><i class="fas fa-tachometer-alt"></i></span>
+                            <span class="admin-nav-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="admin-nav-item">
+                        <a href="/admin/productos" class="admin-nav-link {{#if current_page.productos}}active{{/if}}">
+                            <span class="admin-nav-icon"><i class="fas fa-box"></i></span>
+                            <span class="admin-nav-text">Productos</span>
+                        </a>
+                    </li>
+                    <li class="admin-nav-item">
+                        <a href="/admin/categorias" class="admin-nav-link {{#if current_page.categorias}}active{{/if}}">
+                            <span class="admin-nav-icon"><i class="fas fa-tags"></i></span>
+                            <span class="admin-nav-text">Categorías</span>
+                        </a>
+                    </li>
+                    <li class="admin-nav-item">
+                        <a href="/admin/servicios" class="admin-nav-link {{#if current_page.servicios}}active{{/if}}">
+                            <span class="admin-nav-icon"><i class="fas fa-cogs"></i></span>
+                            <span class="admin-nav-text">Servicios</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="admin-nav-title">Cuenta</div>
+                <ul class="admin-nav-menu">
+                    <li class="admin-nav-item">
+                        <a href="/admin/logout" class="admin-nav-link">
+                            <span class="admin-nav-icon"><i class="fas fa-sign-out-alt"></i></span>
+                            <span class="admin-nav-text">Cerrar Sesión</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1 class="admin-page-title">{{titulo}}</h1>
+                <div class="admin-user-menu">
+                    <div class="admin-user-info">
+                        <div class="admin-user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div>
+                            <div class="admin-user-name">{{admin.nombre}}</div>
+                            <div class="admin-user-role">Administrador</div>
+                        </div>
+                    </div>
+                    <div class="admin-user-dropdown">
+                        <a href="/admin/logout" class="admin-dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                        </a>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="admin-content">
+                {{#if success}}
+                <div class="admin-alert admin-alert-success">
+                    <i class="fas fa-check-circle"></i> {{success}}
+                </div>
+                {{/if}}
+                
+                {{#if error}}
+                <div class="admin-alert admin-alert-danger">
+                    <i class="fas fa-exclamation-circle"></i> {{error}}
+                </div>
+                {{/if}}
+                
+                <div class="admin-actions">
+                    <a href="/admin/categorias/crear" class="admin-btn admin-btn-primary">
+                        <i class="fas fa-plus"></i> Nueva Categoría
+                    </a>
+                </div>
+                
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Productos</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each categorias}}
+                        <tr>
+                            <td>{{id}}</td>
+                            <td>{{nombre}}</td>
+                            <td>{{descripcion}}</td>
+                            <td class="text-center">
+                                <span class="product-count">{{productCount}}</span>
+                            </td>
+                            <td>
+                                <div class="admin-table-actions">
+                                    <a href="/admin/categorias/{{id}}" class="action-btn view" title="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="/admin/categorias/editar/{{id}}" class="action-btn edit" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="action-btn delete delete-btn" data-id="{{id}}" title="Eliminar">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+                
+                {{#if categorias.length === 0}}
+                <div class="no-results">
+                    <p>No hay categorías disponibles.</p>
+                </div>
+                {{/if}}
+            </div>
+        </main>
+    </div>
+    
+    <!-- Modal de confirmación para eliminar -->
+    <div id="deleteModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+        <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+            <h3 style="margin-top: 0;">Confirmar eliminación</h3>
+            <p>¿Está seguro de que desea eliminar esta categoría? Esta acción no se puede deshacer.</p>
+            <p id="categoria-con-productos" style="color: #e74c3c; display: none;">
+                <i class="fas fa-exclamation-triangle"></i> Esta categoría tiene productos asociados. Eliminarla podría afectar a estos productos.
+            </p>
+            <div style="text-align: right; margin-top: 20px;">
+                <button id="cancelDelete" class="admin-btn admin-btn-secondary" style="margin-right: 10px;">Cancelar</button>
+                <button id="confirmDelete" class="admin-btn admin-btn-danger">Eliminar</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Referencia al modal y sus elementos
+        const deleteModal = document.getElementById('deleteModal');
+        const confirmDeleteBtn = document.getElementById('confirmDelete');
+        const cancelDeleteBtn = document.getElementById('cancelDelete');
+        const categoriaConProductos = document.getElementById('categoria-con-productos');
+        let currentCategoriaId = null;
+        let tieneProductos = false;
+        
+        // Botones de eliminar
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                currentCategoriaId = this.dataset.id;
+                
+                // Verificar si la categoría tiene productos
+                const fila = this.closest('tr');
+                const productCount = fila.querySelector('.product-count').textContent;
+                tieneProductos = parseInt(productCount) > 0;
+                
+                // Mostrar advertencia si la categoría tiene productos
+                if (tieneProductos) {
+                    categoriaConProductos.style.display = 'block';
+                } else {
+                    categoriaConProductos.style.display = 'none';
+                }
+                
+                deleteModal.style.display = 'block';
+            });
+        });
+        
+        // Confirmar eliminación
+        confirmDeleteBtn.addEventListener('click', function() {
+            if (currentCategoriaId) {
+                window.location.href = `/admin/categorias/eliminar/${currentCategoriaId}`;
+            }
+            deleteModal.style.display = 'none';
+        });
+        
+        // Cancelar eliminación
+        cancelDeleteBtn.addEventListener('click', function() {
+            deleteModal.style.display = 'none';
+        });
+        
+        // Cerrar el modal si se hace clic fuera de él
+        window.addEventListener('click', function(event) {
+            if (event.target === deleteModal) {
+                deleteModal.style.display = 'none';
+            }
+        });
+    });
+    </script>
+</body>
+</html>

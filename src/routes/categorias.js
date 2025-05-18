@@ -1,41 +1,75 @@
 /**
- * Rutas para la gestión de categorías
+ * Rutas actualizadas para categorías (corregidas)
  */
 
 const express = require('express');
 const router = express.Router();
 const categoriaController = require('../controllers/CategoriaController');
 const productoController = require('../controllers/ProductoController');
-// Importamos el middleware de autenticación
-const authMiddleware = require('../middlewares/authMiddleware');
 
 /**
  * Rutas públicas
  */
 
 // Obtener todas las categorías
-router.get('/', categoriaController.getAllCategorias);
+router.get('/', async (req, res) => {
+    try {
+        // Usar el modelo de Categoria para obtener los datos
+        const Categoria = require('../models/Categoria');
+        const categorias = await Categoria.getAll();
+        
+        res.render('categorias', {
+            categorias,
+            titulo: 'Categorías de Productos'
+        });
+    } catch (error) {
+        console.error('Error al obtener categorías:', error);
+        res.status(500).render('error', {
+            titulo: 'Error',
+            mensaje: 'Error al cargar las categorías',
+            error: process.env.NODE_ENV === 'development' ? error.message : null
+        });
+    }
+});
 
 // Ver detalle de una categoría
-router.get('/:id/detalle', categoriaController.getCategoriaById);
+router.get('/:id/detalle', async (req, res) => {
+    try {
+        const id = parseInt(req.params.id, 10);
+        
+        if (isNaN(id)) {
+            return res.status(400).render('error', {
+                titulo: 'Error',
+                mensaje: 'ID de categoría inválido'
+            });
+        }
+        
+        // Obtener la categoría seleccionada
+        const Categoria = require('../models/Categoria');
+        const categoria = await Categoria.getById(id);
+        
+        if (!categoria) {
+            return res.status(404).render('error', {
+                titulo: 'Error',
+                mensaje: 'Categoría no encontrada'
+            });
+        }
+        
+        res.render('categoria-detalle', {
+            categoria,
+            titulo: `Categoría: ${categoria.nombre}`
+        });
+    } catch (error) {
+        console.error(`Error al obtener categoría ${req.params.id}:`, error);
+        res.status(500).render('error', {
+            titulo: 'Error',
+            mensaje: 'Error al cargar la categoría',
+            error: process.env.NODE_ENV === 'development' ? error.message : null
+        });
+    }
+});
 
 // Ver productos de una categoría
 router.get('/:id', productoController.getProductosByCategoria);
-
-/**
- * Rutas de administración (protegidas)
- * NOTA: Estas rutas están comentadas hasta que se implemente el módulo de administración
- */
-
-// Middleware para proteger rutas administrativas
-// router.use('/admin', authMiddleware.isAdmin);
-
-// Rutas de administración para categorías
-/*
-router.get('/admin', authMiddleware.isAdmin, categoriaController.adminGetAllCategorias);
-router.post('/admin/crear', authMiddleware.isAdmin, categoriaController.createCategoria);
-router.post('/admin/actualizar/:id', authMiddleware.isAdmin, categoriaController.updateCategoria);
-router.get('/admin/eliminar/:id', authMiddleware.isAdmin, categoriaController.deleteCategoria);
-*/
 
 module.exports = router;

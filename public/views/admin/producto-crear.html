@@ -7,6 +7,34 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        /* Estilos adicionales para el campo de precio */
+        .price-input-container {
+            position: relative;
+        }
+        
+        .price-input-container::before {
+            content: '$';
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            font-weight: bold;
+        }
+        
+        .price-input {
+            padding-left: 25px !important;
+            font-weight: bold;
+            color: #2ecc71;
+        }
+        
+        /* Estilos para categorías seleccionadas */
+        .admin-form-control option:checked {
+            background-color: #2ecc71;
+            color: white;
+        }
+    </style>
 </head>
 <body>
     <div class="admin-layout">
@@ -116,8 +144,10 @@
                     <div class="admin-form-row">
                         <div class="admin-form-group">
                             <label for="precio_display">Precio *</label>
-                            <input type="text" id="precio_display" class="admin-form-control" required>
-                            <input type="hidden" id="precio" name="precio" value="0">
+                            <div class="price-input-container">
+                                <input type="text" id="precio_display" class="admin-form-control price-input" required>
+                                <input type="hidden" id="precio" name="precio" value="0">
+                            </div>
                             <small>Puede usar puntos como separadores de miles (Ej: 1.500.000)</small>
                         </div>
                         
@@ -179,21 +209,36 @@
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Previsualización de imagen
-        document.getElementById('imagen').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const preview = document.querySelector('.admin-form-preview');
-                    preview.style.display = 'block';
-                    const img = preview.querySelector('img');
-                    img.src = event.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
+        const imagenInput = document.getElementById('imagen');
+        if (imagenInput) {
+            imagenInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        // Si ya existe una previsualización, actualizarla
+                        let preview = document.querySelector('.admin-form-preview');
+                        
+                        // Si no existe, crear una nueva
+                        if (!preview) {
+                            preview = document.createElement('div');
+                            preview.className = 'admin-form-preview';
+                            const img = document.createElement('img');
+                            preview.appendChild(img);
+                            e.target.parentNode.appendChild(preview);
+                        }
+                        
+                        preview.style.display = 'block';
+                        const img = preview.querySelector('img');
+                        img.src = event.target.result;
+                        img.alt = 'Vista previa';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
         
-        // Formateo de precio con separadores de miles
+        // Formateo avanzado de precio con separadores de miles
         const precioDisplay = document.getElementById('precio_display');
         const precioHidden = document.getElementById('precio');
         const form = document.getElementById('createProductForm');
@@ -201,21 +246,27 @@
         // Manejar cambios en el campo de precio visible
         if (precioDisplay) {
             precioDisplay.addEventListener('input', function(e) {
-                // Permitir solo números y puntos
-                let value = e.target.value.replace(/[^\d.]/g, '');
-                // Formatear con separadores de miles
-                if (value) {
-                    const numericValue = parseFloat(value.replace(/\./g, ''));
+                try {
+                    // Limpiar cualquier cosa que no sea dígito o punto
+                    let value = e.target.value.replace(/[^\d.]/g, '');
+                    
+                    // Eliminar todos los puntos para trabajar con el número puro
+                    const rawValue = value.replace(/\./g, '');
+                    
+                    // Convertir a número
+                    const numericValue = parseInt(rawValue, 10);
+                    
                     if (!isNaN(numericValue)) {
+                        // Formatear número con separadores de miles
                         e.target.value = formatNumber(numericValue);
+                        
+                        // Actualizar campo oculto con valor sin formato
                         if (precioHidden) {
                             precioHidden.value = numericValue;
                         }
                     }
-                } else {
-                    if (precioHidden) {
-                        precioHidden.value = '0';
-                    }
+                } catch (err) {
+                    console.error('Error al formatear precio:', err);
                 }
             });
         }
@@ -225,9 +276,17 @@
             form.addEventListener('submit', function(e) {
                 if (precioDisplay && precioHidden) {
                     // Convertir el precio formateado a un número
-                    const numericValue = parseFloat(precioDisplay.value.replace(/\./g, ''));
-                    if (!isNaN(numericValue)) {
-                        precioHidden.value = numericValue;
+                    try {
+                        // Eliminar todos los puntos para obtener un número
+                        const rawValue = precioDisplay.value.replace(/\./g, '');
+                        const numericValue = parseInt(rawValue, 10);
+                        
+                        if (!isNaN(numericValue)) {
+                            precioHidden.value = numericValue;
+                            console.log('Precio enviado:', numericValue);
+                        }
+                    } catch (err) {
+                        console.error('Error al procesar precio para envío:', err);
                     }
                 }
             });

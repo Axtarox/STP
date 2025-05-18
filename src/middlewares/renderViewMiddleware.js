@@ -1,6 +1,6 @@
 /**
  * Middleware optimizado para renderizar vistas HTML
- * - Ahora con soporte para páginas sin layout (standalone)
+ * - Mejorado para manejar operadores de comparación en condiciones
  */
 const fs = require('fs');
 const path = require('path');
@@ -103,7 +103,7 @@ module.exports = function renderViewMiddleware(req, res, next) {
             // Procesar bloques {{#each}}
             html = processEachBlocks(html, allData);
             
-            // Procesar bloques {{#if}}
+            // Procesar bloques {{#if}} con operadores de comparación
             html = processIfBlocks(html, allData);
             
             // Limpiar variables no procesadas
@@ -160,11 +160,11 @@ function processEachBlocks(html, data) {
 }
 
 /**
- * Procesa bloques {{#if}}
+ * Procesa bloques {{#if}} con soporte para operadores de comparación
  */
 function processIfBlocks(html, data) {
-    // Expresión regular mejorada para capturar correctamente bloques if/else
-    const ifRegex = /{{#if\s+([a-zA-Z0-9_\.]+)}}\s*([\s\S]*?)\s*(?:{{else}}\s*([\s\S]*?)\s*)?{{\/if}}/g;
+    // Expresión regular mejorada para capturar comparaciones con operadores
+    const ifRegex = /{{#if\s+([^}]*)}}\s*([\s\S]*?)\s*(?:{{else}}\s*([\s\S]*?)\s*)?{{\/if}}/g;
     
     let result = html;
     let previousResult = '';
@@ -175,15 +175,101 @@ function processIfBlocks(html, data) {
         previousResult = result;
         iterations++;
         
-        result = result.replace(ifRegex, (match, key, trueBlock, falseBlock = '') => {
-            const value = getNestedValue(data, key);
+        result = result.replace(ifRegex, (match, condition, trueBlock, falseBlock = '') => {
+            let isTrue = false;
             
-            // Considerar valores falsy: null, undefined, false, 0, "", NaN
-            return value ? trueBlock : falseBlock;
+            // Detectar operadores de comparación
+            if (condition.includes('===')) {
+                const [left, right] = condition.split('===').map(part => part.trim());
+                const leftValue = evaluateExpression(left, data);
+                const rightValue = evaluateExpression(right, data);
+                isTrue = leftValue === rightValue;
+            } 
+            else if (condition.includes('==')) {
+                const [left, right] = condition.split('==').map(part => part.trim());
+                const leftValue = evaluateExpression(left, data);
+                const rightValue = evaluateExpression(right, data);
+                isTrue = leftValue == rightValue;
+            }
+            else if (condition.includes('!==')) {
+                const [left, right] = condition.split('!==').map(part => part.trim());
+                const leftValue = evaluateExpression(left, data);
+                const rightValue = evaluateExpression(right, data);
+                isTrue = leftValue !== rightValue;
+            }
+            else if (condition.includes('!=')) {
+                const [left, right] = condition.split('!=').map(part => part.trim());
+                const leftValue = evaluateExpression(left, data);
+                const rightValue = evaluateExpression(right, data);
+                isTrue = leftValue != rightValue;
+            }
+            else if (condition.includes('>=')) {
+                const [left, right] = condition.split('>=').map(part => part.trim());
+                const leftValue = evaluateExpression(left, data);
+                const rightValue = evaluateExpression(right, data);
+                isTrue = leftValue >= rightValue;
+            }
+            else if (condition.includes('<=')) {
+                const [left, right] = condition.split('<=').map(part => part.trim());
+                const leftValue = evaluateExpression(left, data);
+                const rightValue = evaluateExpression(right, data);
+                isTrue = leftValue <= rightValue;
+            }
+            else if (condition.includes('>')) {
+                const [left, right] = condition.split('>').map(part => part.trim());
+                const leftValue = evaluateExpression(left, data);
+                const rightValue = evaluateExpression(right, data);
+                isTrue = leftValue > rightValue;
+            }
+            else if (condition.includes('<')) {
+                const [left, right] = condition.split('<').map(part => part.trim());
+                const leftValue = evaluateExpression(left, data);
+                const rightValue = evaluateExpression(right, data);
+                isTrue = leftValue < rightValue;
+            }
+            else {
+                // Simple check for truthy value
+                const value = evaluateExpression(condition, data);
+                isTrue = !!value;
+            }
+            
+            return isTrue ? trueBlock : falseBlock;
         });
     }
     
     return result;
+}
+
+/**
+ * Evalúa una expresión en el contexto de los datos
+ */
+function evaluateExpression(expr, data) {
+    expr = expr.trim();
+    
+    // Manejar valores literales
+    if (expr === 'true') return true;
+    if (expr === 'false') return false;
+    if (expr === 'null') return null;
+    if (expr === 'undefined') return undefined;
+    
+    // Manejar números
+    if (!isNaN(expr)) {
+        return Number(expr);
+    }
+    
+    // Manejar strings con comillas
+    if ((expr.startsWith('"') && expr.endsWith('"')) || 
+        (expr.startsWith("'") && expr.endsWith("'"))) {
+        return expr.substring(1, expr.length - 1);
+    }
+    
+    // Manejar propiedades anidadas (como objeto.propiedad)
+    if (expr.includes('.')) {
+        return getNestedValue(data, expr);
+    }
+    
+    // Caso normal - obtener el valor de los datos
+    return data[expr];
 }
 
 /**
