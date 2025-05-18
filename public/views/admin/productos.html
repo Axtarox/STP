@@ -7,6 +7,74 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        /* Estilos mejorados para los botones de acción */
+        .admin-table-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+        }
+        
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .action-btn.view {
+            background-color: #2ecc71;
+        }
+        
+        .action-btn.edit {
+            background-color: #2ecc71;
+        }
+        
+        .action-btn.delete {
+            background-color: #2ecc71;
+        }
+        
+        .action-btn:hover {
+            opacity: 0.85;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Estilos para la imagen del producto en la tabla */
+        .product-thumb {
+            width: 50px;
+            height: 50px;
+            border-radius: 4px;
+            object-fit: contain;
+            background-color: #f5f5f5;
+            padding: 2px;
+        }
+        
+        /* Estilos para el badge de disponible */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .badge-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+    </style>
 </head>
 <body>
     <div class="admin-layout">
@@ -116,13 +184,13 @@
                         <tr>
                             <td>{{id}}</td>
                             <td>
-                                <img src="{{imagen}}" alt="{{nombre}}" width="50" height="50" style="object-fit: contain;">
+                                <img src="{{imagen}}" alt="{{nombre}}" class="product-thumb" onerror="this.src='/img/default-product.jpg'">
                             </td>
                             <td>{{nombre}}</td>
                             <td>{{categoria_nombre}}</td>
                             <td>${{precio}}</td>
                             <td>
-                                {{#if disponible}}
+                                {{#if (disponible == 1) || (disponible === true)}}
                                 <span class="badge badge-success">Sí</span>
                                 {{else}}
                                 <span class="badge badge-danger">No</span>
@@ -136,12 +204,9 @@
                                     <a href="/admin/productos/editar/{{id}}" class="action-btn edit" title="Editar">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <form class="delete-form" method="POST" action="/admin/productos/eliminar/{{id}}" style="display:inline;">
-                                        <input type="hidden" name="_method" value="DELETE">
-                                        <button type="button" class="action-btn delete delete-btn" data-id="{{id}}" title="Eliminar">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
+                                    <button type="button" class="action-btn delete delete-btn" data-id="{{id}}" title="Eliminar">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -176,34 +241,49 @@
         const deleteModal = document.getElementById('deleteModal');
         const confirmDeleteBtn = document.getElementById('confirmDelete');
         const cancelDeleteBtn = document.getElementById('cancelDelete');
-        let currentForm = null;
+        let currentProductId = null;
         
         // Añadir evento a todos los botones de eliminar
         document.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                // Guardar referencia al formulario actual
-                currentForm = this.closest('form');
+            btn.addEventListener('click', function(e) {
+                e.preventDefault(); // Prevenir comportamiento predeterminado
+                
+                // Guardar el ID del producto a eliminar
+                currentProductId = this.getAttribute('data-id');
                 
                 // Mostrar el modal
-                deleteModal.style.display = 'block';
+                if (deleteModal) {
+                    deleteModal.style.display = 'block';
+                }
             });
         });
         
         // Evento para confirmar eliminación
-        confirmDeleteBtn.addEventListener('click', function() {
-            if (currentForm) {
-                // Enviar el formulario
-                currentForm.submit();
-            }
-            // Ocultar el modal
-            deleteModal.style.display = 'none';
-        });
+        if (confirmDeleteBtn) {
+            confirmDeleteBtn.addEventListener('click', function() {
+                if (currentProductId) {
+                    // Redirigir a la ruta de eliminación
+                    window.location.href = `/admin/productos/eliminar/${currentProductId}`;
+                }
+                
+                // Ocultar el modal
+                if (deleteModal) {
+                    deleteModal.style.display = 'none';
+                }
+            });
+        }
         
         // Evento para cancelar
-        cancelDeleteBtn.addEventListener('click', function() {
-            // Ocultar el modal
-            deleteModal.style.display = 'none';
-        });
+        if (cancelDeleteBtn) {
+            cancelDeleteBtn.addEventListener('click', function(e) {
+                e.preventDefault(); // Prevenir comportamiento predeterminado
+                
+                // Ocultar el modal
+                if (deleteModal) {
+                    deleteModal.style.display = 'none';
+                }
+            });
+        }
         
         // Cerrar el modal si se hace clic fuera de él
         window.addEventListener('click', function(event) {

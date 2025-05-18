@@ -1,5 +1,5 @@
 /**
- * Rutas actualizadas para el panel de administración
+ * Rutas para el panel de administración (utilizando el controlador de servicios existente)
  */
 
 const express = require('express');
@@ -7,6 +7,7 @@ const router = express.Router();
 const authController = require('../controllers/AuthController');
 const dashboardController = require('../controllers/DashboardController');
 const categoriaController = require('../controllers/CategoriaController');
+const servicioController = require('../controllers/ServicioController'); // Controlador existente
 const authMiddleware = require('../middlewares/authMiddleware');
 const upload = require('../middlewares/uploadMiddleware');
 
@@ -57,7 +58,13 @@ router.get('/categorias/editar/:id', categoriaController.getEditarCategoriaForm)
 router.post('/categorias/editar/:id', categoriaController.editarCategoria);
 router.get('/categorias/eliminar/:id', categoriaController.eliminarCategoria);
 
-// Gestión de servicios
-router.get('/servicios', dashboardController.getServicios);
+// Gestión de servicios (usando el controlador existente)
+router.get('/servicios', servicioController.getAdminServicios);
+router.get('/servicios/crear', servicioController.getCrearServicioForm);
+router.post('/servicios/crear', upload.single('imagen'), servicioController.crearServicio);
+router.get('/servicios/:id', servicioController.getAdminServicioById);
+router.get('/servicios/editar/:id', servicioController.getEditarServicioForm);
+router.post('/servicios/editar/:id', upload.single('imagen'), servicioController.editarServicio);
+router.get('/servicios/eliminar/:id', servicioController.eliminarServicio);
 
 module.exports = router;

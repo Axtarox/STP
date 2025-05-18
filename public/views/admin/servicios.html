@@ -8,72 +8,79 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/admin.css">
     <style>
-        .category-icon {
-            font-size: 3rem;
-            color: #2ecc71;
-            text-align: center;
-            margin-bottom: 1rem;
-        }
-        
-        .category-products {
-            margin-top: 2rem;
-        }
-        
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-        
-        .product-card {
-            background-color: white;
-            border-radius: 8px;
-            padding: 1rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        /* Estilos mejorados para los botones de acción */
+        .admin-table-actions {
             display: flex;
-            flex-direction: column;
+            gap: 0.75rem;
+            justify-content: center;
         }
         
-        .product-image {
-            height: 120px;
-            display: flex;
+        .action-btn {
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 0.5rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
         }
         
-        .product-image img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
+        .action-btn.view {
+            background-color: #2ecc71;
         }
         
-        .product-info {
-            flex: 1;
+        .action-btn.edit {
+            background-color: #2ecc71;
         }
         
-        .product-title {
+        .action-btn.delete {
+            background-color: #2ecc71;
+        }
+        
+        .action-btn:hover {
+            opacity: 0.85;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Estilos para la imagen del servicio en la tabla */
+        .service-thumb {
+            width: 60px;
+            height: 60px;
+            border-radius: 4px;
+            object-fit: cover;
+            background-color: #f5f5f5;
+            padding: 2px;
+        }
+        
+        /* Estilos para el badge de disponible */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
             font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--admin-dark);
         }
         
-        .product-price {
-            color: var(--admin-primary);
-            font-weight: 700;
-            margin-bottom: 0.5rem;
+        .badge-success {
+            background-color: #2ecc71;
+            color: white;
         }
         
-        .no-products {
-            text-align: center;
-            padding: 2rem;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            align-items: center;
+        .badge-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        /* Truncar descripción larga */
+        .service-description {
+            max-width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     </style>
 </head>
@@ -163,70 +170,61 @@
                 {{/if}}
                 
                 <div class="admin-actions">
-                    <a href="/admin/categorias" class="admin-btn admin-btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Volver a Categorías
+                    <a href="/admin/servicios/crear" class="admin-btn admin-btn-primary">
+                        <i class="fas fa-plus"></i> Nuevo Servicio
                     </a>
-                    <a href="/admin/categorias/editar/{{categoria.id}}" class="admin-btn admin-btn-primary">
-                        <i class="fas fa-edit"></i> Editar Categoría
-                    </a>
-                    <button id="deleteBtn" class="admin-btn admin-btn-danger">
-                        <i class="fas fa-trash"></i> Eliminar Categoría
-                    </button>
                 </div>
                 
-                <div class="admin-card">
-                    <div class="admin-card-header">
-                        <h2 class="admin-card-title">Detalles de la Categoría</h2>
-                    </div>
-                    
-                    <div class="admin-card-body">
-                        <div class="category-icon">
-                            <i class="fas fa-tag"></i>
-                        </div>
-                        
-                        <h3>{{categoria.nombre}}</h3>
-                        
-                        {{#if categoria.descripcion}}
-                        <div class="category-description">
-                            <p>{{categoria.descripcion}}</p>
-                        </div>
-                        {{else}}
-                        <div class="category-description">
-                            <p><em>Sin descripción</em></p>
-                        </div>
-                        {{/if}}
-                        
-                        <div class="category-products">
-                            <h3>Productos en esta categoría ({{productos.length}})</h3>
-                            
-                            {{#if productos.length}}
-                            <div class="product-grid">
-                                {{#each productos}}
-                                <div class="product-card">
-                                    <div class="product-image">
-                                        <img src="{{imagen}}" alt="{{nombre}}" onerror="this.src='/img/default-product.jpg'">
-                                    </div>
-                                    <div class="product-info">
-                                        <h4 class="product-title">{{nombre}}</h4>
-                                        <div class="product-price">${{precio}}</div>
-                                        <a href="/admin/productos/{{id}}" class="admin-btn admin-btn-outline admin-btn-sm">
-                                            Ver detalle
-                                        </a>
-                                    </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Imagen</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Disponible</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each servicios}}
+                        <tr>
+                            <td>{{id}}</td>
+                            <td>
+                                <img src="{{imagen}}" alt="{{nombre}}" class="service-thumb" onerror="this.src='/img/default-service.jpg'">
+                            </td>
+                            <td>{{nombre}}</td>
+                            <td class="service-description">{{descripcion}}</td>
+                            <td>
+                                {{#if (disponible == 1) || (disponible === true)}}
+                                <span class="badge badge-success">Sí</span>
+                                {{else}}
+                                <span class="badge badge-danger">No</span>
+                                {{/if}}
+                            </td>
+                            <td>
+                                <div class="admin-table-actions">
+                                    <a href="/admin/servicios/{{id}}" class="action-btn view" title="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="/admin/servicios/editar/{{id}}" class="action-btn edit" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="action-btn delete delete-btn" data-id="{{id}}" title="Eliminar">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </div>
-                                {{/each}}
-                            </div>
-                            {{else}}
-                            <div class="no-products">
-                                <p>No hay productos en esta categoría.</p>
-                                <a href="/admin/productos/crear" class="admin-btn admin-btn-primary">
-                                    <i class="fas fa-plus"></i> Crear Producto
-                                </a>
-                            </div>
-                            {{/if}}
-                        </div>
-                    </div>
+                            </td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+                
+                {{#if servicios.length === 0}}
+                <div class="no-results">
+                    <p>No hay servicios disponibles.</p>
                 </div>
+                {{/if}}
             </div>
         </main>
     </div>
@@ -235,14 +233,7 @@
     <div id="deleteModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
         <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
             <h3 style="margin-top: 0;">Confirmar eliminación</h3>
-            <p>¿Está seguro de que desea eliminar la categoría "{{categoria.nombre}}"? Esta acción no se puede deshacer.</p>
-            
-            {{#if productos.length}}
-            <div class="admin-alert admin-alert-warning" style="margin-top: 1rem;">
-                <i class="fas fa-exclamation-triangle"></i> Esta categoría tiene {{productos.length}} productos asociados. Eliminarla podría afectar a estos productos.
-            </div>
-            {{/if}}
-            
+            <p>¿Está seguro de que desea eliminar este servicio? Esta acción no se puede deshacer.</p>
             <div style="text-align: right; margin-top: 20px;">
                 <button id="cancelDelete" class="admin-btn admin-btn-secondary" style="margin-right: 10px;">Cancelar</button>
                 <button id="confirmDelete" class="admin-btn admin-btn-danger">Eliminar</button>
@@ -256,22 +247,49 @@
         const deleteModal = document.getElementById('deleteModal');
         const confirmDeleteBtn = document.getElementById('confirmDelete');
         const cancelDeleteBtn = document.getElementById('cancelDelete');
-        const deleteBtn = document.getElementById('deleteBtn');
+        let currentServiceId = null;
         
-        // Mostrar el modal al hacer clic en el botón de eliminar
-        deleteBtn.addEventListener('click', function() {
-            deleteModal.style.display = 'block';
+        // Añadir evento a todos los botones de eliminar
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault(); // Prevenir comportamiento predeterminado
+                
+                // Guardar el ID del servicio a eliminar
+                currentServiceId = this.getAttribute('data-id');
+                
+                // Mostrar el modal
+                if (deleteModal) {
+                    deleteModal.style.display = 'block';
+                }
+            });
         });
         
-        // Confirmar eliminación
-        confirmDeleteBtn.addEventListener('click', function() {
-            window.location.href = '/admin/categorias/eliminar/{{categoria.id}}';
-        });
+        // Evento para confirmar eliminación
+        if (confirmDeleteBtn) {
+            confirmDeleteBtn.addEventListener('click', function() {
+                if (currentServiceId) {
+                    // Redirigir a la ruta de eliminación
+                    window.location.href = `/admin/servicios/eliminar/${currentServiceId}`;
+                }
+                
+                // Ocultar el modal
+                if (deleteModal) {
+                    deleteModal.style.display = 'none';
+                }
+            });
+        }
         
-        // Cancelar eliminación
-        cancelDeleteBtn.addEventListener('click', function() {
-            deleteModal.style.display = 'none';
-        });
+        // Evento para cancelar
+        if (cancelDeleteBtn) {
+            cancelDeleteBtn.addEventListener('click', function(e) {
+                e.preventDefault(); // Prevenir comportamiento predeterminado
+                
+                // Ocultar el modal
+                if (deleteModal) {
+                    deleteModal.style.display = 'none';
+                }
+            });
+        }
         
         // Cerrar el modal si se hace clic fuera de él
         window.addEventListener('click', function(event) {
