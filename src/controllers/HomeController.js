@@ -9,10 +9,10 @@ const Servicio = require('../models/Servicio');
  */
 exports.getIndex = async (req, res) => {
   try {
-    // Obtener 5 productos destacados sin logs excesivos
+    // Obtener 5 productos aleatorios sin logs excesivos
     let productos = [];
     try {
-      productos = await Producto.getFeatured(5);
+      productos = await Producto.getRandom(5);
       
       // Si no hay productos, usar un array vacío
       if (!productos || productos.length === 0) {

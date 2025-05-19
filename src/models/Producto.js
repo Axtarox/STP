@@ -139,6 +139,28 @@ class Producto {
             return [];
         }
     }
+    /**
+ * Obtiene productos aleatorios
+ * @param {number} limit - Número máximo de productos a retornar
+ * @returns {Promise<Array>} Lista de productos aleatorios
+ */
+static async getRandom(limit = 5) {
+    try {
+        const [rows] = await pool.query(`
+            SELECT p.*, c.nombre as categoria_nombre 
+            FROM producto p 
+            LEFT JOIN categoria c ON p.categoria_id = c.id
+            WHERE p.disponible = true 
+            ORDER BY RAND() 
+            LIMIT ?
+        `, [limit]);
+        
+        return rows;
+    } catch (error) {
+        console.error(`Error en Producto.getRandom(${limit}):`, error);
+        return [];
+    }
+}
 
     /**
      * Crea un nuevo producto
