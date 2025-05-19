@@ -359,30 +359,13 @@
         container.innerHTML = content;
     }
     
-    function enviarPedidoWhatsApp() {
-        // Obtener carrito
-        let carrito;
-        try {
-            carrito = JSON.parse(localStorage.getItem('carrito')) || { items: [], total: 0 };
-        } catch (e) {
-            console.error('Error al parsear carrito:', e);
-            alert('Ocurrió un error al procesar el carrito');
-            return;
-        }
-        
-        // Verificar si hay productos en el carrito
-        if (carrito.items.length === 0) {
-            alert('No puedes finalizar una compra con el carrito vacío');
-            return;
-        }
-        
-        // Obtener datos del formulario
-        const form = document.getElementById('checkout-form');
-        
-        if (!form) {
-            alert('Error al procesar el formulario');
-            return;
-        }
+function enviarPedidoWhatsApp() {
+    const form = document.getElementById('checkout-form');
+    
+    if (!form) return;
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
         
         // Validar campos requeridos
         const camposRequeridos = [
@@ -392,36 +375,48 @@
         
         let formularioValido = true;
         camposRequeridos.forEach(campo => {
-            const input = document.getElementById(campo);
-            if (!input.value.trim()) {
-                input.classList.add('error');
+            const input = form.querySelector(`[name="${campo}"]`);
+            if (!input || !input.value.trim()) {
+                if (input) {
+                    input.classList.add('error');
+                }
                 formularioValido = false;
             } else {
-                input.classList.remove('error');
+                if (input) {
+                    input.classList.remove('error');
+                }
             }
         });
         
         if (!formularioValido) {
-            alert('Por favor, completa todos los campos obligatorios');
+            showToast('Por favor, completa todos los campos obligatorios');
             return;
         }
         
-        // Obtener valores del formulario
-        const nombres = document.getElementById('nombres').value;
-        const apellidos = document.getElementById('apellidos').value;
-        const tipoDocumento = document.getElementById('tipo_documento').value;
-        const numDocumento = document.getElementById('num_documento').value;
-        const fechaNacimiento = document.getElementById('fecha_nacimiento').value;
-        const ciudad = document.getElementById('ciudad').value;
-        const direccion = document.getElementById('direccion').value;
-        const telefonoMovil = document.getElementById('telefono_movil').value;
-        const email = document.getElementById('email').value;
-        const metodoPago = document.querySelector('input[name="metodo_pago"]:checked').value;
+        // Obtener datos del formulario
+        const nombres = form.querySelector('[name="nombres"]').value;
+        const apellidos = form.querySelector('[name="apellidos"]').value;
+        const tipoDocumento = form.querySelector('[name="tipo_documento"]').value;
+        const numDocumento = form.querySelector('[name="num_documento"]').value;
+        const fechaNacimiento = form.querySelector('[name="fecha_nacimiento"]').value;
+        const ciudad = form.querySelector('[name="ciudad"]').value;
+        const direccion = form.querySelector('[name="direccion"]').value;
+        const telefonoMovil = form.querySelector('[name="telefono_movil"]').value;
+        const email = form.querySelector('[name="email"]').value;
+        const metodoPago = form.querySelector('[name="metodo_pago"]:checked').value;
         
         // Campos opcionales
-        const sexo = document.getElementById('sexo')?.value || '';
-        const estadoCivil = document.getElementById('estado_civil')?.value || '';
-        const telefonoFijo = document.getElementById('telefono_fijo')?.value || '';
+        const sexo = form.querySelector('[name="sexo"]')?.value || '';
+        const estadoCivil = form.querySelector('[name="estado_civil"]')?.value || '';
+        const telefonoFijo = form.querySelector('[name="telefono_fijo"]')?.value || '';
+        
+        // Obtener carrito
+        const carrito = getCarritoFromStorage();
+        
+        if (carrito.items.length === 0) {
+            showToast('El carrito está vacío');
+            return;
+        }
         
         // Crear mensaje de WhatsApp
         let mensaje = `*Nuevo Pedido*%0A%0A`;
@@ -449,29 +444,34 @@
         mensaje += `*Método de Pago:* ${metodoPago}%0A%0A`;
         mensaje += `*Productos:*%0A`;
         
-        // Añadir productos al mensaje
         carrito.items.forEach(item => {
-            const subtotal = item.precio * item.cantidad;
-            mensaje += `- ${item.cantidad}x ${item.nombre} - $${formatNumber(subtotal)}%0A`;
+            mensaje += `- ${item.cantidad}x ${item.nombre} - $${(item.precio * item.cantidad).toLocaleString('es-CO')}%0A`;
         });
         
-        mensaje += `%0A*Total:* $${formatNumber(carrito.total)}`;
+        mensaje += `%0A*Total:* $${carrito.total.toLocaleString('es-CO')}`;
         
-        // Número de WhatsApp de la empresa
+        // Número de WhatsApp de la empresa (actualizado)
         const whatsappNumber = '573225865591';
         
-        // Crear URL de WhatsApp y abrir en nueva ventana
+        // Crear URL de WhatsApp
         const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${mensaje}`;
+        
+        // Mostrar mensaje de confirmación
+        showToast('¡Pedido enviado correctamente! Abriendo WhatsApp...');
+        
+        // Abrir WhatsApp en una nueva ventana
         window.open(whatsappUrl, '_blank');
         
         // Limpiar carrito después de enviar
         localStorage.removeItem('carrito');
+        updateCartCount(0);
         
-        // Redirigir a la página de confirmación
+        // Redirigir a la página de confirmación después de un breve retraso
         setTimeout(() => {
             window.location.href = '/pedidos/confirmacion';
-        }, 1000);
-    }
+        }, 2000);
+    });
+}
 </script>
 
 <style>

@@ -60,17 +60,7 @@
         <div class="contact-form-container">
             <h2 class="section-title">Envíanos un Mensaje</h2>
             
-            {{#if success}}
-            <div class="alert-success">
-                <p>{{success}}</p>
-            </div>
-            {{/if}}
-            
-            {{#if error}}
-            <div class="alert-danger">
-                <p>{{error}}</p>
-            </div>
-            {{/if}}
+        
             
             <form action="/contactanos/enviar" method="POST">
                 <div class="form-group">
@@ -102,6 +92,29 @@
             </form>
         </div>
     </div>
+       {{#if success}}
+            <div class="alert-success">
+                <p>{{success}}</p>
+                {{#if messageSent}}
+                <div class="whatsapp-notification">
+                    <p><i class="fab fa-whatsapp"></i> Tu mensaje ha sido enviado a nuestro WhatsApp: <strong>+573225865591</strong></p>
+                    <p>Si no se abrió automáticamente, puedes <a href="{{whatsappUrl}}" target="_blank" class="whatsapp-link">hacer clic aquí</a> para abrir WhatsApp.</p>
+                </div>
+                <script>
+                    // Abrir WhatsApp automáticamente después de 1 segundo
+                    setTimeout(function() {
+                        window.open('{{whatsappUrl}}', '_blank');
+                    }, 1000);
+                </script>
+                {{/if}}
+            </div>
+            {{/if}}
+            
+            {{#if error}}
+            <div class="alert-danger">
+                <p>{{error}}</p>
+            </div>
+            {{/if}}
     
     <div class="map-container">
     <h2 class="section-title">Nuestra Ubicación</h2>

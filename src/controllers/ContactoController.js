@@ -51,11 +51,34 @@ exports.submitContactForm = async (req, res) => {
     
     // También se podría enviar un correo electrónico de notificación
     // usando un servicio como Nodemailer
+
+    // Crear mensaje de WhatsApp
+    let whatsappMessage = `*Nuevo Mensaje de Contacto*%0A%0A`;
+    whatsappMessage += `*Nombre:* ${nombre}%0A`;
+    whatsappMessage += `*Email:* ${email}%0A`;
+    
+    if (telefono) {
+      whatsappMessage += `*Teléfono:* ${telefono}%0A`;
+    }
+    
+    whatsappMessage += `*Asunto:* ${asunto}%0A%0A`;
+    whatsappMessage += `*Mensaje:*%0A${mensaje}`;
+    
+    // Número de WhatsApp de la empresa (actualizado)
+    const whatsappNumber = '573225865591';
+    
+    // Crear URL de WhatsApp
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${whatsappMessage}`;
+    
+    // Agregar la URL a res.locals para poder acceder en la vista
+    res.locals.whatsappUrl = whatsappUrl;
     
     // Renderizar la página de contacto con mensaje de éxito
     res.render('contacto', {
       titulo: 'Contáctanos',
-      success: '¡Gracias por contactarnos! Te responderemos lo antes posible.'
+      success: '¡Gracias por contactarnos! Tu mensaje ha sido enviado correctamente.',
+      whatsappUrl: whatsappUrl,
+      messageSent: true
     });
   } catch (error) {
     console.error('Error al enviar formulario de contacto:', error);
@@ -110,11 +133,11 @@ exports.sendWhatsAppMessage = (req, res) => {
     whatsappMessage += `*Asunto:* ${asunto}%0A%0A`;
     whatsappMessage += `*Mensaje:*%0A${mensaje}`;
     
-    // Número de WhatsApp de la empresa (cambiar por el real)
+    // Número de WhatsApp de la empresa (actualizado)
     const whatsappNumber = '573225865591';
     
     // Crear URL de WhatsApp
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${whatsappMessage}`;
     
     res.json({
       success: true,

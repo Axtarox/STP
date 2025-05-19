@@ -456,114 +456,155 @@ function showToast(message) {
 /**
  * Envía los datos del pedido a WhatsApp cuando se procesa el checkout
  */
+/**
+ * Actualización para la sección de envío de mensajes a WhatsApp en main.js
+ */
+
+// Añadir al final de la función initCarrito o donde sea apropiado
+function initWhatsAppFunctionality() {
+    // Buscar cualquier botón o enlace de WhatsApp para asegurar el número correcto
+    const whatsappLinks = document.querySelectorAll('a[href*="whatsapp.com/send"]');
+    
+    whatsappLinks.forEach(link => {
+        // Actualizar el href para usar el número correcto
+        const currentHref = link.getAttribute('href');
+        if (currentHref && !currentHref.includes('573225865591')) {
+            // Reemplazar cualquier número antiguo con el nuevo
+            const newHref = currentHref.replace(/phone=\d+/, 'phone=573225865591');
+            link.setAttribute('href', newHref);
+        }
+    });
+    
+    // Verificar formulario de envío de pedido a WhatsApp
+    const checkoutForm = document.getElementById('checkout-form');
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            enviarPedidoWhatsApp();
+        });
+    }
+}
+
+/**
+ * Envía los datos del pedido a WhatsApp cuando se procesa el checkout
+ * Función actualizada con el número correcto
+ */
 function enviarPedidoWhatsApp() {
     const form = document.getElementById('checkout-form');
     
     if (!form) return;
     
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Validar campos requeridos
-        const camposRequeridos = [
-            'nombres', 'apellidos', 'tipo_documento', 'num_documento',
-            'fecha_nacimiento', 'ciudad', 'direccion', 'telefono_movil', 'email'
-        ];
-        
-        let formularioValido = true;
-        camposRequeridos.forEach(campo => {
-            const input = form.querySelector(`[name="${campo}"]`);
-            if (!input || !input.value.trim()) {
-                if (input) {
-                    input.classList.add('error');
-                }
-                formularioValido = false;
-            } else {
-                if (input) {
-                    input.classList.remove('error');
-                }
+    // Validar campos requeridos
+    const camposRequeridos = [
+        'nombres', 'apellidos', 'tipo_documento', 'num_documento',
+        'fecha_nacimiento', 'ciudad', 'direccion', 'telefono_movil', 'email'
+    ];
+    
+    let formularioValido = true;
+    camposRequeridos.forEach(campo => {
+        const input = form.querySelector(`[name="${campo}"]`);
+        if (!input || !input.value.trim()) {
+            if (input) {
+                input.classList.add('error');
             }
-        });
-        
-        if (!formularioValido) {
-            showToast('Por favor, completa todos los campos obligatorios');
-            return;
+            formularioValido = false;
+        } else {
+            if (input) {
+                input.classList.remove('error');
+            }
         }
-        
-        // Obtener datos del formulario
-        const nombres = form.querySelector('[name="nombres"]').value;
-        const apellidos = form.querySelector('[name="apellidos"]').value;
-        const tipoDocumento = form.querySelector('[name="tipo_documento"]').value;
-        const numDocumento = form.querySelector('[name="num_documento"]').value;
-        const fechaNacimiento = form.querySelector('[name="fecha_nacimiento"]').value;
-        const ciudad = form.querySelector('[name="ciudad"]').value;
-        const direccion = form.querySelector('[name="direccion"]').value;
-        const telefonoMovil = form.querySelector('[name="telefono_movil"]').value;
-        const email = form.querySelector('[name="email"]').value;
-        const metodoPago = form.querySelector('[name="metodo_pago"]:checked').value;
-        
-        // Campos opcionales
-        const sexo = form.querySelector('[name="sexo"]')?.value || '';
-        const estadoCivil = form.querySelector('[name="estado_civil"]')?.value || '';
-        const telefonoFijo = form.querySelector('[name="telefono_fijo"]')?.value || '';
-        
-        // Obtener carrito
-        const carrito = getCarritoFromStorage();
-        
-        if (carrito.items.length === 0) {
-            showToast('El carrito está vacío');
-            return;
-        }
-        
-        // Crear mensaje de WhatsApp
-        let mensaje = `*Nuevo Pedido*%0A%0A`;
-        mensaje += `*Nombres:* ${nombres}%0A`;
-        mensaje += `*Apellidos:* ${apellidos}%0A`;
-        mensaje += `*Documento:* ${tipoDocumento} ${numDocumento}%0A`;
-        mensaje += `*Fecha Nacimiento:* ${fechaNacimiento}%0A`;
-        mensaje += `*Ciudad:* ${ciudad}%0A`;
-        mensaje += `*Dirección:* ${direccion}%0A`;
-        mensaje += `*Teléfono Móvil:* ${telefonoMovil}%0A`;
-        mensaje += `*Email:* ${email}%0A`;
-        
-        if (telefonoFijo) {
-            mensaje += `*Teléfono Fijo:* ${telefonoFijo}%0A`;
-        }
-        
-        if (sexo) {
-            mensaje += `*Sexo:* ${sexo}%0A`;
-        }
-        
-        if (estadoCivil) {
-            mensaje += `*Estado Civil:* ${estadoCivil}%0A`;
-        }
-        
-        mensaje += `*Método de Pago:* ${metodoPago}%0A%0A`;
-        mensaje += `*Productos:*%0A`;
-        
-        carrito.items.forEach(item => {
-            mensaje += `- ${item.cantidad}x ${item.nombre} - $${(item.precio * item.cantidad).toLocaleString('es-CO')}%0A`;
-        });
-        
-        mensaje += `%0A*Total:* $${carrito.total.toLocaleString('es-CO')}`;
-        
-        // Número de WhatsApp de la empresa
-        const whatsappNumber = '573126421560';
-        
-        // Crear URL de WhatsApp y redirigir
-        const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${mensaje}`;
-        window.open(whatsappUrl, '_blank');
-        
-        // Limpiar carrito después de enviar
-        localStorage.removeItem('carrito');
-        updateCartCount(0);
-        
-        // Mostrar mensaje de confirmación
-        showToast('¡Pedido enviado correctamente!');
-        
-        // Redirigir a la página de confirmación
-        setTimeout(() => {
-            window.location.href = '/pedidos/confirmacion';
-        }, 2000);
     });
+    
+    if (!formularioValido) {
+        showToast('Por favor, completa todos los campos obligatorios');
+        return;
+    }
+    
+    // Obtener datos del formulario
+    const nombres = form.querySelector('[name="nombres"]').value;
+    const apellidos = form.querySelector('[name="apellidos"]').value;
+    const tipoDocumento = form.querySelector('[name="tipo_documento"]').value;
+    const numDocumento = form.querySelector('[name="num_documento"]').value;
+    const fechaNacimiento = form.querySelector('[name="fecha_nacimiento"]').value;
+    const ciudad = form.querySelector('[name="ciudad"]').value;
+    const direccion = form.querySelector('[name="direccion"]').value;
+    const telefonoMovil = form.querySelector('[name="telefono_movil"]').value;
+    const email = form.querySelector('[name="email"]').value;
+    const metodoPago = form.querySelector('[name="metodo_pago"]:checked').value;
+    
+    // Campos opcionales
+    const sexo = form.querySelector('[name="sexo"]')?.value || '';
+    const estadoCivil = form.querySelector('[name="estado_civil"]')?.value || '';
+    const telefonoFijo = form.querySelector('[name="telefono_fijo"]')?.value || '';
+    
+    // Obtener carrito
+    const carrito = getCarritoFromStorage();
+    
+    if (carrito.items.length === 0) {
+        showToast('El carrito está vacío');
+        return;
+    }
+    
+    // Crear mensaje de WhatsApp
+    let mensaje = `*Nuevo Pedido*%0A%0A`;
+    mensaje += `*Nombres:* ${nombres}%0A`;
+    mensaje += `*Apellidos:* ${apellidos}%0A`;
+    mensaje += `*Documento:* ${tipoDocumento} ${numDocumento}%0A`;
+    mensaje += `*Fecha Nacimiento:* ${fechaNacimiento}%0A`;
+    mensaje += `*Ciudad:* ${ciudad}%0A`;
+    mensaje += `*Dirección:* ${direccion}%0A`;
+    mensaje += `*Teléfono Móvil:* ${telefonoMovil}%0A`;
+    mensaje += `*Email:* ${email}%0A`;
+    
+    if (telefonoFijo) {
+        mensaje += `*Teléfono Fijo:* ${telefonoFijo}%0A`;
+    }
+    
+    if (sexo) {
+        mensaje += `*Sexo:* ${sexo}%0A`;
+    }
+    
+    if (estadoCivil) {
+        mensaje += `*Estado Civil:* ${estadoCivil}%0A`;
+    }
+    
+    mensaje += `*Método de Pago:* ${metodoPago}%0A%0A`;
+    mensaje += `*Productos:*%0A`;
+    
+    carrito.items.forEach(item => {
+        mensaje += `- ${item.cantidad}x ${item.nombre} - $${(item.precio * item.cantidad).toLocaleString('es-CO')}%0A`;
+    });
+    
+    mensaje += `%0A*Total:* $${carrito.total.toLocaleString('es-CO')}`;
+    
+    // Número de WhatsApp de la empresa (actualizado)
+    const whatsappNumber = '573225865591';
+    
+    // Crear URL de WhatsApp
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${mensaje}`;
+    
+    // Mostrar mensaje de confirmación
+    showToast('¡Pedido enviado correctamente! Abriendo WhatsApp...');
+    
+    // Abrir WhatsApp en una nueva ventana
+    window.open(whatsappUrl, '_blank');
+    
+    // Limpiar carrito después de enviar
+    localStorage.removeItem('carrito');
+    updateCartCount(0);
+    
+    // Redirigir a la página de confirmación
+    setTimeout(() => {
+        window.location.href = '/pedidos/confirmacion';
+    }, 2000);
 }
+
+// Modificar la función de inicialización para incluir la función de WhatsApp
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar funcionalidades principales
+    initCarrito();
+    initSearchForm();
+    initMobileMenu();
+    initQuantitySelectors();
+    initWhatsAppFunctionality(); // Agregar esta línea
+});

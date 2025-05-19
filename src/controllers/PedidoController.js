@@ -180,7 +180,7 @@ exports.generateWhatsAppMessage = (req, res) => {
     
     mensaje += `%0A*Total:* $${total.toLocaleString('es-CO')}`;
     
-    // Número de WhatsApp de la empresa
+    // Número de WhatsApp de la empresa (actualizado)
     const whatsappNumber = '573225865591';
     
     // Crear URL de WhatsApp

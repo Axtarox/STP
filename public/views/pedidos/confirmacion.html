@@ -20,7 +20,7 @@
             
             <div class="whatsapp-info">
                 <p><i class="fab fa-whatsapp"></i> Tu pedido ha sido enviado a nuestro WhatsApp de atención al cliente.</p>
-                <p>Si tienes alguna duda, puedes contactarnos al: <strong>3126421560</strong></p>
+                <p>Si tienes alguna duda, puedes contactarnos al: <strong>+573225865591</strong></p>
             </div>
             
             <div class="next-steps">
@@ -44,6 +44,45 @@
         <div class="confirmation-actions">
             <a href="/" class="btn">Volver al inicio</a>
             <a href="/productos" class="btn btn-secondary">Seguir comprando</a>
+            <a href="https://api.whatsapp.com/send?phone=573225865591" target="_blank" class="btn whatsapp-btn">
+                <i class="fab fa-whatsapp"></i> Contactar por WhatsApp
+            </a>
         </div>
     </div>
 </section>
+
+<style>
+.whatsapp-btn {
+    background-color: #25d366;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.whatsapp-btn:hover {
+    background-color: #128c7e;
+}
+
+.confirmation-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.whatsapp-info {
+    background-color: #e7f7e6;
+    border-left: 4px solid #25d366;
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 0 4px 4px 0;
+}
+
+.whatsapp-info i {
+    color: #25d366;
+    margin-right: 5px;
+}
+</style>
