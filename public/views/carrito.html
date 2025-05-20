@@ -1,4 +1,8 @@
-<!-- Actualización para public/views/carrito.html - Nuevo formulario de checkout -->
+// Actualización completa para el archivo public/views/carrito.html
+// Incluye todas las mejoras solicitadas: validación de edad, restricción de ciudades,
+// eliminación de TI y mensaje completo para WhatsApp
+
+<!-- Actualización para public/views/carrito.html - Formulario de checkout optimizado -->
 
 <section class="hero">
     <div class="hero-content">
@@ -32,114 +36,140 @@
             <h2 class="section-title">Información de contacto</h2>
             
             <form id="checkout-form">
-                <div class="form-group">
-                    <label for="nombres">Nombre(s) *</label>
-                    <input type="text" id="nombres" name="nombres" required>
+                <div class="required-note">
+                    <span>*</span> Campos obligatorios
                 </div>
                 
-                <div class="form-group">
-                    <label for="apellidos">Apellidos *</label>
-                    <input type="text" id="apellidos" name="apellidos" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="tipo_documento">Tipo de Documento de Identidad *</label>
-                    <select id="tipo_documento" name="tipo_documento" required>
-                        <option value="" disabled selected>Seleccione una opción</option>
-                        <option value="CC">Cédula de Ciudadanía</option>
-                        <option value="CE">Cédula de Extranjería</option>
-                        <option value="TI">Tarjeta de Identidad</option>
-                        <option value="PASAPORTE">Pasaporte</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="num_documento">Número de Documento de Identidad *</label>
-                    <input type="text" id="num_documento" name="num_documento" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="fecha_nacimiento">Fecha de Nacimiento *</label>
-                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="sexo">Sexo</label>
-                    <select id="sexo" name="sexo">
-                        <option value="" disabled selected>Seleccione una opción</option>
-                        <option value="M">Masculino</option>
-                        <option value="F">Femenino</option>
-                        <option value="O">Otro</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="estado_civil">Estado Civil</label>
-                    <select id="estado_civil" name="estado_civil">
-                        <option value="" disabled selected>Seleccione una opción</option>
-                        <option value="soltero">Soltero/a</option>
-                        <option value="casado">Casado/a</option>
-                        <option value="union_libre">Unión Libre</option>
-                        <option value="separado">Separado/a</option>
-                        <option value="divorciado">Divorciado/a</option>
-                        <option value="viudo">Viudo/a</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="ciudad">Ciudad *</label>
-                    <input type="text" id="ciudad" name="ciudad" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="direccion">Dirección de entrega *</label>
-                    <input type="text" id="direccion" name="direccion" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="telefono_fijo">Teléfono Fijo</label>
-                    <input type="tel" id="telefono_fijo" name="telefono_fijo">
-                </div>
-                
-                <div class="form-group">
-                    <label for="telefono_movil">Teléfono Móvil *</label>
-                    <input type="tel" id="telefono_movil" name="telefono_movil" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="email">Correo Electrónico *</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                
-                <h3>Método de pago</h3>
-                <div class="payment-methods">
-                    <div class="payment-method">
-                        <input type="radio" id="bancolombia" name="metodo_pago" value="Bancolombia" checked>
-                        <label for="bancolombia">
-                            <span class="payment-icon"><i class="fas fa-university"></i></span>
-                            <span class="payment-name">Bancolombia</span>
-                        </label>
+                <div class="form-section">
+                    <h3>Datos personales</h3>
+                    
+                    <div class="form-group">
+                        <label for="nombres" class="required">Nombre(s)</label>
+                        <input type="text" id="nombres" name="nombres" required>
                     </div>
                     
-                    <div class="payment-method">
-                        <input type="radio" id="nequi" name="metodo_pago" value="Nequi">
-                        <label for="nequi">
-                            <span class="payment-icon"><i class="fas fa-mobile-alt"></i></span>
-                            <span class="payment-name">Nequi</span>
-                        </label>
+                    <div class="form-group">
+                        <label for="apellidos" class="required">Apellidos</label>
+                        <input type="text" id="apellidos" name="apellidos" required>
                     </div>
                     
-                    <div class="payment-method">
-                        <input type="radio" id="contraentrega" name="metodo_pago" value="Contra Entrega">
-                        <label for="contraentrega">
-                            <span class="payment-icon"><i class="fas fa-truck"></i></span>
-                            <span class="payment-name">Pago Contra Entrega</span>
-                        </label>
+                    <div class="form-group">
+                        <label for="tipo_documento" class="required">Tipo de Documento de Identidad</label>
+                        <select id="tipo_documento" name="tipo_documento" required>
+                            <option value="" disabled selected>Seleccione una opción</option>
+                            <option value="CC">Cédula de Ciudadanía</option>
+                            <option value="CE">Cédula de Extranjería</option>
+                            <option value="PASAPORTE">Pasaporte</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="num_documento" class="required">Número de Documento de Identidad</label>
+                        <input type="text" id="num_documento" name="num_documento" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fecha_nacimiento" class="required">Fecha de Nacimiento (Mayor de 18 años)</label>
+                        <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sexo">Sexo</label>
+                        <select id="sexo" name="sexo">
+                            <option value="" disabled selected>Seleccione una opción</option>
+                            <option value="M">Masculino</option>
+                            <option value="F">Femenino</option>
+                            <option value="O">Otro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="estado_civil">Estado Civil</label>
+                        <select id="estado_civil" name="estado_civil">
+                            <option value="" disabled selected>Seleccione una opción</option>
+                            <option value="soltero">Soltero/a</option>
+                            <option value="casado">Casado/a</option>
+                            <option value="union_libre">Unión Libre</option>
+                            <option value="separado">Separado/a</option>
+                            <option value="divorciado">Divorciado/a</option>
+                            <option value="viudo">Viudo/a</option>
+                        </select>
                     </div>
                 </div>
                 
-                <div class="payment-details" id="payment-details-container">
-                    <!-- Aquí se mostrará la información del pago según el método seleccionado -->
+                <div class="form-section">
+                    <h3>Datos de contacto</h3>
+                    
+                    <div class="form-group">
+                        <label for="ciudad" class="required">Ciudad</label>
+                        <select id="ciudad" name="ciudad" required>
+                            <option value="" disabled selected>Seleccione una ciudad</option>
+                            <option value="Medellín">Medellín</option>
+                            <option value="Bello">Bello</option>
+                            <option value="Envigado">Envigado</option>
+                            <option value="Itagüí">Itagüí</option>
+                            <option value="Sabaneta">Sabaneta</option>
+                            <option value="La Estrella">La Estrella</option>
+                            <option value="Caldas">Caldas</option>
+                            <option value="Copacabana">Copacabana</option>
+                            <option value="Girardota">Girardota</option>
+                            <option value="Barbosa">Barbosa</option>
+                            <option value="Rionegro">Rionegro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="direccion" class="required">Dirección de entrega</label>
+                        <input type="text" id="direccion" name="direccion" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="telefono_fijo">Teléfono Fijo</label>
+                        <input type="tel" id="telefono_fijo" name="telefono_fijo">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="telefono_movil" class="required">Teléfono Móvil</label>
+                        <input type="tel" id="telefono_movil" name="telefono_movil" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email" class="required">Correo Electrónico</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Método de pago</h3>
+                    <div class="payment-methods">
+                        <div class="payment-method">
+                            <input type="radio" id="bancolombia" name="metodo_pago" value="Bancolombia" checked>
+                            <label for="bancolombia">
+                                <span class="payment-icon"><i class="fas fa-university"></i></span>
+                                <span class="payment-name">Bancolombia</span>
+                            </label>
+                        </div>
+                        
+                        <div class="payment-method">
+                            <input type="radio" id="nequi" name="metodo_pago" value="Nequi">
+                            <label for="nequi">
+                                <span class="payment-icon"><i class="fas fa-mobile-alt"></i></span>
+                                <span class="payment-name">Nequi</span>
+                            </label>
+                        </div>
+                        
+                        <div class="payment-method">
+                            <input type="radio" id="contraentrega" name="metodo_pago" value="Contra Entrega">
+                            <label for="contraentrega">
+                                <span class="payment-icon"><i class="fas fa-truck"></i></span>
+                                <span class="payment-name">Pago Contra Entrega</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="payment-details" id="payment-details-container">
+                        <!-- Aquí se mostrará la información del pago según el método seleccionado -->
+                    </div>
                 </div>
                 
                 <div class="checkout-actions">
@@ -153,6 +183,19 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Configurar validación de edad (mayor de 18 años)
+        const fechaNacimiento = document.getElementById('fecha_nacimiento');
+        if (fechaNacimiento) {
+            // Calcular fecha máxima (18 años atrás desde hoy)
+            const hoy = new Date();
+            const maxDate = new Date();
+            maxDate.setFullYear(hoy.getFullYear() - 18);
+            
+            // Formatear fecha en formato YYYY-MM-DD para el input date
+            const maxDateStr = maxDate.toISOString().split('T')[0];
+            fechaNacimiento.setAttribute('max', maxDateStr);
+        }
+        
         // Cargar carrito desde localStorage
         loadCart();
         
@@ -359,13 +402,11 @@
         container.innerHTML = content;
     }
     
-function enviarPedidoWhatsApp() {
-    const form = document.getElementById('checkout-form');
-    
-    if (!form) return;
-    
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
+    // Función mejorada para enviar pedido por WhatsApp
+    function enviarPedidoWhatsApp() {
+        const form = document.getElementById('checkout-form');
+        
+        if (!form) return;
         
         // Validar campos requeridos
         const camposRequeridos = [
@@ -388,27 +429,46 @@ function enviarPedidoWhatsApp() {
             }
         });
         
+        // Validar mayoría de edad (18 años)
+        const fechaNacimiento = form.querySelector('[name="fecha_nacimiento"]');
+        if (fechaNacimiento && fechaNacimiento.value) {
+            const fechaNac = new Date(fechaNacimiento.value);
+            const hoy = new Date();
+            let edad = hoy.getFullYear() - fechaNac.getFullYear();
+            const m = hoy.getMonth() - fechaNac.getMonth();
+            
+            if (m < 0 || (m === 0 && hoy.getDate() < fechaNac.getDate())) {
+                edad--;
+            }
+            
+            if (edad < 18) {
+                fechaNacimiento.classList.add('error');
+                showToast('Debe ser mayor de 18 años para realizar un pedido');
+                formularioValido = false;
+            }
+        }
+        
         if (!formularioValido) {
-            showToast('Por favor, completa todos los campos obligatorios');
+            showToast('Por favor, completa todos los campos obligatorios correctamente');
             return;
         }
         
-        // Obtener datos del formulario
+        // Obtener datos del formulario (todos los campos)
         const nombres = form.querySelector('[name="nombres"]').value;
         const apellidos = form.querySelector('[name="apellidos"]').value;
         const tipoDocumento = form.querySelector('[name="tipo_documento"]').value;
         const numDocumento = form.querySelector('[name="num_documento"]').value;
-        const fechaNacimiento = form.querySelector('[name="fecha_nacimiento"]').value;
+        const fechaNacimientoValue = form.querySelector('[name="fecha_nacimiento"]').value;
         const ciudad = form.querySelector('[name="ciudad"]').value;
         const direccion = form.querySelector('[name="direccion"]').value;
         const telefonoMovil = form.querySelector('[name="telefono_movil"]').value;
         const email = form.querySelector('[name="email"]').value;
         const metodoPago = form.querySelector('[name="metodo_pago"]:checked').value;
         
-        // Campos opcionales
-        const sexo = form.querySelector('[name="sexo"]')?.value || '';
-        const estadoCivil = form.querySelector('[name="estado_civil"]')?.value || '';
-        const telefonoFijo = form.querySelector('[name="telefono_fijo"]')?.value || '';
+        // Campos opcionales (siempre incluirlos aunque estén vacíos)
+        const sexo = form.querySelector('[name="sexo"]') ? form.querySelector('[name="sexo"]').value : 'No especificado';
+        const estadoCivil = form.querySelector('[name="estado_civil"]') ? form.querySelector('[name="estado_civil"]').value : 'No especificado';
+        const telefonoFijo = form.querySelector('[name="telefono_fijo"]') ? form.querySelector('[name="telefono_fijo"]').value : 'No proporcionado';
         
         // Obtener carrito
         const carrito = getCarritoFromStorage();
@@ -418,45 +478,38 @@ function enviarPedidoWhatsApp() {
             return;
         }
         
-        // Crear mensaje de WhatsApp
+        // Crear mensaje de WhatsApp completo con todos los campos
         let mensaje = `*Nuevo Pedido*%0A%0A`;
         mensaje += `*Nombres:* ${nombres}%0A`;
         mensaje += `*Apellidos:* ${apellidos}%0A`;
         mensaje += `*Documento:* ${tipoDocumento} ${numDocumento}%0A`;
-        mensaje += `*Fecha Nacimiento:* ${fechaNacimiento}%0A`;
+        mensaje += `*Fecha Nacimiento:* ${fechaNacimientoValue}%0A`;
         mensaje += `*Ciudad:* ${ciudad}%0A`;
         mensaje += `*Dirección:* ${direccion}%0A`;
         mensaje += `*Teléfono Móvil:* ${telefonoMovil}%0A`;
         mensaje += `*Email:* ${email}%0A`;
-        
-        if (telefonoFijo) {
-            mensaje += `*Teléfono Fijo:* ${telefonoFijo}%0A`;
-        }
-        
-        if (sexo) {
-            mensaje += `*Sexo:* ${sexo}%0A`;
-        }
-        
-        if (estadoCivil) {
-            mensaje += `*Estado Civil:* ${estadoCivil}%0A`;
-        }
-        
+        mensaje += `*Teléfono Fijo:* ${telefonoFijo}%0A`;
+        mensaje += `*Sexo:* ${sexo}%0A`;
+        mensaje += `*Estado Civil:* ${estadoCivil}%0A`;
         mensaje += `*Método de Pago:* ${metodoPago}%0A%0A`;
         mensaje += `*Productos:*%0A`;
         
+        let total = 0;
         carrito.items.forEach(item => {
-            mensaje += `- ${item.cantidad}x ${item.nombre} - $${(item.precio * item.cantidad).toLocaleString('es-CO')}%0A`;
+            const subtotal = item.precio * item.cantidad;
+            total += subtotal;
+            mensaje += `- ${item.cantidad}x ${item.nombre} - $${subtotal.toLocaleString('es-CO')}%0A`;
         });
         
-        mensaje += `%0A*Total:* $${carrito.total.toLocaleString('es-CO')}`;
+        mensaje += `%0A*Total:* $${total.toLocaleString('es-CO')}`;
         
-        // Número de WhatsApp de la empresa (actualizado)
+        // Número de WhatsApp de la empresa
         const whatsappNumber = '573225865591';
         
         // Crear URL de WhatsApp
         const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${mensaje}`;
         
-        // Mostrar mensaje de confirmación
+        // Mostrar confirmación
         showToast('¡Pedido enviado correctamente! Abriendo WhatsApp...');
         
         // Abrir WhatsApp en una nueva ventana
@@ -466,12 +519,59 @@ function enviarPedidoWhatsApp() {
         localStorage.removeItem('carrito');
         updateCartCount(0);
         
-        // Redirigir a la página de confirmación después de un breve retraso
+        // Redirigir a la página de confirmación
         setTimeout(() => {
             window.location.href = '/pedidos/confirmacion';
         }, 2000);
-    });
-}
+    }
+    
+    /**
+     * Obtiene el carrito del almacenamiento local
+     * @returns {Object} Carrito de compras
+     */
+    function getCarritoFromStorage() {
+        const carritoJSON = localStorage.getItem('carrito');
+        
+        if (carritoJSON) {
+            try {
+                return JSON.parse(carritoJSON);
+            } catch (e) {
+                console.error('Error al parsear carrito:', e);
+            }
+        }
+        
+        // Carrito por defecto
+        return {
+            items: [],
+            total: 0
+        };
+    }
+    
+
+    /**
+     * Muestra un mensaje toast
+     * @param {string} message - Mensaje a mostrar
+     */
+    function showToast(message) {
+        // Verificar si ya existe un toast
+        let toast = document.querySelector('.toast');
+        
+        // Si no existe, crear uno nuevo
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.className = 'toast';
+            document.body.appendChild(toast);
+        }
+        
+        // Establecer el mensaje y mostrar
+        toast.textContent = message;
+        toast.classList.add('show');
+        
+        // Ocultar después de 3 segundos
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
 </script>
 
 <style>
@@ -480,5 +580,33 @@ function enviarPedidoWhatsApp() {
     .form-group textarea.error {
         border: 1px solid #e74c3c;
         background-color: #ffeaea;
+    }
+    
+    .required:after {
+        content: " *";
+        color: #e74c3c;
+    }
+    
+    .required-note {
+        font-size: 0.85rem;
+        color: var(--color-secondary);
+        margin-bottom: 1.5rem;
+        font-style: italic;
+    }
+    
+    .required-note span {
+        color: #e74c3c;
+    }
+    
+    .form-section {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--color-accent);
+    }
+    
+    .form-section h3 {
+        margin-bottom: 1rem;
+        color: var(--color-dark);
+        font-size: 1.2rem;
     }
 </style>

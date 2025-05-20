@@ -9,36 +9,45 @@ document.addEventListener('DOMContentLoaded', function() {
     const addToCartBtn = document.getElementById('btnAddToCart');
     
     if (addToCartBtn) {
-        addToCartBtn.addEventListener('click', function() {
-            const productId = this.getAttribute('data-id');
-            const productName = this.getAttribute('data-nombre');
-            const productPrice = this.getAttribute('data-precio');
-            const productImg = this.getAttribute('data-imagen');
-            
-            // Obtener la cantidad seleccionada
-            const quantityInput = document.getElementById('product-quantity');
-            const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
-            
-            // Crear el objeto de producto
-            const producto = {
-                id: productId,
-                nombre: productName,
-                precio: parseFloat(productPrice.replace(/\./g, '').replace(/,/g, '.')) || 0,
-                imagen: productImg,
-                cantidad: quantity
-            };
-            
-            // Añadir al carrito
-            addProductToCart(producto);
-            
-            // Mostrar confirmación con el toast mejorado
-            showToast(productName + ' ha sido añadido al carrito');
-            
-            // Animar el botón flotante del carrito
-            animateCartIcon();
-        });
+        // Remover cualquier event listener previo (para evitar duplicados)
+        addToCartBtn.removeEventListener('click', handleAddToCart);
+        
+        // Añadir el nuevo event listener
+        addToCartBtn.addEventListener('click', handleAddToCart);
     }
 });
+
+/**
+ * Manejador para el evento click del botón añadir al carrito
+ */
+function handleAddToCart() {
+    const productId = this.getAttribute('data-id');
+    const productName = this.getAttribute('data-nombre');
+    const productPrice = this.getAttribute('data-precio');
+    const productImg = this.getAttribute('data-imagen');
+    
+    // Obtener la cantidad seleccionada
+    const quantityInput = document.getElementById('product-quantity');
+    const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
+    
+    // Crear el objeto de producto
+    const producto = {
+        id: productId,
+        nombre: productName,
+        precio: parseFloat(productPrice.replace(/\./g, '').replace(/,/g, '.')) || 0,
+        imagen: productImg,
+        cantidad: quantity
+    };
+    
+    // Añadir al carrito (una sola vez)
+    addProductToCart(producto);
+    
+    // Mostrar confirmación con el toast mejorado
+    showToast(productName + ' ha sido añadido al carrito');
+    
+    // Animar el botón flotante del carrito
+    animateCartIcon();
+}
 
 /**
  * Inicializa el selector de cantidad
@@ -139,6 +148,7 @@ function animateCartIcon() {
 
 /**
  * Añade un producto al carrito
+ * Se asegura de que solo se añada una vez evitando duplicados
  */
 function addProductToCart(producto) {
     // Obtener carrito actual del localStorage
@@ -147,6 +157,7 @@ function addProductToCart(producto) {
         carrito = JSON.parse(localStorage.getItem('carrito')) || { items: [], total: 0 };
     } catch (e) {
         carrito = { items: [], total: 0 };
+        console.error('Error al parsear carrito:', e);
     }
     
     // Verificar si el producto ya existe
