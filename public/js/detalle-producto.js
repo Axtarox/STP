@@ -161,7 +161,8 @@ function addProductToCart(producto) {
     }
     
     // Verificar si el producto ya existe
-    const index = carrito.items.findIndex(item => item.id === producto.id);
+    // Convert IDs to strings for consistent comparison
+    const index = carrito.items.findIndex(item => String(item.id) === String(producto.id));
     
     if (index !== -1) {
         // Incrementar cantidad
@@ -182,7 +183,6 @@ function addProductToCart(producto) {
     // Actualizar contador
     updateCartCount();
 }
-
 /**
  * Actualiza el contador del carrito
  */

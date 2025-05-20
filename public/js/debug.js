@@ -1,11 +1,4 @@
-/**
- * Debug.js - Herramienta para detectar problemas de renderización
- * 
- * Instrucciones:
- * 1. Guardar este archivo como debug.js en la carpeta /public/js/
- * 2. Incluirlo en las vistas que quieras depurar con:
- *    <script src="/js/debug.js"></script>
- */
+
 
 (function() {
     console.log('🔍 Herramienta de depuración de renderización cargada');

@@ -1,6 +1,3 @@
-/**
- * main.js - Funcionalidades principales para la tienda online de Soluciones Tecnológicas Pradito
- */
 
 document.addEventListener('DOMContentLoaded', function() {
     // Inicializar funcionalidades principales
@@ -8,17 +5,14 @@ document.addEventListener('DOMContentLoaded', function() {
     initSearchForm();
     initMobileMenu();
     initQuantitySelectors();
+    initWhatsAppFunctionality(); 
 });
 
-/**
- * Inicializa la funcionalidad del carrito de compras
- */
 function initCarrito() {
-    // Botones de "Añadir al carrito"
     const addToCartButtons = document.querySelectorAll('.add-to-cart');
     const cartCount = document.querySelector('.cart-count');
     
-    if (!cartCount) return; // Si no existe el elemento, salir
+    if (!cartCount) return; 
     
     // Inicializar el contador del carrito
     const carrito = getCarritoFromStorage();
@@ -76,7 +70,7 @@ function initCarrito() {
             e.preventDefault();
             cartSidebar.classList.add('open');
             cartOverlay.classList.add('show');
-            updateCartView(); // Actualizar vista del carrito
+            updateCartView(); 
         });
     }
     
@@ -108,11 +102,9 @@ function initCarrito() {
     });
 }
 
-/**
- * Inicializa los selectores de cantidad en los productos
- */
+
 function initQuantitySelectors() {
-    // Manejar botones de cantidad
+
     document.querySelectorAll('.quantity-btn').forEach(button => {
         button.addEventListener('click', function() {
             const isPlus = this.classList.contains('plus');
@@ -163,7 +155,8 @@ function addProductToCart(producto) {
     const carrito = getCarritoFromStorage();
     
     // Verificar si el producto ya está en el carrito
-    const existingProductIndex = carrito.items.findIndex(item => item.id === producto.id);
+    // Convert IDs to strings for consistent comparison
+    const existingProductIndex = carrito.items.findIndex(item => String(item.id) === String(producto.id));
     
     if (existingProductIndex !== -1) {
         // Incrementar cantidad
@@ -184,17 +177,18 @@ function addProductToCart(producto) {
     
     // Actualizar vista del carrito si está abierta
     updateCartView();
+    
     // Añadir el efecto de rebote
     const floatingCart = document.getElementById('floating-cart');
-    floatingCart.classList.add('cart-bounce');
-    
-    // Remover la clase después de la animación
-    setTimeout(() => {
-        floatingCart.classList.remove('cart-bounce');
-    }, 750);
-
+    if (floatingCart) {
+        floatingCart.classList.add('cart-bounce');
+        
+        // Remover la clase después de la animación
+        setTimeout(() => {
+            floatingCart.classList.remove('cart-bounce');
+        }, 750);
+    }
 }
-
 /**
  * Actualiza el contador del carrito
  * @param {number} count - Número de items
@@ -254,9 +248,7 @@ function calculateCartTotal(items) {
     }, 0);
 }
 
-/**
- * Actualiza la vista del carrito
- */
+
 function updateCartView() {
     const cartItemsContainer = document.querySelector('.cart-items');
     const cartTotalElement = document.querySelector('.cart-total');
@@ -304,9 +296,7 @@ function updateCartView() {
     }
 }
 
-/**
- * Agrega listeners a los botones del carrito
- */
+
 function addCartItemEventListeners() {
     // Botones de cantidad
     document.querySelectorAll('.quantity-btn').forEach(btn => {
@@ -383,9 +373,7 @@ function removeProductFromCart(id) {
     updateCartView();
 }
 
-/**
- * Inicializa el formulario de búsqueda
- */
+
 function initSearchForm() {
     const searchForm = document.querySelector('.search-container');
     if (!searchForm) return;
@@ -413,9 +401,7 @@ function initSearchForm() {
     });
 }
 
-/**
- * Inicializa el menú móvil
- */
+
 function initMobileMenu() {
     const menuToggle = document.querySelector('.menu-toggle');
     const mainNav = document.querySelector('.main-nav');
@@ -453,23 +439,13 @@ function showToast(message) {
     }, 3000);
 }
 
-/**
- * Envía los datos del pedido a WhatsApp cuando se procesa el checkout
- */
-/**
- * Actualización para la sección de envío de mensajes a WhatsApp en main.js
- */
 
-// Añadir al final de la función initCarrito o donde sea apropiado
 function initWhatsAppFunctionality() {
-    // Buscar cualquier botón o enlace de WhatsApp para asegurar el número correcto
     const whatsappLinks = document.querySelectorAll('a[href*="whatsapp.com/send"]');
     
     whatsappLinks.forEach(link => {
-        // Actualizar el href para usar el número correcto
         const currentHref = link.getAttribute('href');
         if (currentHref && !currentHref.includes('573225865591')) {
-            // Reemplazar cualquier número antiguo con el nuevo
             const newHref = currentHref.replace(/phone=\d+/, 'phone=573225865591');
             link.setAttribute('href', newHref);
         }
@@ -485,10 +461,7 @@ function initWhatsAppFunctionality() {
     }
 }
 
-/**
- * Envía los datos del pedido a WhatsApp cuando se procesa el checkout
- * Función actualizada con el número correcto
- */
+
 function enviarPedidoWhatsApp() {
     const form = document.getElementById('checkout-form');
     
@@ -577,7 +550,7 @@ function enviarPedidoWhatsApp() {
     
     mensaje += `%0A*Total:* $${carrito.total.toLocaleString('es-CO')}`;
     
-    // Número de WhatsApp de la empresa (actualizado)
+    // Número de WhatsApp de la empresa 
     const whatsappNumber = '573225865591';
     
     // Crear URL de WhatsApp
@@ -599,12 +572,3 @@ function enviarPedidoWhatsApp() {
     }, 2000);
 }
 
-// Modificar la función de inicialización para incluir la función de WhatsApp
-document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar funcionalidades principales
-    initCarrito();
-    initSearchForm();
-    initMobileMenu();
-    initQuantitySelectors();
-    initWhatsAppFunctionality(); // Agregar esta línea
-});

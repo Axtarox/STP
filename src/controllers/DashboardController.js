@@ -465,16 +465,15 @@ exports.eliminarProducto = async (req, res) => {
       throw new Error('No se pudo eliminar el producto');
     }
     
-    // Redirigir a la lista de productos con mensaje de éxito
-    req.session.successMessage = 'Producto eliminado correctamente';
-    res.redirect('/admin/productos');
+    // Guardar mensaje de éxito en la sesión
+    req.session.successMessage = `El producto "${producto.nombre}" ha sido eliminado correctamente`;
+    
+    // Redirigir a la lista de productos
+    return res.redirect('/admin/productos');
   } catch (error) {
     console.error('Error al eliminar producto:', error);
-    res.status(500).render('error', {
-      titulo: 'Error',
-      mensaje: `Error al eliminar el producto: ${error.message}`,
-      error: process.env.NODE_ENV === 'development' ? error.stack : null
-    });
+    req.session.error = `Error al eliminar el producto: ${error.message}`;
+    return res.redirect('/admin/productos');
   }
 };
 

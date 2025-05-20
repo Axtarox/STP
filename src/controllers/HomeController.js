@@ -6,8 +6,7 @@ const Servicio = require('../models/Servicio');
 
 /**
  * Página principal con productos aleatorios y servicios destacados
- */
-exports.getIndex = async (req, res) => {
+ */exports.getIndex = async (req, res) => {
   try {
     // Obtener 5 productos aleatorios sin logs excesivos
     let productos = [];
@@ -35,10 +34,11 @@ exports.getIndex = async (req, res) => {
       servicios = [];
     }
 
-    // Formatear precios de productos
+    // Formatear precios de productos - FORMAT AS INTEGERS by using Math.round
     productos = productos.map(producto => ({
       ...producto,
-      precio: producto.precio ? producto.precio.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0
+      precio: Math.round(parseFloat(producto.precio || 0))
+             .toLocaleString('es-CO') // Format according to Colombian locale
     }));
     
     // Renderizar la vista con los datos obtenidos
