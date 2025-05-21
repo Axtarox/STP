@@ -518,43 +518,43 @@ function enviarPedidoWhatsApp() {
         return;
     }
     
-    // Crear mensaje de WhatsApp
-    let mensaje = `*Nuevo Pedido*%0A%0A`;
-    mensaje += `*Nombres:* ${nombres}%0A`;
-    mensaje += `*Apellidos:* ${apellidos}%0A`;
-    mensaje += `*Documento:* ${tipoDocumento} ${numDocumento}%0A`;
-    mensaje += `*Fecha Nacimiento:* ${fechaNacimiento}%0A`;
-    mensaje += `*Ciudad:* ${ciudad}%0A`;
-    mensaje += `*Dirección:* ${direccion}%0A`;
-    mensaje += `*Teléfono Móvil:* ${telefonoMovil}%0A`;
-    mensaje += `*Email:* ${email}%0A`;
+    // Construir el mensaje pero sin aplicar %0A directamente
+    let mensaje = "Nuevo Pedido\n\n";
+    mensaje += `Nombres: ${nombres}\n`;
+    mensaje += `Apellidos: ${apellidos}\n`;
+    mensaje += `Documento: ${tipoDocumento} ${numDocumento}\n`;
+    mensaje += `Fecha Nacimiento: ${fechaNacimiento}\n`;
+    mensaje += `Ciudad: ${ciudad}\n`;
+    mensaje += `Dirección: ${direccion}\n`;
+    mensaje += `Teléfono Móvil: ${telefonoMovil}\n`;
+    mensaje += `Email: ${email}\n`;
     
     if (telefonoFijo) {
-        mensaje += `*Teléfono Fijo:* ${telefonoFijo}%0A`;
+        mensaje += `Teléfono Fijo: ${telefonoFijo}\n`;
     }
     
     if (sexo) {
-        mensaje += `*Sexo:* ${sexo}%0A`;
+        mensaje += `Sexo: ${sexo}\n`;
     }
     
     if (estadoCivil) {
-        mensaje += `*Estado Civil:* ${estadoCivil}%0A`;
+        mensaje += `Estado Civil: ${estadoCivil}\n`;
     }
     
-    mensaje += `*Método de Pago:* ${metodoPago}%0A%0A`;
-    mensaje += `*Productos:*%0A`;
+    mensaje += `Método de Pago: ${metodoPago}\n\n`;
+    mensaje += `Productos:\n`;
     
     carrito.items.forEach(item => {
-        mensaje += `- ${item.cantidad}x ${item.nombre} - $${(item.precio * item.cantidad).toLocaleString('es-CO')}%0A`;
+        mensaje += `- ${item.cantidad}x ${item.nombre} - $${(item.precio * item.cantidad).toLocaleString('es-CO')}\n`;
     });
     
-    mensaje += `%0A*Total:* $${carrito.total.toLocaleString('es-CO')}`;
+    mensaje += `\nTotal: $${carrito.total.toLocaleString('es-CO')}`;
     
     // Número de WhatsApp de la empresa 
     const whatsappNumber = '573225865591';
     
-    // Crear URL de WhatsApp
-    const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${mensaje}`;
+    // Crear URL de WhatsApp con el mensaje adecuadamente codificado
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(mensaje)}`;
     
     // Mostrar mensaje de confirmación
     showToast('¡Pedido enviado correctamente! Abriendo WhatsApp...');

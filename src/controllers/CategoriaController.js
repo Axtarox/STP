@@ -70,7 +70,7 @@ exports.getCrearCategoriaForm = (req, res) => {
 exports.crearCategoria = async (req, res) => {
     try {
         // Obtener datos del formulario
-        const { nombre, descripcion = '' } = req.body;
+        const { nombre } = req.body;
         
         // Validar campos requeridos
         if (!nombre || nombre.trim() === '') {
@@ -83,8 +83,8 @@ exports.crearCategoria = async (req, res) => {
             });
         }
         
-        // Crear nueva categoría
-        const categoriaId = await Categoria.create(nombre, descripcion);
+        // Crear nueva categoría (solo con el nombre)
+        const categoriaId = await Categoria.create(nombre);
         
         if (!categoriaId) {
             throw new Error('No se pudo crear la categoría');
@@ -222,7 +222,7 @@ exports.editarCategoria = async (req, res) => {
         }
         
         // Obtener datos del formulario
-        const { nombre, descripcion = '' } = req.body;
+        const { nombre } = req.body;
         
         // Validar campos requeridos
         if (!nombre || nombre.trim() === '') {
@@ -239,8 +239,8 @@ exports.editarCategoria = async (req, res) => {
             });
         }
         
-        // Actualizar categoría
-        const success = await Categoria.update(id, nombre, descripcion);
+        // Actualizar categoría (solo el nombre)
+        const success = await Categoria.update(id, nombre);
         
         if (!success) {
             throw new Error('No se pudo actualizar la categoría');

@@ -101,11 +101,6 @@
                         <input type="text" id="nombre" name="nombre" class="admin-form-control" value="{{categoria.nombre}}" required>
                     </div>
                     
-                    <div class="admin-form-group">
-                        <label for="descripcion">Descripción</label>
-                        <textarea id="descripcion" name="descripcion" class="admin-form-control" rows="4">{{categoria.descripcion}}</textarea>
-                    </div>
-                    
                     {{#if productsCount}}
                     <div class="admin-alert admin-alert-info">
                         <i class="fas fa-info-circle"></i> Esta categoría tiene {{productsCount}} productos asociados.

@@ -59,32 +59,53 @@ function initQuantitySelector() {
     
     if (!quantityMinus || !quantityPlus || !quantityInput) return;
     
-    quantityMinus.addEventListener('click', function() {
-        let value = parseInt(quantityInput.value);
-        if (value > 1) {
-            quantityInput.value = value - 1;
-        }
-    });
+    // Eliminar eventos existentes para evitar duplicados
+    quantityMinus.removeEventListener('click', decrementQuantity);
+    quantityPlus.removeEventListener('click', incrementQuantity);
     
-    quantityPlus.addEventListener('click', function() {
-        let value = parseInt(quantityInput.value);
-        const max = parseInt(quantityInput.getAttribute('max'));
-        if (value < max) {
-            quantityInput.value = value + 1;
-        }
-    });
+    // Agregar nuevos event listeners
+    quantityMinus.addEventListener('click', decrementQuantity);
+    quantityPlus.addEventListener('click', incrementQuantity);
     
     // Validar entrada directa
-    quantityInput.addEventListener('change', function() {
-        let value = parseInt(this.value);
-        const max = parseInt(this.getAttribute('max'));
-        
-        if (isNaN(value) || value < 1) {
-            this.value = 1;
-        } else if (value > max) {
-            this.value = max;
-        }
-    });
+    quantityInput.addEventListener('change', validateQuantityInput);
+}
+
+/**
+ * Función para decrementar la cantidad
+ */
+function decrementQuantity() {
+    const quantityInput = document.getElementById('product-quantity');
+    let value = parseInt(quantityInput.value);
+    if (value > 1) {
+        quantityInput.value = value - 1;
+    }
+}
+
+/**
+ * Función para incrementar la cantidad
+ */
+function incrementQuantity() {
+    const quantityInput = document.getElementById('product-quantity');
+    let value = parseInt(quantityInput.value);
+    const max = parseInt(quantityInput.getAttribute('max'));
+    if (value < max) {
+        quantityInput.value = value + 1;
+    }
+}
+
+/**
+ * Función para validar la entrada directa
+ */
+function validateQuantityInput() {
+    let value = parseInt(this.value);
+    const max = parseInt(this.getAttribute('max'));
+    
+    if (isNaN(value) || value < 1) {
+        this.value = 1;
+    } else if (value > max) {
+        this.value = max;
+    }
 }
 
 /**

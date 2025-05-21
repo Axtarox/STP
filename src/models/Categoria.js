@@ -43,15 +43,14 @@ class Categoria {
   /**
    * Crea una nueva categoría
    * @param {string} nombre - Nombre de la categoría
-   * @param {string} descripcion - Descripción de la categoría
    * @returns {Promise<number|null>} ID de la categoría creada o null en caso de error
    */
-  static async create(nombre, descripcion = '') {
+  static async create(nombre) {
     try {
       const [result] = await pool.query(`
-        INSERT INTO categoria (nombre, descripcion) 
-        VALUES (?, ?)
-      `, [nombre, descripcion]);
+        INSERT INTO categoria (nombre) 
+        VALUES (?)
+      `, [nombre]);
       return result.insertId;
     } catch (error) {
       console.error(`Error en Categoria.create("${nombre}"):`, error);
@@ -63,16 +62,15 @@ class Categoria {
    * Actualiza una categoría existente
    * @param {number} id - ID de la categoría
    * @param {string} nombre - Nuevo nombre de la categoría
-   * @param {string} descripcion - Nueva descripción de la categoría
    * @returns {Promise<boolean>} Resultado de la operación
    */
-  static async update(id, nombre, descripcion = '') {
+  static async update(id, nombre) {
     try {
       const [result] = await pool.query(`
         UPDATE categoria 
-        SET nombre = ?, descripcion = ?
+        SET nombre = ?
         WHERE id = ?
-      `, [nombre, descripcion, id]);
+      `, [nombre, id]);
       return result.affectedRows > 0;
     } catch (error) {
       console.error(`Error en Categoria.update(${id}, "${nombre}"):`, error);

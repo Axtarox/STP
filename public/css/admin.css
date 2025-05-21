@@ -437,4 +437,248 @@ button:hover {
     justify-content: flex-end;
     padding-top: 1rem;
     border-top: 1px solid var(--admin-accent);
+}/* Mejoras responsive para el panel de administración */
+
+/* Reglas generales para mejora responsive */
+@media (max-width: 992px) {
+    /* Ajustes para la barra lateral */
+    .admin-sidebar {
+        width: 70px;
+        transition: all 0.3s ease;
+    }
+    
+    .admin-sidebar-header {
+        padding: 0.5rem;
+    }
+    
+    .admin-sidebar-header p {
+        display: none;
+    }
+    
+    .admin-logo {
+        font-size: 0;
+    }
+    
+    .admin-logo span {
+        display: none;
+    }
+    
+    .admin-logo::first-letter {
+        font-size: 1.5rem;
+    }
+    
+    .admin-nav-title,
+    .admin-nav-text {
+        display: none;
+    }
+    
+    .admin-main {
+        margin-left: 70px;
+        transition: all 0.3s ease;
+    }
+    
+    /* Ajustes para tarjetas y widgets */
+    .admin-form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Mejora de tablas para vista mobile */
+    .admin-table {
+        overflow-x: auto;
+        display: block;
+        width: 100%;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Ajustes para formularios */
+    .admin-form {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Ajustes header admin */
+    .admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem;
+        height: auto;
+    }
+    
+    .admin-page-title {
+        margin-bottom: 1rem;
+    }
+    
+    .admin-actions {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: flex-start;
+    }
+    
+    .admin-btn {
+        font-size: 0.85rem;
+        padding: 0.5rem 1rem;
+    }
+    
+    /* Mejoras para tablas en móviles */
+    .admin-table th,
+    .admin-table td {
+        padding: 0.5rem;
+        font-size: 0.85rem;
+    }
+    
+    .admin-table-actions {
+        flex-wrap: wrap;
+        gap: 0.3rem;
+    }
+    
+    .action-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 0.85rem;
+    }
+    
+    /* Ajustes para vista de detalle de productos/servicios */
+    .product-details, 
+    .service-details {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .product-image,
+    .service-image {
+        margin-bottom: 1rem;
+    }
+    
+    .product-info-item, 
+    .service-info-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .info-label {
+        width: 100%;
+        margin-bottom: 0.25rem;
+    }
+    
+    /* Ajustes para tarjetas y widgets */
+    .admin-card {
+        padding: 1rem;
+    }
+    
+    .admin-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .admin-form-actions {
+        flex-direction: column;
+    }
+    
+    .admin-form-actions .admin-btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    /* Ajustes para tablas en pantallas muy pequeñas */
+    .admin-table {
+        font-size: 0.8rem;
+    }
+    
+    /* Ocultar columnas menos importantes en móvil */
+    .admin-table th:nth-child(4),
+    .admin-table td:nth-child(4) {
+        display: none;
+    }
+    
+    /* Convertir la tabla en layout de tarjetas en pantallas muy pequeñas */
+    .admin-table thead {
+        display: none;
+    }
+    
+    .admin-table tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid var(--admin-accent);
+        border-radius: 8px;
+        padding: 0.5rem;
+    }
+    
+    .admin-table tbody td {
+        display: flex;
+        padding: 0.5rem;
+        text-align: right;
+        border-bottom: none;
+    }
+    
+    .admin-table tbody td:before {
+        content: attr(data-label);
+        font-weight: bold;
+        margin-right: auto;
+        text-align: left;
+    }
+    
+    /* Ajustar la columna de acciones */
+    .admin-table tbody td:last-child {
+        justify-content: center;
+    }
+    
+    /* Modal de confirmación más pequeño */
+    .modal-content {
+        width: 95% !important;
+        margin: 30% auto !important;
+    }
+}
+
+/* Mejorar visualización de imágenes en vistas de detalle */
+.product-image img,
+.service-image img,
+.product-thumb,
+.service-thumb {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Ajustes para campos de formulario en pantallas pequeñas */
+@media (max-width: 576px) {
+    .admin-form-control {
+        font-size: 16px; /* Evita el zoom en dispositivos iOS */
+    }
+    
+    .price-input {
+        font-size: 16px;
+    }
+    
+    .admin-form-group label {
+        font-size: 0.9rem;
+    }
+}
+
+/* Mejoras para el panel de categorías */
+@media (max-width: 768px) {
+    .category-card {
+        flex-direction: column;
+    }
+    
+    .value-card,
+    .team-member,
+    .advantage-card,
+    .testimonial {
+        padding: 1rem;
+    }
+    
+    .product-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Mejora de legibilidad en alerts para móviles */
+@media (max-width: 576px) {
+    .admin-alert {
+        padding: 0.75rem;
+        font-size: 0.85rem;
+    }
 }

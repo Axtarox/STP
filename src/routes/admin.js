@@ -1,5 +1,5 @@
 /**
- * Rutas para el panel de administración (utilizando el controlador de servicios existente)
+ * Rutas para el panel de administración (con orden corregido para categorías)
  */
 
 const express = require('express');
@@ -7,7 +7,7 @@ const router = express.Router();
 const authController = require('../controllers/AuthController');
 const dashboardController = require('../controllers/DashboardController');
 const categoriaController = require('../controllers/CategoriaController');
-const servicioController = require('../controllers/ServicioController'); // Controlador existente
+const servicioController = require('../controllers/ServicioController');
 const authMiddleware = require('../middlewares/authMiddleware');
 const upload = require('../middlewares/uploadMiddleware');
 
@@ -44,27 +44,27 @@ router.get('/', (req, res) => res.redirect('/admin/dashboard'));
 router.get('/productos', dashboardController.getProductos);
 router.get('/productos/crear', dashboardController.getCrearProductoForm);
 router.post('/productos/crear', upload.single('imagen'), dashboardController.crearProducto);
-router.get('/productos/:id', dashboardController.getProductoById);
 router.get('/productos/editar/:id', dashboardController.getEditarProductoForm);
 router.post('/productos/editar/:id', upload.single('imagen'), dashboardController.editarProducto);
 router.get('/productos/eliminar/:id', dashboardController.eliminarProducto);
+router.get('/productos/:id', dashboardController.getProductoById);
 
-// Gestión de categorías
+// Gestión de categorías (ORDEN CORREGIDO)
 router.get('/categorias', categoriaController.getAdminCategorias);
 router.get('/categorias/crear', categoriaController.getCrearCategoriaForm);
 router.post('/categorias/crear', categoriaController.crearCategoria);
-router.get('/categorias/:id', categoriaController.getCategoriaById);
 router.get('/categorias/editar/:id', categoriaController.getEditarCategoriaForm);
 router.post('/categorias/editar/:id', categoriaController.editarCategoria);
 router.get('/categorias/eliminar/:id', categoriaController.eliminarCategoria);
+router.get('/categorias/:id', categoriaController.getCategoriaById);
 
-// Gestión de servicios (usando el controlador existente)
+// Gestión de servicios (también con orden corregido)
 router.get('/servicios', servicioController.getAdminServicios);
 router.get('/servicios/crear', servicioController.getCrearServicioForm);
 router.post('/servicios/crear', upload.single('imagen'), servicioController.crearServicio);
-router.get('/servicios/:id', servicioController.getAdminServicioById);
 router.get('/servicios/editar/:id', servicioController.getEditarServicioForm);
 router.post('/servicios/editar/:id', upload.single('imagen'), servicioController.editarServicio);
 router.get('/servicios/eliminar/:id', servicioController.eliminarServicio);
+router.get('/servicios/:id', servicioController.getAdminServicioById);
 
 module.exports = router;
