@@ -1,5 +1,5 @@
 /**
- * Controlador CategoriaController.js - Administrar categorías en panel admin
+ * Controlador CategoriaController.js 
  */
 const Categoria = require('../models/Categoria');
 const Producto = require('../models/Producto');
@@ -83,7 +83,7 @@ exports.crearCategoria = async (req, res) => {
             });
         }
         
-        // Crear nueva categoría (solo con el nombre)
+        // Crear nueva categoría 
         const categoriaId = await Categoria.create(nombre);
         
         if (!categoriaId) {
@@ -239,7 +239,7 @@ exports.editarCategoria = async (req, res) => {
             });
         }
         
-        // Actualizar categoría (solo el nombre)
+        // Actualizar categoría 
         const success = await Categoria.update(id, nombre);
         
         if (!success) {

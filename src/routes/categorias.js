@@ -1,15 +1,7 @@
-/**
- * Rutas actualizadas para categorías (corregidas)
- */
-
 const express = require('express');
 const router = express.Router();
 const categoriaController = require('../controllers/CategoriaController');
 const productoController = require('../controllers/ProductoController');
-
-/**
- * Rutas públicas
- */
 
 // Obtener todas las categorías
 router.get('/', async (req, res) => {

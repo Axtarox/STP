@@ -1,21 +1,17 @@
 <section class="container product-detail-page">
-    <!-- Breadcrumbs -->
     <div class="breadcrumbs">
         <a href="/">Inicio</a> &gt;
         <a href="/productos">Productos</a> &gt;
         <span>{{producto.nombre}}</span>
     </div>
     
-    <!-- Contenedor principal del producto -->
     <div class="product-detail">
-        <!-- Imagen del producto -->
         <div class="product-image-container">
             <div class="main-image">
                 <img src="{{producto.imagen}}" alt="{{producto.nombre}}" onerror="this.src='/img/default-product.jpg'">
             </div>
         </div>
         
-        <!-- Información del producto -->
         <div class="product-info-container">
             <h1 class="product-title">{{producto.nombre}}</h1>
             

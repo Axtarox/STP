@@ -17,9 +17,9 @@ const { pool, testConnection, dbConfig } = require('./config/database');
 const renderViewMiddleware = require('./middlewares/renderViewMiddleware');
 const dbDebugMiddleware = require('./middlewares/dbDebugMiddleware');
 
-/**
- * Configuración de middleware
- */
+
+ //Configuración de middleware
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
@@ -36,25 +36,25 @@ app.use(session({
 
 app.use(methodOverride('_method'));
 
-/**
- * Servir archivos estáticos (HTML, CSS, JS)
- */
+
+ //Servir archivos estáticos (HTML, CSS, JS)
+
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-/**
- * Middleware para depuración de base de datos
- */
+
+  //Middleware para depuración de base de datos
+ 
 app.use(dbDebugMiddleware);
 
-/**
- * Middleware para renderizar vistas HTML
- */
+
+ //Middleware para renderizar vistas HTML
+
 app.use(renderViewMiddleware);
 // Middleware para adjuntar datos del administrador a todas las vistas
 app.use(require('./middlewares/authMiddleware').attachAdminData);
-/**
- * Variables globales (usadas desde scripts o apis)
- */
+
+  //Variables globales (usadas desde scripts o apis)
+ 
 app.use(async (req, res, next) => {
   try {
     if (req.session.user) {
@@ -87,9 +87,9 @@ app.use(async (req, res, next) => {
     next();
   }
 });
-/**
- * Importar rutas
- */
+
+//Importar rutas
+ 
 const homeRoutes = require('./routes/home');
 const categoriasRoutes = require('./routes/categorias');
 const productosRoutes = require('./routes/productos');
@@ -99,9 +99,9 @@ const pedidosRoutes = require('./routes/pedidos');
 const contactoRoutes = require('./routes/contacto');
 const adminRoutes = require('./routes/admin');
 
-/**
- * Configurar rutas
- */
+
+ //Configurar rutas
+ 
 app.use('/', homeRoutes);
 app.use('/categorias', categoriasRoutes);
 app.use('/productos', productosRoutes);
@@ -110,28 +110,28 @@ app.use('/carrito', carritoRoutes);
 app.use('/pedidos', pedidosRoutes);
 app.use('/contactanos', contactoRoutes);
 app.use('/admin', adminRoutes);
-/**
- * Ruta Quiénes Somos
- */
+
+ //Ruta Quiénes Somos
+ 
 app.get('/quienes-somos', (req, res) => {
   res.render('quienes-somos', { titulo: 'Quiénes Somos' });
 });
 
-/**
- * Ruta Contactanos
- */
+
+ //Ruta Contactanos
+ 
 app.get('/contactanos', (req, res) => {
   res.render('contacto', { titulo: 'Contáctanos' });
 });
 
-/**
- * Rutas para el formulario de contacto
- */
+
+  //Rutas para el formulario de contacto
+ 
 app.use('/contactanos', contactoRoutes);
 
-/**
- * Manejador de rutas no encontradas
- */
+
+ //Manejador de rutas no encontradas
+ 
 app.use((req, res) => {
   res.status(404).render('error', { 
     titulo: 'Página no encontrada',
@@ -139,9 +139,9 @@ app.use((req, res) => {
   });
 });
 
-/**
- * Iniciar servidor
- */
+
+ //Iniciar servidor
+ 
 async function iniciarServidor() {
   try {
     const dbConnected = await testConnection();

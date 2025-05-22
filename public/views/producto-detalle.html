@@ -1,21 +1,18 @@
 <section class="container product-detail-page">
-    <!-- Breadcrumbs -->
     <div class="breadcrumbs">
         <a href="/">Inicio</a> &gt;
         <a href="/productos">Productos</a> &gt;
         <span>{{producto.nombre}}</span>
     </div>
     
-    <!-- Contenedor principal del producto -->
+
     <div class="product-detail">
-        <!-- Imagen del producto -->
         <div class="product-image-container">
             <div class="main-image">
                 <img src="{{producto.imagen}}" alt="{{producto.nombre}}" onerror="this.src='/img/default-product.jpg'">
             </div>
         </div>
         
-        <!-- Información del producto -->
         <div class="product-info-container">
             <h1 class="product-title">{{producto.nombre}}</h1>
             
@@ -80,7 +77,6 @@
     </div>
 </section>
 
-<!-- Script para manejar funcionalidad del detalle del producto -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Comprobar si hay características y ocultar el contenedor si está vacío
@@ -190,5 +186,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-<!-- Agregar al final de la vista producto-detalle.html -->
 <script src="/js/debug.js"></script>

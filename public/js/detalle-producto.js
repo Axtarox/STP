@@ -10,7 +10,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (addToCartBtn) {
         // Remover cualquier event listener previo (para evitar duplicados)
-        addToCartBtn.removeEventListener('click', handleAddToCart);
+        const oldAddToCart = addToCartBtn.onclick;
+        if (oldAddToCart) {
+            addToCartBtn.removeEventListener('click', oldAddToCart);
+        }
         
         // Añadir el nuevo event listener
         addToCartBtn.addEventListener('click', handleAddToCart);
@@ -39,7 +42,7 @@ function handleAddToCart() {
         cantidad: quantity
     };
     
-    // Añadir al carrito (una sola vez)
+    // Añadir al carrito 
     addProductToCart(producto);
     
     // Mostrar confirmación con el toast mejorado
@@ -50,7 +53,7 @@ function handleAddToCart() {
 }
 
 /**
- * Inicializa el selector de cantidad
+ * Inicializa el selector de cantidad asegurando que no haya eventos duplicados
  */
 function initQuantitySelector() {
     const quantityMinus = document.getElementById('quantity-minus');
@@ -59,16 +62,28 @@ function initQuantitySelector() {
     
     if (!quantityMinus || !quantityPlus || !quantityInput) return;
     
-    // Eliminar eventos existentes para evitar duplicados
-    quantityMinus.removeEventListener('click', decrementQuantity);
-    quantityPlus.removeEventListener('click', incrementQuantity);
+    // Eliminamos los event listeners antiguos clonando los elementos
+    const newMinus = quantityMinus.cloneNode(true);
+    const newPlus = quantityPlus.cloneNode(true);
     
-    // Agregar nuevos event listeners
-    quantityMinus.addEventListener('click', decrementQuantity);
-    quantityPlus.addEventListener('click', incrementQuantity);
+    quantityMinus.parentNode.replaceChild(newMinus, quantityMinus);
+    quantityPlus.parentNode.replaceChild(newPlus, quantityPlus);
     
-    // Validar entrada directa
-    quantityInput.addEventListener('change', validateQuantityInput);
+    // Agregar nuevos event listeners a los elementos clonados
+    newMinus.addEventListener('click', decrementQuantity);
+    newPlus.addEventListener('click', incrementQuantity);
+    
+    // Renovar el input para evitar problemas con los event listeners
+    const newInput = quantityInput.cloneNode(true);
+    quantityInput.parentNode.replaceChild(newInput, quantityInput);
+    
+    // Añadir el evento al nuevo input
+    newInput.addEventListener('change', validateQuantityInput);
+    
+    // Deshabilitar el evento wheel para evitar cambios accidentales
+    newInput.addEventListener('wheel', function(e) {
+        e.preventDefault();
+    });
 }
 
 /**
@@ -88,7 +103,7 @@ function decrementQuantity() {
 function incrementQuantity() {
     const quantityInput = document.getElementById('product-quantity');
     let value = parseInt(quantityInput.value);
-    const max = parseInt(quantityInput.getAttribute('max'));
+    const max = parseInt(quantityInput.getAttribute('max') || '99');
     if (value < max) {
         quantityInput.value = value + 1;
     }
@@ -99,7 +114,7 @@ function incrementQuantity() {
  */
 function validateQuantityInput() {
     let value = parseInt(this.value);
-    const max = parseInt(this.getAttribute('max'));
+    const max = parseInt(this.getAttribute('max') || '99');
     
     if (isNaN(value) || value < 1) {
         this.value = 1;
@@ -114,7 +129,7 @@ function validateQuantityInput() {
  * @param {string} tipo - Tipo de notificación (success, error)
  */
 function showToast(mensaje, tipo = 'success') {
-    // Buscar si ya existe un toast
+    // Verificar si ya existe un toast
     let toast = document.querySelector('.toast');
     
     // Si no existe, crear uno nuevo
@@ -169,7 +184,6 @@ function animateCartIcon() {
 
 /**
  * Añade un producto al carrito
- * Se asegura de que solo se añada una vez evitando duplicados
  */
 function addProductToCart(producto) {
     // Obtener carrito actual del localStorage
@@ -182,7 +196,6 @@ function addProductToCart(producto) {
     }
     
     // Verificar si el producto ya existe
-    // Convert IDs to strings for consistent comparison
     const index = carrito.items.findIndex(item => String(item.id) === String(producto.id));
     
     if (index !== -1) {
@@ -204,6 +217,7 @@ function addProductToCart(producto) {
     // Actualizar contador
     updateCartCount();
 }
+
 /**
  * Actualiza el contador del carrito
  */
@@ -214,7 +228,7 @@ function updateCartCount() {
     try {
         const carrito = JSON.parse(localStorage.getItem('carrito')) || { items: [] };
         
-        // Calcular número total de ítems (sumando las cantidades)
+        // Calcular número total de ítems 
         const totalItems = carrito.items.reduce((sum, item) => sum + item.cantidad, 0);
         
         // Actualizar número

@@ -1,12 +1,7 @@
-/**
- * Middleware optimizado para renderizar vistas HTML
- * - Mejorado para manejar operadores de comparación en condiciones
- */
 const fs = require('fs');
 const path = require('path');
 
 module.exports = function renderViewMiddleware(req, res, next) {
-    // Guardar referencia al método original
     const originalRender = res.render;
 
     // Reemplazar el método render

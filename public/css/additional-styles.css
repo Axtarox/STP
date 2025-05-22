@@ -634,7 +634,7 @@
 }
 .service-detail .service-image {
     width: 100%;
-    max-height: 350px; /* Reduced from 400px */
+    max-height: 350px; 
     overflow: hidden;
     border-radius: 8px;
     margin-bottom: 2rem;
@@ -646,8 +646,8 @@
 
 .service-detail .service-image img {
     max-width: 100%;
-    max-height: 350px; /* Match container max-height */
-    object-fit: contain; /* Changed from 'cover' to 'contain' */
+    max-height: 350px; 
+    object-fit: contain; 
     display: block;
     margin: 0 auto;
 }
@@ -1239,12 +1239,12 @@
     line-height: 1.5;
     margin-bottom: 1.2rem;
     flex-grow: 1;
-    overflow: visible; /* Cambiado de 'hidden' a 'visible' */
-    display: block; /* Cambiado de '-webkit-box' a 'block' */
-    /* Eliminado el -webkit-line-clamp y -webkit-box-orient para mostrar texto completo */
+    overflow: visible; 
+    display: block;
+    
 }
 
-/* Mejorar el espaciado para descripciones más largas */
+
 .service-btn {
     align-self: center;
     padding: 0.5rem 1rem;
@@ -1254,13 +1254,13 @@
     border-radius: 4px;
     transition: background-color 0.3s;
     text-align: center;
-    margin-top: auto; /* Esto empuja el botón hacia abajo */
+    margin-top: auto; 
 }
 
-/* En pantallas pequeñas, asegurar que las tarjetas tengan suficiente espacio */
+
 @media (max-width: 768px) {
     .services {
-        grid-gap: 2rem; /* Aumentar el espacio entre tarjetas */
+        grid-gap: 2rem; 
     }
     
     .service-card {

@@ -1,6 +1,5 @@
 /**
- * Controlador optimizado para el panel de administración
- * - Con soporte mejorado para precios formateados
+ * Controlador  para el panel de administración
  */
 const Producto = require('../models/Producto');
 const Categoria = require('../models/Categoria');
@@ -29,7 +28,7 @@ exports.getDashboard = async (req, res) => {
         servicios: numServicios
       },
       current_page: { dashboard: true },
-      standalone: true // Esta opción evita usar el layout principal
+      standalone: true 
     });
   } catch (error) {
     console.error('Error al cargar dashboard:', error);
@@ -64,7 +63,7 @@ exports.getProductos = async (req, res) => {
       productos: productosFormateados,
       categorias,
       current_page: { productos: true },
-      standalone: true // Esta opción evita usar el layout principal
+      standalone: true 
     });
   } catch (error) {
     console.error('Error al obtener productos:', error);
@@ -478,7 +477,7 @@ exports.eliminarProducto = async (req, res) => {
 };
 
 /**
- * Gestión de categorías
+ * Gestión de categoríasA
  */
 exports.getCategorias = async (req, res) => {
   try {
@@ -490,7 +489,7 @@ exports.getCategorias = async (req, res) => {
       admin: req.session.adminData,
       categorias,
       current_page: { categorias: true },
-      standalone: true // Esta opción evita usar el layout principal
+      standalone: true 
     });
   } catch (error) {
     console.error('Error al obtener categorías:', error);
@@ -515,7 +514,7 @@ exports.getServicios = async (req, res) => {
       admin: req.session.adminData,
       servicios,
       current_page: { servicios: true },
-      standalone: true // Esta opción evita usar el layout principal
+      standalone: true 
     });
   } catch (error) {
     console.error('Error al obtener servicios:', error);

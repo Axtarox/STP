@@ -1,7 +1,3 @@
-/**
- * Rutas para el panel de administración (con orden corregido para categorías)
- */
-
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/AuthController');
@@ -49,7 +45,7 @@ router.post('/productos/editar/:id', upload.single('imagen'), dashboardControlle
 router.get('/productos/eliminar/:id', dashboardController.eliminarProducto);
 router.get('/productos/:id', dashboardController.getProductoById);
 
-// Gestión de categorías (ORDEN CORREGIDO)
+// Gestión de categorías 
 router.get('/categorias', categoriaController.getAdminCategorias);
 router.get('/categorias/crear', categoriaController.getCrearCategoriaForm);
 router.post('/categorias/crear', categoriaController.crearCategoria);
@@ -58,7 +54,7 @@ router.post('/categorias/editar/:id', categoriaController.editarCategoria);
 router.get('/categorias/eliminar/:id', categoriaController.eliminarCategoria);
 router.get('/categorias/:id', categoriaController.getCategoriaById);
 
-// Gestión de servicios (también con orden corregido)
+// Gestión de servicios 
 router.get('/servicios', servicioController.getAdminServicios);
 router.get('/servicios/crear', servicioController.getCrearServicioForm);
 router.post('/servicios/crear', upload.single('imagen'), servicioController.crearServicio);

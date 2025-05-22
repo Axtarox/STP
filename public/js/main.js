@@ -155,7 +155,6 @@ function addProductToCart(producto) {
     const carrito = getCarritoFromStorage();
     
     // Verificar si el producto ya está en el carrito
-    // Convert IDs to strings for consistent comparison
     const existingProductIndex = carrito.items.findIndex(item => String(item.id) === String(producto.id));
     
     if (existingProductIndex !== -1) {

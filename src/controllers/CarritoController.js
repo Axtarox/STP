@@ -1,5 +1,5 @@
 /**
- * Controlador para el carrito de compras (CarritoController.js)
+ * Controlador para el carrito de compras 
  */
 
 /**
@@ -25,9 +25,6 @@ exports.getCarrito = (req, res) => {
  */
 exports.procesarCheckout = (req, res) => {
   try {
-    // En una implementación real, aquí se procesaría el pedido y se guardaría en la base de datos
-    
-    // Para la versión actual, simplemente redirigimos a la página de confirmación
     res.redirect('/pedidos/confirmacion');
   } catch (error) {
     console.error('Error al procesar el checkout:', error);
@@ -82,8 +79,6 @@ exports.addToCart = (req, res) => {
     if (existingProduct) {
       existingProduct.cantidad += cantidad;
     } else {
-      // En una implementación real, se buscaría el producto en la base de datos
-      // Para este ejemplo, simplemente añadimos el ID y la cantidad
       req.session.cart.push({ id, cantidad });
     }
     
@@ -184,7 +179,6 @@ exports.updateCartItem = (req, res) => {
  */
 exports.getCartContents = (req, res) => {
   try {
-    // Si no hay carrito en la sesión, devolver un carrito vacío
     if (!req.session.cart) {
       return res.json({
         success: true,
@@ -195,14 +189,13 @@ exports.getCartContents = (req, res) => {
       });
     }
     
-    // En una implementación real, aquí se buscarían los detalles de los productos
-    // en la base de datos y se calcularía el total
+   
     
     res.json({
       success: true,
       cart: {
         items: req.session.cart,
-        total: req.session.cart.length // Aquí solo devolvemos la cantidad, no el total real
+        total: req.session.cart.length 
       }
     });
   } catch (error) {

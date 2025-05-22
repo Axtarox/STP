@@ -1,7 +1,5 @@
-/**
- * Funciones auxiliares para el formateo de datos
- */
-
+ //Funciones auxiliares para el formateo de datos
+ 
 /**
  * Formatea un número como precio con separadores de miles
  * @param {number|string} precio - Precio a formatear

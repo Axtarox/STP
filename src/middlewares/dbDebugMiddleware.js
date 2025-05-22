@@ -1,9 +1,4 @@
 
-/**
- * Middleware para debugging de base de datos optimizado
- * - Solo muestra información esencial
- * - Desactivado en producción
- */
 const util = require('util');
 
 function dbDebugMiddleware(req, res, next) {

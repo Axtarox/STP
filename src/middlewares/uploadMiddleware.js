@@ -1,6 +1,3 @@
-/**
- * Middleware para la carga de archivos
- */
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');

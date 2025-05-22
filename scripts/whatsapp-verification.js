@@ -1,8 +1,5 @@
 /**
  * Script para verificar y corregir los enlaces de WhatsApp
- * 
- * Este script se puede agregar a la página principal o a través de un archivo JS separado.
- * Verifica que todos los enlaces de WhatsApp usen el número correcto.
  */
 
 (function() {

@@ -16,7 +16,7 @@ exports.getLoginPage = (req, res) => {
   res.render('admin/login', {
     titulo: 'Iniciar sesión - Panel de Administración',
     error: req.query.error ? 'Credenciales incorrectas' : null,
-    standalone: true // Esta opción evita que se utilice el layout principal
+    standalone: true 
   });
 };
 /**

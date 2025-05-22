@@ -1,6 +1,4 @@
-/**
- * Modelo de Producto optimizado con todas las operaciones CRUD
- */
+
 const { pool } = require('../config/database');
 
 class Producto {

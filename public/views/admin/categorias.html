@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/admin.css">
     <style>
-        /* Estilos mejorados para los botones de acción */
         .admin-table-actions {
             display: flex;
             gap: 0.75rem;
@@ -46,7 +45,6 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         
-        /* Estilo de conteo de productos por categoría */
         .product-count {
             display: inline-block;
             padding: 0.25rem 0.5rem;
@@ -59,7 +57,7 @@
 </head>
 <body>
     <div class="admin-layout">
-        <!-- Sidebar -->
+
         <aside class="admin-sidebar">
             <div class="admin-sidebar-header">
                 <a href="/admin" class="admin-logo">Soluciones <span>Tecnológicas</span> Pradito</a>
@@ -107,7 +105,7 @@
             </nav>
         </aside>
         
-        <!-- Main Content -->
+
         <main class="admin-main">
             <header class="admin-header">
                 <h1 class="admin-page-title">{{titulo}}</h1>
@@ -191,8 +189,7 @@
             </div>
         </main>
     </div>
-    
-    <!-- Modal de confirmación para eliminar -->
+
     <div id="deleteModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
         <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
             <h3 style="margin-top: 0;">Confirmar eliminación</h3>
@@ -209,7 +206,6 @@
     
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Referencia al modal y sus elementos
         const deleteModal = document.getElementById('deleteModal');
         const confirmDeleteBtn = document.getElementById('confirmDelete');
         const cancelDeleteBtn = document.getElementById('cancelDelete');

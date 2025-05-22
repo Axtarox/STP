@@ -1,7 +1,3 @@
-/**
- * Rutas para el carrito de compras
- */
-
 const express = require('express');
 const router = express.Router();
 const carritoController = require('../controllers/CarritoController');

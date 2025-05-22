@@ -22,7 +22,6 @@ exports.getConfirmacion = (req, res) => {
 
 /**
  * Crea un nuevo pedido en la base de datos
- * Nota: Esta función está diseñada para ser llamada por API
  */
 exports.createPedido = async (req, res) => {
   try {
@@ -61,37 +60,6 @@ exports.createPedido = async (req, res) => {
       });
     }
     
-    // En una implementación real, aquí se guardaría el pedido en la base de datos
-    // Ejemplo pseudocódigo:
-    /*
-    const formularioId = await Formulario.create({
-      nombres,
-      apellidos,
-      tipo_documento,
-      num_documento,
-      fecha_nacimiento,
-      sexo,
-      estado_civil,
-      ciudad,
-      direccion,
-      telefono_fijo,
-      telefono_movil,
-      correo_electronico: email,
-      opcion_pago: metodoPago
-    });
-    
-    const carritoId = await Carrito.create({
-      productos: req.session.cart,
-      total: calcularTotal(req.session.cart)
-    });
-    
-    const pedidoId = await Pedido.create({
-      carrito_id: carritoId,
-      formulario_id: formularioId,
-      estado: 'pendiente',
-      fecha: new Date()
-    });
-    */
     
     // Limpiar el carrito después de crear el pedido
     req.session.cart = [];
@@ -180,7 +148,7 @@ exports.generateWhatsAppMessage = (req, res) => {
     
     mensaje += `%0A*Total:* $${total.toLocaleString('es-CO')}`;
     
-    // Número de WhatsApp de la empresa (actualizado)
+    // Número de WhatsApp de la empresa 
     const whatsappNumber = '573225865591';
     
     // Crear URL de WhatsApp

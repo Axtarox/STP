@@ -1,5 +1,3 @@
-
-
 <section class="hero">
     <div class="hero-content">
         <h1>Carrito de Compras</h1>
@@ -13,7 +11,6 @@
             <h2 class="section-title">Tus productos</h2>
             
             <div id="cart-items-list">
-                <!-- Aquí se mostrarán los productos del carrito -->
                 <div class="empty-cart-message" style="display: none;">
                     <p>Tu carrito está vacío</p>
                     <a href="/productos" class="btn">Ver productos</a>
@@ -164,7 +161,6 @@
                     </div>
                     
                     <div class="payment-details" id="payment-details-container">
-                        <!-- Aquí se mostrará la información del pago según el método seleccionado -->
                     </div>
                 </div>
                 
@@ -521,10 +517,7 @@
         }, 2000);
     }
     
-    /**
-     * Obtiene el carrito del almacenamiento local
-     * @returns {Object} Carrito de compras
-     */
+
     function getCarritoFromStorage() {
         const carritoJSON = localStorage.getItem('carrito');
         
@@ -544,10 +537,6 @@
     }
     
 
-    /**
-     * Muestra un mensaje toast
-     * @param {string} message - Mensaje a mostrar
-     */
     function showToast(message) {
         // Verificar si ya existe un toast
         let toast = document.querySelector('.toast');

@@ -1,5 +1,5 @@
 /**
- * Controlador principal optimizado (homeController.js)
+ * Controlador principal optimizado 
  */
 const Producto = require('../models/Producto');
 const Servicio = require('../models/Servicio');

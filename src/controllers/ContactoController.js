@@ -35,23 +35,6 @@ exports.submitContactForm = async (req, res) => {
       });
     }
     
-    // En una implementación real, aquí se guardaría el mensaje en la base de datos
-    // Ejemplo pseudocódigo:
-    /*
-    await Contacto.create({
-      nombres: nombre.split(' ')[0],
-      apellidos: nombre.split(' ').slice(1).join(' '),
-      telefono_movil: telefono,
-      correo_electronico: email,
-      mensaje,
-      asunto,
-      fecha_contacto: new Date()
-    });
-    */
-    
-    // También se podría enviar un correo electrónico de notificación
-    // usando un servicio como Nodemailer
-
     // Crear mensaje de WhatsApp
     let whatsappMessage = `*Nuevo Mensaje de Contacto*%0A%0A`;
     whatsappMessage += `*Nombre:* ${nombre}%0A`;
@@ -64,7 +47,7 @@ exports.submitContactForm = async (req, res) => {
     whatsappMessage += `*Asunto:* ${asunto}%0A%0A`;
     whatsappMessage += `*Mensaje:*%0A${mensaje}`;
     
-    // Número de WhatsApp de la empresa (actualizado)
+    // Número de WhatsApp de la empresa 
     const whatsappNumber = '573225865591';
     
     // Crear URL de WhatsApp
@@ -133,7 +116,7 @@ exports.sendWhatsAppMessage = (req, res) => {
     whatsappMessage += `*Asunto:* ${asunto}%0A%0A`;
     whatsappMessage += `*Mensaje:*%0A${mensaje}`;
     
-    // Número de WhatsApp de la empresa (actualizado)
+    // Número de WhatsApp de la empresa 
     const whatsappNumber = '573225865591';
     
     // Crear URL de WhatsApp

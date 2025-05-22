@@ -1,8 +1,3 @@
-/**
- * Script para crear la base de datos y datos iniciales
- * Para uso en desarrollo
- */
-
 const mysql = require('mysql2/promise');
 require('dotenv').config();
 

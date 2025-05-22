@@ -1,7 +1,3 @@
-/**
- * Modelo mejorado para la entidad Categoria
- */
-
 const { pool } = require('../config/database');
 
 class Categoria {

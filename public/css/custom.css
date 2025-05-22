@@ -1,9 +1,9 @@
-/* Botón flotante para el carrito */
+
 .cart-icon {
     position: fixed;
     right: 20px;
-    bottom: auto; /* Quitamos bottom para usar top */
-    top: 100px; /* Posición desde la parte superior */
+    bottom: auto; 
+    top: 100px; 
     width: 60px;
     height: 60px;
     background-color: var(--color-primary);
@@ -19,7 +19,6 @@
     transition: all 0.3s ease;
 }
 
-/* Cursor estilo "mover" para indicar que es arrastrable */
 .cart-icon:hover {
     transform: scale(1.1);
     background-color: #23ad5c;
@@ -29,7 +28,7 @@
     position: absolute;
     top: -8px;
     right: -8px;
-    background-color: #e74c3c; /* Rojo para llamar la atención */
+    background-color: #e74c3c; 
     color: white;
     font-size: 14px;
     font-weight: bold;
@@ -42,7 +41,7 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-/* Efecto de rebote cuando se añade un producto */
+
 @keyframes cartBounce {
     0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
     40% {transform: translateY(-10px);}
@@ -52,7 +51,7 @@
 .cart-bounce {
     animation: cartBounce 0.75s;
 }
-/* Logo styling in header */
+
 .logo {
     display: flex;
     align-items: center;
@@ -71,7 +70,7 @@
     color: var(--color-white);
 }
 
-/* Responsive adjustments */
+
 @media (max-width: 768px) {
     .logo-img {
         height: 30px;

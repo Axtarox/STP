@@ -1,6 +1,3 @@
-/**
- * Modelo para la entidad Servicio
- */
 const { pool } = require('../config/database');
 
 class Servicio {
