@@ -93,11 +93,24 @@ function initCarrito() {
         });
     }
     
-    // Botones de proceder al checkout (si existen)
+    // Botones de proceder al checkout (ir a página de carrito)
     const checkoutButtons = document.querySelectorAll('.checkout-btn');
     checkoutButtons.forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
+            
+            // Verificar que hay productos en el carrito
+            const carrito = getCarritoFromStorage();
+            if (!carrito.items || carrito.items.length === 0) {
+                showToast('Tu carrito está vacío', 'error');
+                return;
+            }
+            
+            // Cerrar carrito flotante si está abierto
+            if (cartSidebar) cartSidebar.classList.remove('open');
+            if (cartOverlay) cartOverlay.classList.remove('show');
+            
+            // Ir a la página de carrito
             window.location.href = '/carrito';
         });
     });
@@ -217,7 +230,7 @@ function addProductToCart(producto) {
  * @returns {number} Total de items
  */
 function getTotalItemsInCart(carrito) {
-    return carrito.items.reduce((total, item) => total + item.cantidad, 0);
+    return carrito.items.reduce((total, item) => total + (parseInt(item.cantidad) || 0), 0);
 }
 
 /**
@@ -277,7 +290,9 @@ function saveCarritoToStorage(carrito) {
  */
 function calculateCartTotal(items) {
     return items.reduce((total, item) => {
-        return total + (item.precio * item.cantidad);
+        const precio = parseFloat(item.precio) || 0;
+        const cantidad = parseInt(item.cantidad) || 0;
+        return total + (precio * cantidad);
     }, 0);
 }
 
@@ -300,6 +315,9 @@ function updateCartView() {
             const itemElement = document.createElement('div');
             itemElement.className = 'cart-item';
             const maxStock = item.stock || 999;
+            const precio = parseFloat(item.precio) || 0;
+            const cantidad = parseInt(item.cantidad) || 0;
+            const subtotal = precio * cantidad;
             
             itemElement.innerHTML = `
                 <div class="cart-item-img">
@@ -307,15 +325,18 @@ function updateCartView() {
                 </div>
                 <div class="cart-item-info">
                     <h4>${item.nombre}</h4>
-                    <p>$${item.precio.toLocaleString('es-CO')}</p>
+                    <p>$${precio.toLocaleString('es-CO')}</p>
                     <div class="cart-item-quantity">
-                        <button class="quantity-btn minus" data-id="${item.id}" ${item.cantidad <= 1 ? 'disabled' : ''}>-</button>
-                        <span>${item.cantidad}</span>
-                        <button class="quantity-btn plus" data-id="${item.id}" ${item.cantidad >= maxStock ? 'disabled' : ''}>+</button>
+                        <button class="quantity-btn minus" data-id="${item.id}" ${cantidad <= 1 ? 'disabled' : ''}>-</button>
+                        <span>${cantidad}</span>
+                        <button class="quantity-btn plus" data-id="${item.id}" ${cantidad >= maxStock ? 'disabled' : ''}>+</button>
                     </div>
                     <p class="stock-info">Stock: ${maxStock}</p>
                 </div>
-                <button class="remove-item" data-id="${item.id}">×</button>
+                <div class="cart-item-subtotal">
+                    <p>$${subtotal.toLocaleString('es-CO')}</p>
+                    <button class="remove-item" data-id="${item.id}">×</button>
+                </div>
             `;
             
             cartItemsContainer.appendChild(itemElement);
@@ -325,9 +346,20 @@ function updateCartView() {
         addCartItemEventListeners();
     }
     
-    // Actualizar total
+    // Calcular y actualizar total
+    const total = carrito.items.reduce((sum, item) => {
+        const precio = parseFloat(item.precio) || 0;
+        const cantidad = parseInt(item.cantidad) || 0;
+        return sum + (precio * cantidad);
+    }, 0);
+    
+    // Actualizar total en el carrito
+    carrito.total = total;
+    saveCarritoToStorage(carrito);
+    
+    // Actualizar total en la interfaz
     if (cartTotalElement) {
-        cartTotalElement.textContent = `$${carrito.total.toLocaleString('es-CO')}`;
+        cartTotalElement.textContent = `$${total.toLocaleString('es-CO')}`;
     }
 }
 
@@ -360,7 +392,7 @@ function addCartItemEventListeners() {
  */
 function updateProductQuantity(id, isIncrement) {
     const carrito = getCarritoFromStorage();
-    const index = carrito.items.findIndex(item => item.id === id);
+    const index = carrito.items.findIndex(item => String(item.id) === String(id));
     
     if (index === -1) return;
     
@@ -409,7 +441,7 @@ function updateProductQuantity(id, isIncrement) {
  */
 function removeProductFromCart(id) {
     const carrito = getCarritoFromStorage();
-    const index = carrito.items.findIndex(item => item.id === id);
+    const index = carrito.items.findIndex(item => String(item.id) === String(id));
     
     if (index === -1) return;
     
@@ -508,18 +540,47 @@ function showToast(message, tipo = 'success') {
     // Añadir clase según el tipo
     if (tipo === 'error') {
         toast.classList.add('toast-error');
+        toast.style.backgroundColor = '#e74c3c';
     } else {
         toast.classList.add('toast-success');
+        toast.style.backgroundColor = '#2ecc71';
     }
     
-    // Establecer el mensaje y mostrar
-    toast.textContent = message;
-    toast.classList.add('show');
+    // Configurar estilos
+    toast.style.color = 'white';
+    toast.style.position = 'fixed';
+    toast.style.bottom = '20px';
+    toast.style.left = '50%';
+    toast.style.transform = 'translateX(-50%)';
+    toast.style.padding = '12px 24px';
+    toast.style.borderRadius = '4px';
+    toast.style.zIndex = '9999';
+    toast.style.fontSize = '14px';
+    toast.style.transition = 'all 0.3s ease';
     
-    // Ocultar después de 3 segundos
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 3000);
+    // Añadir icono según el tipo
+    let icono = tipo === 'success' ? 
+        '<i class="fas fa-check-circle" style="margin-right: 8px;"></i>' : 
+        '<i class="fas fa-exclamation-circle" style="margin-right: 8px;"></i>';
+    
+    // Establecer el contenido
+    toast.innerHTML = `${icono}<span>${message}</span>`;
+    
+    // Mostrar toast
+    toast.classList.add('show');
+    toast.style.opacity = '1';
+    toast.style.visibility = 'visible';
+    
+    // Ocultar después del tiempo apropiado
+    const timeout = tipo === 'error' ? 4000 : 3000;
+    setTimeout(function() {
+        toast.style.opacity = '0';
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }, timeout);
 }
 
 function initWhatsAppFunctionality() {
@@ -626,7 +687,10 @@ function enviarPedidoWhatsApp() {
     mensaje += `Productos:\n`;
     
     carrito.items.forEach(item => {
-        mensaje += `- ${item.cantidad}x ${item.nombre} - $${(item.precio * item.cantidad).toLocaleString('es-CO')}\n`;
+        const precio = parseFloat(item.precio) || 0;
+        const cantidad = parseInt(item.cantidad) || 0;
+        const subtotal = precio * cantidad;
+        mensaje += `- ${cantidad}x ${item.nombre} - $${subtotal.toLocaleString('es-CO')}\n`;
     });
     
     mensaje += `\nTotal: $${carrito.total.toLocaleString('es-CO')}`;
