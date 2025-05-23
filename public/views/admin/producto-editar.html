@@ -186,7 +186,7 @@
                             <select id="categoria_id" name="categoria_id" class="admin-form-control" required>
                                 <option value="">-- Seleccione una categoría --</option>
                                 {{#each categorias}}
-                                <option value="{{id}}" {{#if (id == ../producto.categoria_id)}}selected="selected"{{/if}}>{{nombre}}</option>
+                                <option value="{{id}}" {{#if (eq id ../producto.categoria_id)}}selected="selected"{{/if}}>{{nombre}}</option>
                                 {{/each}}
                             </select>
                         </div>
@@ -205,10 +205,10 @@
                         <div class="admin-form-group">
                             <label for="condicion" class="required">Condición</label>
                             <select id="condicion" name="condicion" class="admin-form-control" required>
-                                <option value="Nuevo" {{#if (producto.condicion == 'Nuevo')}}selected="selected"{{/if}}>Nuevo</option>
-                                <option value="Usado" {{#if (producto.condicion == 'Usado')}}selected="selected"{{/if}}>Usado</option>
-                                <option value="Reacondicionado" {{#if (producto.condicion == 'Reacondicionado')}}selected="selected"{{/if}}>Reacondicionado</option>
-                                <option value="Digital" {{#if (producto.condicion == 'Digital')}}selected="selected"{{/if}}>Digital</option>
+                                <option value="Nuevo" {{#if (eq producto.condicion 'Nuevo')}}selected="selected"{{/if}}>Nuevo</option>
+                                <option value="Usado" {{#if (eq producto.condicion 'Usado')}}selected="selected"{{/if}}>Usado</option>
+                                <option value="Reacondicionado" {{#if (eq producto.condicion 'Reacondicionado')}}selected="selected"{{/if}}>Reacondicionado</option>
+                                <option value="Digital" {{#if (eq producto.condicion 'Digital')}}selected="selected"{{/if}}>Digital</option>
                             </select>
                         </div>
                         
@@ -230,7 +230,7 @@
                     </div>
                     
                     <div class="admin-form-group">
-                        <label for="imagen">Imagen del Producto {{#unless producto.imagen}}(Requerida){{/unless}}</label>
+                        <label for="imagen">Imagen del Producto </label>
                         <input type="file" id="imagen" name="imagen" class="admin-form-control" accept="image/*" {{#unless producto.imagen}}required{{/unless}}>
                         <small>Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 5MB. {{#if producto.imagen}}Deje este campo vacío para mantener la imagen actual.{{/if}}</small>
                         
@@ -277,6 +277,23 @@
                 
                 // Forzar la selección correctamente
                 if (option.value == productoCategoria) {
+                    option.selected = true;
+                }
+            });
+        }
+        
+        // Verificar que la condición esté correctamente seleccionada
+        const condicionSelect = document.getElementById('condicion');
+        if (condicionSelect) {
+            const productoCondicion = "{{producto.condicion}}";
+            
+            // Log para depuración
+            console.log("Condición del producto:", productoCondicion);
+            Array.from(condicionSelect.options).forEach(option => {
+                console.log(`Opción condición ${option.value}: ${option.value === productoCondicion ? 'Coincide' : 'No coincide'}`);
+                
+                // Forzar la selección correctamente
+                if (option.value === productoCondicion) {
                     option.selected = true;
                 }
             });

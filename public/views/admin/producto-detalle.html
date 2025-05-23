@@ -1,81 +1,227 @@
-<section class="container product-detail-page">
-    <div class="breadcrumbs">
-        <a href="/">Inicio</a> &gt;
-        <a href="/productos">Productos</a> &gt;
-        <span>{{producto.nombre}}</span>
-    </div>
-    
-    <div class="product-detail">
-        <div class="product-image-container">
-            <div class="main-image">
-                <img src="{{producto.imagen}}" alt="{{producto.nombre}}" onerror="this.src='/img/default-product.jpg'">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{titulo}} | Soluciones Tecnológicas Pradito</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-sidebar-header">
+                <a href="/admin" class="admin-logo">Soluciones <span>Tecnológicas</span> Pradito</a>
+                <p>Panel de Administración</p>
             </div>
-        </div>
+            
+            <nav class="admin-nav">
+                <div class="admin-nav-title">Principal</div>
+                <ul class="admin-nav-menu">
+                    <li class="admin-nav-item">
+                        <a href="/admin/dashboard" class="admin-nav-link {{#if current_page.dashboard}}active{{/if}}">
+                            <span class="admin-nav-icon"><i class="fas fa-tachometer-alt"></i></span>
+                            <span class="admin-nav-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="admin-nav-item">
+                        <a href="/admin/productos" class="admin-nav-link {{#if current_page.productos}}active{{/if}}">
+                            <span class="admin-nav-icon"><i class="fas fa-box"></i></span>
+                            <span class="admin-nav-text">Productos</span>
+                        </a>
+                    </li>
+                    <li class="admin-nav-item">
+                        <a href="/admin/categorias" class="admin-nav-link {{#if current_page.categorias}}active{{/if}}">
+                            <span class="admin-nav-icon"><i class="fas fa-tags"></i></span>
+                            <span class="admin-nav-text">Categorías</span>
+                        </a>
+                    </li>
+                    <li class="admin-nav-item">
+                        <a href="/admin/servicios" class="admin-nav-link {{#if current_page.servicios}}active{{/if}}">
+                            <span class="admin-nav-icon"><i class="fas fa-cogs"></i></span>
+                            <span class="admin-nav-text">Servicios</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="admin-nav-title">Cuenta</div>
+                <ul class="admin-nav-menu">
+                    <li class="admin-nav-item">
+                        <a href="/admin/logout" class="admin-nav-link">
+                            <span class="admin-nav-icon"><i class="fas fa-sign-out-alt"></i></span>
+                            <span class="admin-nav-text">Cerrar Sesión</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
         
-        <div class="product-info-container">
-            <h1 class="product-title">{{producto.nombre}}</h1>
-            
-            <div class="product-category">
-                <span>Categoría: <a href="/categorias/{{producto.categoria_id}}">{{producto.categoria_nombre}}</a></span>
-            </div>
-            
-            <div class="product-condition">
-                <span class="condition-badge">{{producto.condicion}}</span>
-            </div>
-            
-            <div class="product-price">
-                <span class="price">${{producto.precio}}</span>
-            </div>
-            
-            <div class="product-availability">
-                <span class="stock in-stock">
-                    {{#if producto.cantidad_disponible}}
-                    En stock ({{producto.cantidad_disponible}} disponibles)
-                    {{else}}
-                    Agotado
-                    {{/if}}
-                </span>
-            </div>
-            
-            <div class="product-description">
-                <h3>Descripción</h3>
-                <p>{{producto.descripcion}}</p>
-            </div>
-            
-            <div class="product-features" id="caracteristicasContainer">
-                <h3>Características</h3>
-                <div class="features-content">
-                    <ul id="caracteristicasList">
-                        {{#each caracteristicasList}}
-                        <li>{{this}}</li>
-                        {{/each}}
-                    </ul>
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1 class="admin-page-title">{{titulo}}</h1>
+                <div class="admin-user-menu">
+                    <div class="admin-user-info">
+                        <div class="admin-user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div>
+                            <div class="admin-user-name">{{admin.nombre}}</div>
+                            <div class="admin-user-role">Administrador</div>
+                        </div>
+                    </div>
+                    <div class="admin-user-dropdown">
+                        <a href="/admin/logout" class="admin-dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                        </a>
+                    </div>
                 </div>
-            </div>
+            </header>
             
-            <div class="product-actions">
-                <div class="quantity-selector">
-                    <button class="quantity-btn minus" id="quantity-minus">-</button>
-                    <input type="number" id="product-quantity" class="quantity-input" value="1" min="1" max="{{producto.cantidad_disponible}}">
-                    <button class="quantity-btn plus" id="quantity-plus">+</button>
+            <div class="admin-content">
+                {{#if success}}
+                <div class="admin-alert admin-alert-success">
+                    <i class="fas fa-check-circle"></i> {{success}}
+                </div>
+                {{/if}}
+                
+                {{#if error}}
+                <div class="admin-alert admin-alert-danger">
+                    <i class="fas fa-exclamation-circle"></i> {{error}}
+                </div>
+                {{/if}}
+                
+                <div class="admin-actions">
+                    <a href="/admin/productos" class="admin-btn admin-btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver a Productos
+                    </a>
+                    <a href="/admin/productos/editar/{{producto.id}}" class="admin-btn admin-btn-primary">
+                        <i class="fas fa-edit"></i> Editar Producto
+                    </a>
+                    <form id="deleteForm" method="POST" action="/admin/productos/eliminar/{{producto.id}}" style="display:inline;">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button type="button" id="deleteBtn" class="admin-btn admin-btn-danger">
+                            <i class="fas fa-trash"></i> Eliminar Producto
+                        </button>
+                    </form>
                 </div>
                 
-                <button class="btn add-to-cart" id="btnAddToCart" 
-                        data-id="{{producto.id}}" 
-                        data-nombre="{{producto.nombre}}" 
-                        data-precio="{{producto.precio}}" 
-                        data-imagen="{{producto.imagen}}">
-                    Añadir al carrito
-                </button>
-                <a href="https://wa.me/573225865591?text=Hola, estoy interesado en el producto: {{producto.nombre}}" 
-                   target="_blank" class="btn btn-secondary">
-                    <i class="fab fa-whatsapp"></i> Consultar por WhatsApp
-                </a>
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <h2 class="admin-card-title">Detalles del Producto</h2>
+                    </div>
+                    
+                    <div class="product-details">
+                        <div class="product-image">
+                            <img src="{{producto.imagen}}" alt="{{producto.nombre}}" onerror="this.src='/img/default-product.jpg'">
+                        </div>
+                        
+                        <div class="product-info">
+                            <div class="product-info-item">
+                                <div class="info-label">ID:</div>
+                                <div>{{producto.id}}</div>
+                            </div>
+                            
+                            <div class="product-info-item">
+                                <div class="info-label">Nombre:</div>
+                                <div>{{producto.nombre}}</div>
+                            </div>
+                            
+                            <div class="product-info-item">
+                                <div class="info-label">Categoría:</div>
+                                <div>{{producto.categoria_nombre}}</div>
+                            </div>
+                            
+                            <div class="product-info-item">
+                                <div class="info-label">Precio:</div>
+                                <div>${{producto.precio}}</div>
+                            </div>
+                            
+                            <div class="product-info-item">
+                                <div class="info-label">Condición:</div>
+                                <div>{{producto.condicion}}</div>
+                            </div>
+                            
+                            <div class="product-info-item">
+                                <div class="info-label">Cantidad Disponible:</div>
+                                <div>{{producto.cantidad_disponible}} unidades</div>
+                            </div>
+                            
+                            <div class="product-info-item">
+                                <div class="info-label">Disponible:</div>
+                                <div>
+                                    {{#if producto.disponible}}
+                                    <span style="color: var(--admin-primary);">✓ Sí</span>
+                                    {{else}}
+                                    <span style="color: #e74c3c;">✗ No</span>
+                                    {{/if}}
+                                </div>
+                            </div>
+                            
+                            <h3>Descripción</h3>
+                            <p>{{producto.descripcion}}</p>
+                            
+                            <h3>Características</h3>
+                            <ul class="characteristics-list">
+                                {{#each caracteristicasList}}
+                                <li>{{this}}</li>
+                                {{/each}}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
+        </main>
+    </div>
+
+<!-- Update the modal and confirmation script -->
+<!-- Modal de confirmación para eliminar -->
+<div id="deleteModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+    <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <h3 style="margin-top: 0;">Confirmar eliminación</h3>
+        <p>¿Está seguro de que desea eliminar el producto "{{producto.nombre}}"? Esta acción no se puede deshacer.</p>
+        <div style="text-align: right; margin-top: 20px;">
+            <button id="cancelDelete" class="admin-btn admin-btn-secondary" style="margin-right: 10px;">Cancelar</button>
+            <a href="/admin/productos/eliminar/{{producto.id}}" id="confirmDelete" class="admin-btn admin-btn-danger">Eliminar</a>
         </div>
     </div>
-</section>
+</div>
 
-
-
-<script src="/js/debug.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Referencia al modal y sus elementos
+    const deleteModal = document.getElementById('deleteModal');
+    const confirmDeleteBtn = document.getElementById('confirmDelete');
+    const cancelDeleteBtn = document.getElementById('cancelDelete');
+    const deleteBtn = document.getElementById('deleteBtn');
+    
+    // Mostrar el modal al hacer clic en el botón de eliminar
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', function() {
+            if (deleteModal) {
+                deleteModal.style.display = 'block';
+            }
+        });
+    }
+    
+    // Cancelar eliminación
+    if (cancelDeleteBtn) {
+        cancelDeleteBtn.addEventListener('click', function() {
+            if (deleteModal) {
+                deleteModal.style.display = 'none';
+            }
+        });
+    }
+    
+    // Cerrar el modal si se hace clic fuera de él
+    window.addEventListener('click', function(event) {
+        if (event.target === deleteModal) {
+            deleteModal.style.display = 'none';
+        }
+    });
+});
+</script>
+</body>
+</html>
