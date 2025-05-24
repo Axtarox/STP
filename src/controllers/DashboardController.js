@@ -1,5 +1,5 @@
 /**
- * Controlador  para el panel de administración
+ * Controlador para el panel de administración - Mejorado para disponibilidad
  */
 const Producto = require('../models/Producto');
 const Categoria = require('../models/Categoria');
@@ -14,7 +14,8 @@ const { formatPrice } = require('../helpers/formatHelper');
 exports.getDashboard = async (req, res) => {
   try {
     // Obtener estadísticas básicas
-    const numProductos = (await Producto.getAll()).length;
+    const allProductos = await Producto.getAll();
+    const availableProductos = await Producto.getAllAvailable();
     const numCategorias = (await Categoria.getAll()).length;
     const numServicios = (await Servicio.getAll()).length;
     
@@ -23,7 +24,8 @@ exports.getDashboard = async (req, res) => {
       titulo: 'Dashboard - Panel de Administración',
       admin: req.session.adminData,
       stats: {
-        productos: numProductos,
+        productos: allProductos.length,
+        productosDisponibles: availableProductos.length,
         categorias: numCategorias,
         servicios: numServicios
       },
@@ -41,17 +43,19 @@ exports.getDashboard = async (req, res) => {
 };
 
 /**
- * Gestión de productos
+ * Gestión de productos - Muestra TODOS los productos (disponibles y no disponibles)
  */
 exports.getProductos = async (req, res) => {
   try {
-    // Obtener todos los productos
+    // Obtener TODOS los productos para el admin (disponibles y no disponibles)
     const productos = await Producto.getAll();
     
     // Formatear precios para visualización
     const productosFormateados = productos.map(producto => ({
       ...producto,
-      precio: formatPrice(producto.precio)
+      precio: formatPrice(producto.precio),
+      // Asegurar que disponible sea un booleano consistente
+      disponible: Boolean(producto.disponible)
     }));
     
     // Obtener categorías para el formulario
@@ -101,7 +105,7 @@ exports.getCrearProductoForm = async (req, res) => {
 };
 
 /**
- * Crea un nuevo producto
+ * Crea un nuevo producto con manejo mejorado de disponibilidad
  */
 exports.crearProducto = async (req, res) => {
   try {
@@ -151,6 +155,12 @@ exports.crearProducto = async (req, res) => {
     // Convertir el precio a número limpiando separadores
     const precioNumerico = parseFloat(String(precio).replace(/\./g, '').replace(/,/g, '.')) || 0;
     
+    // Procesar disponibilidad correctamente
+    let isDisponible = false;
+    if (disponible === 'on' || disponible === true || disponible === 'true' || disponible === '1') {
+      isDisponible = true;
+    }
+    
     // Crear objeto de producto
     const productoData = {
       nombre,
@@ -160,7 +170,7 @@ exports.crearProducto = async (req, res) => {
       descripcion,
       caracteristicas,
       cantidad_disponible: parseInt(cantidad_disponible) || 0,
-      disponible: disponible === 'on' || disponible === true,
+      disponible: isDisponible,
       imagen: imagenUrl
     };
     
@@ -171,8 +181,13 @@ exports.crearProducto = async (req, res) => {
       throw new Error('No se pudo crear el producto');
     }
     
+    // Mensaje de éxito con información sobre visibilidad
+    const visibilityMessage = isDisponible ? 
+      'Producto creado correctamente y visible en la tienda.' : 
+      'Producto creado correctamente pero oculto en la tienda (puedes activarlo editándolo).';
+    
     // Redirigir a la lista de productos con mensaje de éxito
-    req.session.successMessage = 'Producto creado correctamente';
+    req.session.successMessage = visibilityMessage;
     res.redirect('/admin/productos');
   } catch (error) {
     console.error('Error al crear producto:', error);
@@ -205,7 +220,7 @@ exports.getProductoById = async (req, res) => {
       });
     }
     
-    // Obtener producto
+    // Obtener producto (usar getById para admin, que no filtra por disponibilidad)
     const producto = await Producto.getById(id);
     
     if (!producto) {
@@ -275,6 +290,9 @@ exports.getEditarProductoForm = async (req, res) => {
     // Formatear el precio para visualización
     producto.precio = formatPrice(producto.precio);
     
+    // Asegurar que disponible sea un booleano
+    producto.disponible = Boolean(producto.disponible);
+    
     // Renderizar la vista con los datos completos
     res.render('admin/producto-editar', {
       titulo: 'Editar Producto',
@@ -295,7 +313,7 @@ exports.getEditarProductoForm = async (req, res) => {
 };
 
 /**
- * Actualiza un producto existente
+ * Actualiza un producto existente con manejo mejorado de disponibilidad
  */
 exports.editarProducto = async (req, res) => {
   try {
@@ -377,6 +395,12 @@ exports.editarProducto = async (req, res) => {
     // Convertir precio formateado a número
     const precioNumerico = parseFloat(String(precio).replace(/\./g, '').replace(/,/g, '.')) || 0;
     
+    // Procesar disponibilidad correctamente
+    let isDisponible = false;
+    if (disponible === 'on' || disponible === true || disponible === 'true' || disponible === '1') {
+      isDisponible = true;
+    }
+    
     // Crear objeto de producto actualizado
     const productoData = {
       nombre,
@@ -386,7 +410,7 @@ exports.editarProducto = async (req, res) => {
       descripcion,
       caracteristicas,
       cantidad_disponible: parseInt(cantidad_disponible) || 0,
-      disponible: disponible === 'on' || disponible === true,
+      disponible: isDisponible,
       imagen: imagenUrl
     };
     
@@ -397,8 +421,22 @@ exports.editarProducto = async (req, res) => {
       throw new Error('No se pudo actualizar el producto');
     }
     
+    // Mensaje de éxito con información sobre visibilidad
+    const wasAvailable = Boolean(productoActual.disponible);
+    let visibilityMessage = 'Producto actualizado correctamente.';
+    
+    if (wasAvailable && !isDisponible) {
+      visibilityMessage += ' El producto ahora está oculto en la tienda.';
+    } else if (!wasAvailable && isDisponible) {
+      visibilityMessage += ' El producto ahora es visible en la tienda.';
+    } else if (isDisponible) {
+      visibilityMessage += ' El producto sigue siendo visible en la tienda.';
+    } else {
+      visibilityMessage += ' El producto sigue oculto en la tienda.';
+    }
+    
     // Redirigir a la lista de productos con mensaje de éxito
-    req.session.successMessage = 'Producto actualizado correctamente';
+    req.session.successMessage = visibilityMessage;
     res.redirect('/admin/productos');
   } catch (error) {
     console.error('Error al actualizar producto:', error);
@@ -477,7 +515,7 @@ exports.eliminarProducto = async (req, res) => {
 };
 
 /**
- * Gestión de categoríasA
+ * Gestión de categorías
  */
 exports.getCategorias = async (req, res) => {
   try {

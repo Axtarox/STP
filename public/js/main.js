@@ -106,6 +106,9 @@ function initCarrito() {
                 return;
             }
             
+            // NUEVA FUNCIONALIDAD: Mover carrito a checkout y limpiar carrito flotante
+            moveCarritoToCheckout();
+            
             // Cerrar carrito flotante si está abierto
             if (cartSidebar) cartSidebar.classList.remove('open');
             if (cartOverlay) cartOverlay.classList.remove('show');
@@ -167,6 +170,87 @@ function initQuantitySelectors() {
             }
         });
     });
+}
+
+/**
+ * NUEVA FUNCIÓN: Mueve el carrito al storage de checkout y limpia el carrito flotante
+ */
+function moveCarritoToCheckout() {
+    try {
+        const carrito = getCarritoFromStorage();
+        
+        if (carrito.items && carrito.items.length > 0) {
+            // Guardar en checkout storage
+            localStorage.setItem('carritoCheckout', JSON.stringify(carrito));
+            
+            // Limpiar carrito flotante
+            localStorage.removeItem('carrito');
+            
+            // Actualizar UI del carrito flotante
+            updateCartCount(0);
+            updateCartView();
+            
+            console.log('Carrito movido a checkout y carrito flotante limpiado');
+        }
+    } catch (error) {
+        console.error('Error al mover carrito a checkout:', error);
+    }
+}
+
+/**
+ * NUEVA FUNCIÓN: Restaura el carrito desde checkout al carrito flotante
+ */
+function restoreCarritoFromCheckout() {
+    try {
+        const carritoCheckout = getCarritoCheckoutFromStorage();
+        
+        if (carritoCheckout.items && carritoCheckout.items.length > 0) {
+            // Restaurar al carrito flotante
+            localStorage.setItem('carrito', JSON.stringify(carritoCheckout));
+            
+            // Actualizar UI del carrito flotante
+            updateCartCount(getTotalItemsInCart(carritoCheckout));
+            updateCartView();
+            
+            console.log('Carrito restaurado desde checkout');
+            showToast('Carrito restaurado para seguir comprando');
+        }
+    } catch (error) {
+        console.error('Error al restaurar carrito desde checkout:', error);
+    }
+}
+
+/**
+ * NUEVA FUNCIÓN: Obtiene el carrito de checkout
+ */
+function getCarritoCheckoutFromStorage() {
+    const carritoJSON = localStorage.getItem('carritoCheckout');
+    
+    if (carritoJSON) {
+        try {
+            return JSON.parse(carritoJSON);
+        } catch (e) {
+            console.error('Error al parsear carrito checkout:', e);
+        }
+    }
+    
+    // Carrito por defecto
+    return {
+        items: [],
+        total: 0
+    };
+}
+
+/**
+ * NUEVA FUNCIÓN: Limpia el carrito de checkout
+ */
+function clearCarritoCheckout() {
+    try {
+        localStorage.removeItem('carritoCheckout');
+        console.log('Carrito checkout limpiado');
+    } catch (error) {
+        console.error('Error al limpiar carrito checkout:', error);
+    }
 }
 
 /**
@@ -732,3 +816,8 @@ function enviarPedidoWhatsApp() {
         window.location.href = '/pedidos/confirmacion';
     }, 2000);
 }
+
+// Exponer funciones globalmente para uso en otras páginas
+window.restoreCarritoFromCheckout = restoreCarritoFromCheckout;
+window.clearCarritoCheckout = clearCarritoCheckout;
+window.getCarritoCheckoutFromStorage = getCarritoCheckoutFromStorage;

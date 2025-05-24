@@ -1,9 +1,8 @@
-
 const { pool } = require('../config/database');
 
 class Producto {
     /**
-     * Obtiene todos los productos activos con su categoría
+     * Obtiene todos los productos activos con su categoría (SOLO PARA ADMIN)
      * @returns {Promise<Array>} Lista de productos
      */
     static async getAll() {
@@ -18,6 +17,27 @@ class Producto {
             return rows;
         } catch (error) {
             console.error('Error en Producto.getAll:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Obtiene todos los productos DISPONIBLES con su categoría (PARA LA TIENDA PÚBLICA)
+     * @returns {Promise<Array>} Lista de productos disponibles
+     */
+    static async getAllAvailable() {
+        try {
+            const [rows] = await pool.query(`
+                SELECT p.*, c.nombre as categoria_nombre 
+                FROM producto p 
+                LEFT JOIN categoria c ON p.categoria_id = c.id
+                WHERE p.disponible = true
+                ORDER BY p.id DESC
+            `);
+            
+            return rows;
+        } catch (error) {
+            console.error('Error en Producto.getAllAvailable:', error);
             return [];
         }
     }
@@ -63,6 +83,51 @@ class Producto {
             return producto;
         } catch (error) {
             console.error(`Error en Producto.getById(${id}):`, error);
+            return null;
+        }
+    }
+
+    /**
+     * Obtiene un producto por su ID SOLO SI ESTÁ DISPONIBLE (para la tienda pública)
+     * @param {number} id - ID del producto
+     * @returns {Promise<Object|null>} Producto encontrado o null
+     */
+    static async getByIdAvailable(id) {
+        try {
+            const [rows] = await pool.query(`
+                SELECT p.*, c.nombre as categoria_nombre 
+                FROM producto p 
+                LEFT JOIN categoria c ON p.categoria_id = c.id 
+                WHERE p.id = ? AND p.disponible = true
+            `, [id]);
+            
+            if (rows.length === 0) {
+                return null;
+            }
+            
+            const producto = rows[0];
+            
+            // Preprocesar características para mostrarlas correctamente
+            if (producto.caracteristicas) {
+                producto.caracteristicas = producto.caracteristicas.replace(/\\n/g, '\n');
+            }
+            
+            // Asegurar que los campos sean del tipo correcto
+            if (producto.precio !== undefined) {
+                producto.precio = parseFloat(producto.precio);
+            }
+            
+            if (producto.cantidad_disponible !== undefined) {
+                producto.cantidad_disponible = parseInt(producto.cantidad_disponible, 10);
+            }
+            
+            if (producto.disponible !== undefined) {
+                producto.disponible = Boolean(parseInt(producto.disponible, 10));
+            }
+            
+            return producto;
+        } catch (error) {
+            console.error(`Error en Producto.getByIdAvailable(${id}):`, error);
             return null;
         }
     }
@@ -137,28 +202,29 @@ class Producto {
             return [];
         }
     }
+    
     /**
- * Obtiene productos aleatorios
- * @param {number} limit - Número máximo de productos a retornar
- * @returns {Promise<Array>} Lista de productos aleatorios
- */
-static async getRandom(limit = 5) {
-    try {
-        const [rows] = await pool.query(`
-            SELECT p.*, c.nombre as categoria_nombre 
-            FROM producto p 
-            LEFT JOIN categoria c ON p.categoria_id = c.id
-            WHERE p.disponible = true 
-            ORDER BY RAND() 
-            LIMIT ?
-        `, [limit]);
-        
-        return rows;
-    } catch (error) {
-        console.error(`Error en Producto.getRandom(${limit}):`, error);
-        return [];
+     * Obtiene productos aleatorios
+     * @param {number} limit - Número máximo de productos a retornar
+     * @returns {Promise<Array>} Lista de productos aleatorios
+     */
+    static async getRandom(limit = 5) {
+        try {
+            const [rows] = await pool.query(`
+                SELECT p.*, c.nombre as categoria_nombre 
+                FROM producto p 
+                LEFT JOIN categoria c ON p.categoria_id = c.id
+                WHERE p.disponible = true 
+                ORDER BY RAND() 
+                LIMIT ?
+            `, [limit]);
+            
+            return rows;
+        } catch (error) {
+            console.error(`Error en Producto.getRandom(${limit}):`, error);
+            return [];
+        }
     }
-}
 
     /**
      * Crea un nuevo producto

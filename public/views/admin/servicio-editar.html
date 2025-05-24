@@ -128,15 +128,18 @@
                         <small>Describa el servicio de manera clara y detallada.</small>
                     </div>
                     
-                    <div class="admin-form-group">
-                        <label for="imagen">Imagen del Servicio</label>
-                        <input type="file" id="imagen" name="imagen" class="admin-form-control" accept="image/*">
+                       <div class="admin-form-group">
+                        <label for="imagen" class="{{#unless servicio.imagen}}required{{/unless}}">Imagen del Servicio</label>
+                        <input type="file" id="imagen" name="imagen" class="admin-form-control" accept="image/*" {{#unless servicio.imagen}}required{{/unless}}>
                         
                         {{#if servicio.imagen}}
                         <div class="admin-form-preview">
                             <img src="{{servicio.imagen}}" alt="{{servicio.nombre}}" onerror="this.src='/img/default-service.jpg'">
                         </div>
                         <small>Deje este campo vacío para mantener la imagen actual</small>
+                        <input type="hidden" name="imagen_actual" value="{{servicio.imagen}}">
+                        {{else}}
+                        <small>Debe seleccionar una imagen para el servicio. Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 5MB</small>
                         {{/if}}
                     </div>
                     

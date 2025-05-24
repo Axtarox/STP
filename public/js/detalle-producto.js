@@ -1,5 +1,6 @@
 /**
  * Funcionalidad específica para la página de detalle de producto con validación de stock
+ * Actualizado para trabajar con el nuevo sistema de carrito flotante/checkout
  */
 document.addEventListener('DOMContentLoaded', function() {
     // Inicializar selector de cantidad
@@ -43,7 +44,7 @@ function handleAddToCart() {
         return;
     }
     
-    // Verificar disponibilidad en el carrito actual
+    // Verificar disponibilidad en el carrito actual (flotante, no checkout)
     const carrito = getCarritoFromStorage();
     const existingItem = carrito.items.find(item => String(item.id) === String(productId));
     
@@ -91,7 +92,7 @@ function handleAddToCart() {
  * @param {Object} producto - Producto a añadir
  */
 function addProductToCartLocal(producto) {
-    // Obtener carrito actual del localStorage
+    // Obtener carrito actual del localStorage (carrito flotante, no checkout)
     let carrito;
     try {
         carrito = JSON.parse(localStorage.getItem('carrito')) || { items: [], total: 0 };
@@ -132,7 +133,7 @@ function addProductToCartLocal(producto) {
 }
 
 /**
- * Obtiene el carrito desde localStorage
+ * Obtiene el carrito desde localStorage (carrito flotante)
  * @returns {Object} Carrito de compras
  */
 function getCarritoFromStorage() {
@@ -221,7 +222,7 @@ function incrementQuantity(maxStock) {
     const quantityInput = document.getElementById('product-quantity');
     let value = parseInt(quantityInput.value);
     
-    // Verificar disponibilidad en el carrito
+    // Verificar disponibilidad en el carrito flotante (no checkout)
     const carrito = getCarritoFromStorage();
     const productId = document.getElementById('btnAddToCart')?.getAttribute('data-id');
     const existingItem = carrito.items.find(item => String(item.id) === String(productId));
@@ -248,7 +249,7 @@ function validateQuantityInput(maxStock) {
     const quantityInput = document.getElementById('product-quantity');
     let value = parseInt(quantityInput.value);
     
-    // Verificar disponibilidad en el carrito
+    // Verificar disponibilidad en el carrito flotante (no checkout)
     const carrito = getCarritoFromStorage();
     const productId = document.getElementById('btnAddToCart')?.getAttribute('data-id');
     const existingItem = carrito.items.find(item => String(item.id) === String(productId));
@@ -282,7 +283,7 @@ function updateQuantityButtons(maxStock) {
     
     const currentValue = parseInt(quantityInput.value);
     
-    // Verificar disponibilidad en el carrito
+    // Verificar disponibilidad en el carrito flotante (no checkout)
     const carrito = getCarritoFromStorage();
     const productId = document.getElementById('btnAddToCart')?.getAttribute('data-id');
     const existingItem = carrito.items.find(item => String(item.id) === String(productId));
@@ -442,7 +443,7 @@ function updateCartCount() {
 
 // Actualizar botones de cantidad cuando se carga la página y cuando cambia el carrito
 document.addEventListener('DOMContentLoaded', function() {
-    // Actualizar cada vez que cambie el localStorage
+    // Actualizar cada vez que cambie el localStorage del carrito flotante
     window.addEventListener('storage', function(e) {
         if (e.key === 'carrito') {
             const quantityInput = document.getElementById('product-quantity');

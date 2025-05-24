@@ -165,7 +165,7 @@
                 </div>
                 
                 <div class="checkout-actions">
-                    <a href="/productos" class="btn btn-secondary" id="seguir-comprando-btn">Seguir Comprando</a>
+                    <button type="button" class="btn btn-secondary" id="seguir-comprando-btn">Seguir Comprando</button>
                     <button type="submit" class="btn" id="finalizar-compra-btn">Confirmar Pedido</button>
                 </div>
             </form>
@@ -188,8 +188,8 @@
             fechaNacimiento.setAttribute('max', maxDateStr);
         }
         
-        // Cargar carrito desde localStorage
-        loadCart();
+        // Cargar carrito desde localStorage de checkout
+        loadCartFromCheckout();
         
         // Inicializar detalles de pago
         updatePaymentDetails();
@@ -209,41 +209,37 @@
             });
         }
         
-        // Manejar botón "Seguir comprando"
+        // Manejar botón "Seguir comprando" - NUEVA FUNCIONALIDAD
         const seguirComprandoBtn = document.getElementById('seguir-comprando-btn');
         if (seguirComprandoBtn) {
             seguirComprandoBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                // Restaurar carrito al localStorage y redirigir
-                sincronizarCarritoFlotante();
+                
+                // Restaurar carrito flotante desde checkout
+                if (typeof window.restoreCarritoFromCheckout === 'function') {
+                    window.restoreCarritoFromCheckout();
+                } else {
+                    // Función de respaldo
+                    restoreCarritoFromCheckoutLocal();
+                }
+                
+                // Redirigir a productos
                 window.location.href = '/productos';
             });
         }
         
-        // Escuchar cambios en el localStorage para sincronización
-        window.addEventListener('storage', function(e) {
-            if (e.key === 'carrito') {
-                loadCart();
-            }
-        });
-        
-        // Escuchar eventos personalizados de actualización del carrito
-        window.addEventListener('cartUpdated', function(e) {
-            if (e.detail && e.detail.source !== 'cartPage') {
-                loadCart();
-            }
-        });
-        
-        // Verificar periódicamente si hay cambios en el carrito
+        // Verificar periódicamente si hay cambios en el carrito de checkout
         setInterval(function() {
             if (document.hasFocus()) {
-                loadCart();
+                loadCartFromCheckout();
             }
         }, 2000);
     });
     
-    // Función para cargar el carrito con validación de stock y cálculo correcto del total
-    function loadCart() {
+    // NUEVA FUNCIÓN: Cargar carrito desde checkout storage
+    function loadCartFromCheckout() {
+        console.log('Cargando carrito desde checkout storage...');
+        
         // Obtener elementos del DOM
         const cartItemsList = document.getElementById('cart-items-list');
         const emptyCartMessage = document.querySelector('.empty-cart-message');
@@ -252,13 +248,13 @@
         
         if (!cartItemsList || !cartTotalPrice) return;
         
-        // Obtener carrito desde localStorage
+        // Obtener carrito desde checkout localStorage
         let carrito;
         try {
-            carrito = JSON.parse(localStorage.getItem('carrito')) || { items: [], total: 0 };
+            carrito = JSON.parse(localStorage.getItem('carritoCheckout')) || { items: [], total: 0 };
         } catch (e) {
             carrito = { items: [], total: 0 };
-            console.error('Error al parsear carrito:', e);
+            console.error('Error al parsear carrito checkout:', e);
         }
         
         // Mostrar mensaje si el carrito está vacío
@@ -267,8 +263,6 @@
             if (finalizarCompraBtn) finalizarCompraBtn.disabled = true;
             cartItemsList.innerHTML = '';
             cartTotalPrice.textContent = '$0';
-            // Sincronizar carrito flotante cuando está vacío
-            sincronizarCarritoFlotante();
             return;
         }
         
@@ -321,13 +315,12 @@
         
         // Actualizar total en el carrito y guardarlo
         carrito.total = total;
-        localStorage.setItem('carrito', JSON.stringify(carrito));
+        localStorage.setItem('carritoCheckout', JSON.stringify(carrito));
         
         // Añadir event listeners a los botones
         addCartEventListeners();
         
-        // Sincronizar con carrito flotante después de cargar
-        sincronizarCarritoFlotante();
+        console.log('Carrito checkout cargado correctamente');
     }
 
     // Añadir event listeners a los botones del carrito con validación de stock
@@ -343,8 +336,8 @@
                 const productId = this.getAttribute('data-id');
                 const isPlus = this.classList.contains('plus');
                 
-                console.log(`${isPlus ? 'Incrementando' : 'Decrementando'} producto ${productId}`);
-                updateProductQuantityLocal(productId, isPlus);
+                console.log(`${isPlus ? 'Incrementando' : 'Decrementando'} producto ${productId} en checkout`);
+                updateProductQuantityCheckout(productId, isPlus);
             });
         });
         
@@ -355,18 +348,18 @@
                 e.stopPropagation();
                 
                 const productId = this.getAttribute('data-id');
-                console.log(`Eliminando producto ${productId}`);
-                removeProductFromCartLocal(productId);
+                console.log(`Eliminando producto ${productId} del checkout`);
+                removeProductFromCheckout(productId);
             });
         });
     }
     
-    // Función para actualizar cantidad de productos
-    function updateProductQuantityLocal(productId, isIncrement) {
-        console.log(`updateProductQuantityLocal: ${productId}, incrementar: ${isIncrement}`);
+    // NUEVA FUNCIÓN: Actualizar cantidad de productos en checkout
+    function updateProductQuantityCheckout(productId, isIncrement) {
+        console.log(`updateProductQuantityCheckout: ${productId}, incrementar: ${isIncrement}`);
         
-        // Obtener carrito
-        let carrito = JSON.parse(localStorage.getItem('carrito')) || { items: [], total: 0 };
+        // Obtener carrito de checkout
+        let carrito = JSON.parse(localStorage.getItem('carritoCheckout')) || { items: [], total: 0 };
         
         // Encontrar el producto
         const productIndex = carrito.items.findIndex(item => String(item.id) === String(productId));
@@ -391,7 +384,7 @@
                 
                 // Remover si la cantidad llega a 0
                 if (carrito.items[productIndex].cantidad <= 0) {
-                    console.log(`Removiendo producto ${productId} del carrito`);
+                    console.log(`Removiendo producto ${productId} del checkout`);
                     carrito.items.splice(productIndex, 1);
                 }
             }
@@ -401,29 +394,24 @@
                 return total + ((parseFloat(item.precio) || 0) * (parseInt(item.cantidad) || 0));
             }, 0);
             
-            console.log(`Nuevo total: ${carrito.total}`);
+            console.log(`Nuevo total checkout: ${carrito.total}`);
             
             // Guardar carrito y recargar
-            localStorage.setItem('carrito', JSON.stringify(carrito));
+            localStorage.setItem('carritoCheckout', JSON.stringify(carrito));
             
             // Actualizar vista inmediatamente
-            loadCart();
-            
-            // Notificar cambio
-            window.dispatchEvent(new CustomEvent('cartUpdated', {
-                detail: { source: 'cartPage', productId: productId, action: isIncrement ? 'increment' : 'decrement' }
-            }));
+            loadCartFromCheckout();
         } else {
-            console.error(`Producto ${productId} no encontrado en el carrito`);
+            console.error(`Producto ${productId} no encontrado en el checkout`);
         }
     }
     
-    // Función para eliminar producto del carrito
-    function removeProductFromCartLocal(productId) {
-        console.log(`removeProductFromCartLocal: ${productId}`);
+    // NUEVA FUNCIÓN: Eliminar producto del checkout
+    function removeProductFromCheckout(productId) {
+        console.log(`removeProductFromCheckout: ${productId}`);
         
         // Obtener carrito
-        let carrito = JSON.parse(localStorage.getItem('carrito')) || { items: [], total: 0 };
+        let carrito = JSON.parse(localStorage.getItem('carritoCheckout')) || { items: [], total: 0 };
         
         // Obtener nombre del producto antes de eliminarlo
         const product = carrito.items.find(item => String(item.id) === String(productId));
@@ -434,7 +422,7 @@
         carrito.items = carrito.items.filter(item => String(item.id) !== String(productId));
         
         if (carrito.items.length < originalLength) {
-            console.log(`Producto ${productName} eliminado del carrito`);
+            console.log(`Producto ${productName} eliminado del checkout`);
             
             // Recalcular total
             carrito.total = carrito.items.reduce((total, item) => {
@@ -442,13 +430,8 @@
             }, 0);
             
             // Guardar carrito y recargar
-            localStorage.setItem('carrito', JSON.stringify(carrito));
-            loadCart();
-            
-            // Notificar cambio
-            window.dispatchEvent(new CustomEvent('cartUpdated', {
-                detail: { source: 'cartPage', productId: productId, action: 'remove' }
-            }));
+            localStorage.setItem('carritoCheckout', JSON.stringify(carrito));
+            loadCartFromCheckout();
             
             showToast(`${productName} eliminado del carrito`);
         } else {
@@ -456,36 +439,19 @@
         }
     }
     
-    // Función para sincronizar el carrito flotante
-    function sincronizarCarritoFlotante() {
-        console.log('Sincronizando carrito flotante...');
-        
-        const carrito = JSON.parse(localStorage.getItem('carrito')) || { items: [] };
-        const totalItems = carrito.items.reduce((sum, item) => sum + (parseInt(item.cantidad) || 0), 0);
-        
-        // Actualizar contador del carrito flotante
-        const cartCount = document.querySelector('.cart-count');
-        if (cartCount) {
-            cartCount.textContent = totalItems;
+    // NUEVA FUNCIÓN: Restaurar carrito desde checkout (función local de respaldo)
+    function restoreCarritoFromCheckoutLocal() {
+        try {
+            const carritoCheckout = JSON.parse(localStorage.getItem('carritoCheckout')) || { items: [], total: 0 };
             
-            // Mostrar/ocultar contador según haya items
-            if (totalItems > 0) {
-                cartCount.style.display = 'flex';
-            } else {
-                cartCount.style.display = 'none';
+            if (carritoCheckout.items && carritoCheckout.items.length > 0) {
+                // Restaurar al carrito flotante
+                localStorage.setItem('carrito', JSON.stringify(carritoCheckout));
+                console.log('Carrito restaurado desde checkout (función local)');
+                showToast('Carrito restaurado para seguir comprando');
             }
-            
-            console.log(`Contador actualizado a: ${totalItems}`);
-        }
-        
-        // Actualizar vista del carrito flotante si existe la función
-        if (typeof updateCartView === 'function') {
-            updateCartView();
-        }
-        
-        // Actualizar función global si existe
-        if (typeof updateCartCount === 'function') {
-            updateCartCount(totalItems);
+        } catch (error) {
+            console.error('Error al restaurar carrito desde checkout (función local):', error);
         }
     }
     
@@ -537,7 +503,7 @@
         container.innerHTML = content;
     }
     
-    // Función para enviar pedido por WhatsApp con validación
+    // Función para enviar pedido por WhatsApp con validación - MODIFICADA PARA CHECKOUT
     function enviarPedidoWhatsApp() {
         const form = document.getElementById('checkout-form');
         
@@ -600,13 +566,13 @@
         const email = form.querySelector('[name="email"]').value;
         const metodoPago = form.querySelector('[name="metodo_pago"]:checked').value;
         
-        // Campos opcionales (siempre incluirlos aunque estén vacíos)
+        // Campos opcionales
         const sexo = form.querySelector('[name="sexo"]') ? form.querySelector('[name="sexo"]').value : 'No especificado';
         const estadoCivil = form.querySelector('[name="estado_civil"]') ? form.querySelector('[name="estado_civil"]').value : 'No especificado';
         const telefonoFijo = form.querySelector('[name="telefono_fijo"]') ? form.querySelector('[name="telefono_fijo"]').value : 'No proporcionado';
         
-        // Obtener carrito
-        const carrito = getCarritoFromStorage();
+        // Obtener carrito de checkout
+        const carrito = getCarritoCheckoutFromStorage();
         
         if (carrito.items.length === 0) {
             showToast('El carrito está vacío', 'error');
@@ -652,11 +618,9 @@
         // Abrir WhatsApp en una nueva ventana
         window.open(whatsappUrl, '_blank');
         
-        // Limpiar carrito después de enviar
+        // Limpiar carritos después de enviar
         localStorage.removeItem('carrito');
-        
-        // Actualizar carrito flotante
-        sincronizarCarritoFlotante();
+        localStorage.removeItem('carritoCheckout');
         
         // Redirigir a la página de confirmación
         setTimeout(() => {
@@ -664,14 +628,14 @@
         }, 2000);
     }
     
-    function getCarritoFromStorage() {
-        const carritoJSON = localStorage.getItem('carrito');
+    function getCarritoCheckoutFromStorage() {
+        const carritoJSON = localStorage.getItem('carritoCheckout');
         
         if (carritoJSON) {
             try {
                 return JSON.parse(carritoJSON);
             } catch (e) {
-                console.error('Error al parsear carrito:', e);
+                console.error('Error al parsear carrito checkout:', e);
             }
         }
         

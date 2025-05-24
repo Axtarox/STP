@@ -1,16 +1,18 @@
 /**
- * Controlador principal optimizado 
+ * Controlador principal optimizado - Solo muestra productos disponibles
  */
 const Producto = require('../models/Producto');
 const Servicio = require('../models/Servicio');
 
 /**
- * Página principal con productos aleatorios y servicios destacados
- */exports.getIndex = async (req, res) => {
+ * Página principal con productos aleatorios DISPONIBLES y servicios destacados
+ */
+exports.getIndex = async (req, res) => {
   try {
-    // Obtener 5 productos aleatorios sin logs excesivos
+    // Obtener 5 productos aleatorios DISPONIBLES sin logs excesivos
     let productos = [];
     try {
+      // Usar getRandom que ya filtra por disponibles
       productos = await Producto.getRandom(5);
       
       // Si no hay productos, usar un array vacío
@@ -18,12 +20,14 @@ const Servicio = require('../models/Servicio');
         productos = [];
       }
     } catch (error) {
+      console.error('Error al obtener productos aleatorios:', error);
       productos = [];
     }
     
-    // Obtener 5 servicios destacados sin logs excesivos
+    // Obtener 5 servicios destacados DISPONIBLES sin logs excesivos
     let servicios = [];
     try {
+      // Usar getFeatured que ya filtra por disponibles
       servicios = await Servicio.getFeatured(5);
       
       // Si no hay servicios, usar un array vacío
@@ -31,6 +35,7 @@ const Servicio = require('../models/Servicio');
         servicios = [];
       }
     } catch (error) {
+      console.error('Error al obtener servicios destacados:', error);
       servicios = [];
     }
 
@@ -48,6 +53,7 @@ const Servicio = require('../models/Servicio');
       servicios
     });
   } catch (error) {
+    console.error('Error al cargar la página principal:', error);
     // Manejar error general
     res.status(500).render('error', {
       titulo: 'Error',
