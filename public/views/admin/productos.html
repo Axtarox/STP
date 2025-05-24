@@ -72,87 +72,6 @@
             background-color: #e74c3c;
             color: white;
         }
-
-        /* Estilos para el toggle switch */
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 24px;
-        }
-
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        .toggle-switch input:checked + .toggle-slider {
-            background-color: #2ecc71;
-        }
-
-        .toggle-switch input:checked + .toggle-slider:before {
-            transform: translateX(26px);
-        }
-
-        .toggle-switch input:disabled + .toggle-slider {
-            background-color: #ddd;
-            cursor: not-allowed;
-        }
-
-        .toggle-switch input:disabled + .toggle-slider:before {
-            background-color: #f9f9f9;
-        }
-
-        /* Indicador de carga para el toggle */
-        .toggle-loading {
-            opacity: 0.6;
-            pointer-events: none;
-        }
-
-        .disponibilidad-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .status-text {
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        .status-text.active {
-            color: #2ecc71;
-        }
-
-        .status-text.inactive {
-            color: #e74c3c;
-        }
     </style>
 </head>
 <body>
@@ -258,7 +177,7 @@
                     </thead>
                     <tbody>
                         {{#each productos}}
-                        <tr data-product-id="{{id}}">
+                        <tr>
                             <td>{{id}}</td>
                             <td>
                                 <img src="{{imagen}}" alt="{{nombre}}" class="product-thumb" onerror="this.src='/img/default-product.jpg'">
@@ -267,18 +186,11 @@
                             <td>{{categoria_nombre}}</td>
                             <td>${{precio}}</td>
                             <td>
-                                <div class="disponibilidad-container">
-                                    <label class="toggle-switch">
-                                        <input type="checkbox" 
-                                               class="disponibilidad-toggle" 
-                                               data-product-id="{{id}}" 
-                                               {{#if (disponible == 1) || (disponible === true)}}checked{{/if}}>
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                    <span class="status-text {{#if (disponible == 1) || (disponible === true)}}active{{else}}inactive{{/if}}">
-                                        {{#if (disponible == 1) || (disponible === true)}}Activo{{else}}Inactivo{{/if}}
-                                    </span>
-                                </div>
+                                {{#if (disponible == 1) || (disponible === true)}}
+                                <span class="badge badge-success">Sí</span>
+                                {{else}}
+                                <span class="badge badge-danger">No</span>
+                                {{/if}}
                             </td>
                             <td>
                                 <div class="admin-table-actions">
@@ -320,7 +232,7 @@
     
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Referencia al modal y sus elementos para eliminación
+        // Referencia al modal y sus elementos
         const deleteModal = document.getElementById('deleteModal');
         const confirmDeleteBtn = document.getElementById('confirmDelete');
         const cancelDeleteBtn = document.getElementById('cancelDelete');
@@ -329,10 +241,12 @@
         // Añadir evento a todos los botones de eliminar
         document.querySelectorAll('.delete-btn').forEach(btn => {
             btn.addEventListener('click', function(e) {
-                e.preventDefault();
+                e.preventDefault(); // Prevenir comportamiento predeterminado
                 
+                // Guardar el ID del producto a eliminar
                 currentProductId = this.getAttribute('data-id');
                 
+                // Mostrar el modal
                 if (deleteModal) {
                     deleteModal.style.display = 'block';
                 }
@@ -343,20 +257,23 @@
         if (confirmDeleteBtn) {
             confirmDeleteBtn.addEventListener('click', function() {
                 if (currentProductId) {
+                    // Redirigir a la ruta de eliminación
                     window.location.href = `/admin/productos/eliminar/${currentProductId}`;
                 }
                 
+                // Ocultar el modal
                 if (deleteModal) {
                     deleteModal.style.display = 'none';
                 }
             });
         }
         
-        // Evento para cancelar eliminación
+        // Evento para cancelar
         if (cancelDeleteBtn) {
             cancelDeleteBtn.addEventListener('click', function(e) {
-                e.preventDefault();
+                e.preventDefault(); // Prevenir comportamiento predeterminado
                 
+                // Ocultar el modal
                 if (deleteModal) {
                     deleteModal.style.display = 'none';
                 }
@@ -369,120 +286,7 @@
                 deleteModal.style.display = 'none';
             }
         });
-
-        // Manejar toggles de disponibilidad
-        document.querySelectorAll('.disponibilidad-toggle').forEach(toggle => {
-            toggle.addEventListener('change', function() {
-                const productId = this.getAttribute('data-product-id');
-                const isChecked = this.checked;
-                const row = document.querySelector(`tr[data-product-id="${productId}"]`);
-                const statusText = row.querySelector('.status-text');
-                const toggleContainer = row.querySelector('.disponibilidad-container');
-                
-                // Deshabilitar el toggle mientras se procesa
-                this.disabled = true;
-                toggleContainer.classList.add('toggle-loading');
-                
-                // Realizar petición AJAX para actualizar disponibilidad
-                fetch(`/admin/productos/${productId}/disponibilidad`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        disponible: isChecked
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Actualizar texto del estado
-                        if (data.disponible) {
-                            statusText.textContent = 'Activo';
-                            statusText.className = 'status-text active';
-                        } else {
-                            statusText.textContent = 'Inactivo';
-                            statusText.className = 'status-text inactive';
-                        }
-                        
-                        // Mostrar mensaje de éxito
-                        showToast(data.message, 'success');
-                        
-                        // Asegurar que el toggle refleje el estado correcto
-                        this.checked = data.disponible;
-                    } else {
-                        // Revertir el toggle en caso de error
-                        this.checked = !isChecked;
-                        showToast(data.message || 'Error al actualizar la disponibilidad', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    // Revertir el toggle en caso de error
-                    this.checked = !isChecked;
-                    showToast('Error de conexión al actualizar la disponibilidad', 'error');
-                })
-                .finally(() => {
-                    // Rehabilitar el toggle
-                    this.disabled = false;
-                    toggleContainer.classList.remove('toggle-loading');
-                });
-            });
-        });
     });
-
-    // Función para mostrar notificaciones toast
-    function showToast(message, type = 'success') {
-        // Crear elemento toast
-        const toast = document.createElement('div');
-        toast.className = `toast toast-${type}`;
-        toast.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 12px 24px;
-            border-radius: 4px;
-            color: white;
-            font-size: 14px;
-            z-index: 10000;
-            opacity: 0;
-            transform: translateX(100%);
-            transition: all 0.3s ease;
-            max-width: 300px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        `;
-        
-        // Establecer color de fondo según el tipo
-        if (type === 'success') {
-            toast.style.backgroundColor = '#2ecc71';
-        } else if (type === 'error') {
-            toast.style.backgroundColor = '#e74c3c';
-        }
-        
-        // Añadir icono y mensaje
-        const icon = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
-        toast.innerHTML = `<i class="${icon}" style="margin-right: 8px;"></i>${message}`;
-        
-        // Añadir al DOM
-        document.body.appendChild(toast);
-        
-        // Animar entrada
-        setTimeout(() => {
-            toast.style.opacity = '1';
-            toast.style.transform = 'translateX(0)';
-        }, 100);
-        
-        // Animar salida y remover
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateX(100%)';
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.parentNode.removeChild(toast);
-                }
-            }, 300);
-        }, 3000);
-    }
     </script>
 </body>
 </html>

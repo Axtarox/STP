@@ -563,3 +563,71 @@ exports.getServicios = async (req, res) => {
     });
   }
 };
+exports.updateProductDisponibilidad = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { disponible } = req.body;
+    
+    // Validar ID
+    if (isNaN(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID de producto inválido'
+      });
+    }
+    
+    // Obtener producto actual
+    const productoActual = await Producto.getById(id);
+    
+    if (!productoActual) {
+      return res.status(404).json({
+        success: false,
+        message: 'Producto no encontrado'
+      });
+    }
+    
+    // Procesar disponibilidad
+    const isDisponible = Boolean(disponible);
+    
+    // Crear objeto con todos los datos del producto pero solo cambiar disponibilidad
+    const productoData = {
+      nombre: productoActual.nombre,
+      categoria_id: productoActual.categoria_id,
+      precio: productoActual.precio,
+      condicion: productoActual.condicion,
+      descripcion: productoActual.descripcion,
+      caracteristicas: productoActual.caracteristicas,
+      cantidad_disponible: productoActual.cantidad_disponible,
+      disponible: isDisponible,
+      imagen: productoActual.imagen
+    };
+    
+    // Actualizar producto usando el modelo
+    const success = await Producto.update(id, productoData);
+    
+    if (!success) {
+      throw new Error('No se pudo actualizar la disponibilidad');
+    }
+    
+    // Determinar mensaje según el cambio
+    const message = isDisponible ? 
+      `"${productoActual.nombre}" ahora es visible en la tienda` :
+      `"${productoActual.nombre}" ahora está oculto en la tienda`;
+    
+    // Responder con éxito
+    res.json({
+      success: true,
+      message: message,
+      disponible: isDisponible,
+      productId: id,
+      productName: productoActual.nombre
+    });
+    
+  } catch (error) {
+    console.error('Error al actualizar disponibilidad del producto:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor al actualizar la disponibilidad'
+    });
+  }
+};

@@ -45,6 +45,9 @@ router.post('/productos/editar/:id', upload.single('imagen'), dashboardControlle
 router.get('/productos/eliminar/:id', dashboardController.eliminarProducto);
 router.get('/productos/:id', dashboardController.getProductoById);
 
+// NUEVA RUTA: Actualizar disponibilidad de producto
+router.put('/productos/:id/disponibilidad', dashboardController.updateProductDisponibilidad);
+
 // Gestión de categorías 
 router.get('/categorias', categoriaController.getAdminCategorias);
 router.get('/categorias/crear', categoriaController.getCrearCategoriaForm);
