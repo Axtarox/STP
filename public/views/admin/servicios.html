@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/admin.css">
     <style>
-
         .admin-table-actions {
             display: flex;
             gap: 0.75rem;
@@ -177,7 +176,6 @@
                             <th>Imagen</th>
                             <th>Nombre</th>
                             <th>Descripción</th>
-                            <th>Disponible</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -190,13 +188,6 @@
                             </td>
                             <td>{{nombre}}</td>
                             <td class="service-description">{{descripcion}}</td>
-                            <td>
-                                {{#if (disponible == 1) || (disponible === true)}}
-                                <span class="badge badge-success">Sí</span>
-                                {{else}}
-                                <span class="badge badge-danger">No</span>
-                                {{/if}}
-                            </td>
                             <td>
                                 <div class="admin-table-actions">
                                     <a href="/admin/servicios/{{id}}" class="action-btn view" title="Ver detalles">

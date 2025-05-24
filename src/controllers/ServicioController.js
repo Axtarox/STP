@@ -262,6 +262,9 @@ exports.getAdminServicioById = async (req, res) => {
 /**
  * Muestra el formulario para editar un servicio
  */
+/**
+ * Muestra el formulario para editar un servicio
+ */
 exports.getEditarServicioForm = async (req, res) => {
     try {
         const id = parseInt(req.params.id);
@@ -283,10 +286,30 @@ exports.getEditarServicioForm = async (req, res) => {
             });
         }
         
+        // Procesar el campo disponible para asegurar que sea booleano
+        let disponible = false;
+        
+        // Manejar diferentes tipos de valores que pueden venir de la BD
+        if (servicio.disponible === 1 || 
+            servicio.disponible === '1' || 
+            servicio.disponible === true || 
+            servicio.disponible === 'true') {
+            disponible = true;
+        }
+        
+        // Crear objeto de servicio con disponible como booleano
+        const servicioFormateado = {
+            ...servicio,
+            disponible: disponible
+        };
+        
+        console.log(`Debug - Servicio ${id} disponible original:`, servicio.disponible);
+        console.log(`Debug - Servicio ${id} disponible formateado:`, disponible);
+        
         res.render('admin/servicio-editar', {
             titulo: 'Editar Servicio',
             admin: req.session.adminData,
-            servicio,
+            servicio: servicioFormateado,
             current_page: { servicios: true },
             standalone: true
         });
@@ -299,7 +322,6 @@ exports.getEditarServicioForm = async (req, res) => {
         });
     }
 };
-
 /**
  * Procesa la actualización de un servicio
  */
@@ -454,6 +476,48 @@ exports.eliminarServicio = async (req, res) => {
             titulo: 'Error',
             mensaje: `Error al eliminar el servicio: ${error.message}`,
             error: process.env.NODE_ENV === 'development' ? error.stack : null
+        });
+    }
+};
+
+exports.getAdminServicios = async (req, res) => {
+    try {
+        // Obtener TODOS los servicios (disponibles y no disponibles) para el admin
+        const servicios = await Servicio.getAllForAdmin();
+        
+        // Formatear disponibilidad para asegurar consistencia
+        const serviciosFormateados = servicios.map(servicio => {
+            // Convertir el campo disponible a booleano de forma robusta
+            let disponible = false;
+            
+            // Manejar diferentes tipos de valores de disponible
+            if (servicio.disponible === 1 || 
+                servicio.disponible === '1' || 
+                servicio.disponible === true || 
+                servicio.disponible === 'true') {
+                disponible = true;
+            }
+            
+            return {
+                ...servicio,
+                disponible: disponible  // Asegurar que sea booleano
+            };
+        });
+        
+        // Renderizar la vista con todos los servicios
+        res.render('admin/servicios', {
+            titulo: 'Gestión de Servicios',
+            admin: req.session.adminData,
+            servicios: serviciosFormateados,
+            current_page: { servicios: true },
+            standalone: true
+        });
+    } catch (error) {
+        console.error('Error al obtener servicios para admin:', error);
+        res.status(500).render('error', {
+            titulo: 'Error',
+            mensaje: 'Error al cargar los servicios',
+            error: process.env.NODE_ENV === 'development' ? error.message : null
         });
     }
 };

@@ -2,9 +2,9 @@ const { pool } = require('../config/database');
 
 class Servicio {
   /**
-   * Obtiene todos los servicios
+   * Obtiene todos los servicios DISPONIBLES (para la vista pública)
    * @param {number} limit - Límite opcional de servicios a retornar
-   * @returns {Promise<Array>} Lista de servicios
+   * @returns {Promise<Array>} Lista de servicios disponibles
    */
   static async getAll(limit = null) {
     try {
@@ -24,6 +24,32 @@ class Servicio {
       }
     } catch (error) {
       console.error('Error en Servicio.getAll:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Obtiene TODOS los servicios (disponibles y no disponibles) - PARA ADMIN
+   * @param {number} limit - Límite opcional de servicios a retornar
+   * @returns {Promise<Array>} Lista de todos los servicios
+   */
+  static async getAllForAdmin(limit = null) {
+    try {
+      let query = `
+        SELECT * FROM servicio
+        ORDER BY id DESC
+      `;
+      
+      if (limit) {
+        query += ' LIMIT ?';
+        const [rows] = await pool.query(query, [limit]);
+        return rows;
+      } else {
+        const [rows] = await pool.query(query);
+        return rows;
+      }
+    } catch (error) {
+      console.error('Error en Servicio.getAllForAdmin:', error);
       throw error;
     }
   }

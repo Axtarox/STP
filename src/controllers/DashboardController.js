@@ -17,7 +17,10 @@ exports.getDashboard = async (req, res) => {
     const allProductos = await Producto.getAll();
     const availableProductos = await Producto.getAllAvailable();
     const numCategorias = (await Categoria.getAll()).length;
-    const numServicios = (await Servicio.getAll()).length;
+    
+    // Para servicios, usar getAllForAdmin para contar todos los servicios
+    const allServicios = await Servicio.getAllForAdmin();
+    const availableServicios = await Servicio.getAll(); // Solo los disponibles
     
     // Renderizar dashboard en modo standalone
     res.render('admin/dashboard', {
@@ -27,7 +30,8 @@ exports.getDashboard = async (req, res) => {
         productos: allProductos.length,
         productosDisponibles: availableProductos.length,
         categorias: numCategorias,
-        servicios: numServicios
+        servicios: allServicios.length,
+        serviciosDisponibles: availableServicios.length
       },
       current_page: { dashboard: true },
       standalone: true 
@@ -50,13 +54,25 @@ exports.getProductos = async (req, res) => {
     // Obtener TODOS los productos para el admin (disponibles y no disponibles)
     const productos = await Producto.getAll();
     
-    // Formatear precios para visualización
-    const productosFormateados = productos.map(producto => ({
-      ...producto,
-      precio: formatPrice(producto.precio),
-      // Asegurar que disponible sea un booleano consistente
-      disponible: Boolean(producto.disponible)
-    }));
+    // Formatear precios y asegurar tipos correctos para visualización
+    const productosFormateados = productos.map(producto => {
+      // Convertir el campo disponible a booleano de forma más robusta
+      let disponible = false;
+      
+      // Manejar diferentes tipos de valores de disponible
+      if (producto.disponible === 1 || 
+          producto.disponible === '1' || 
+          producto.disponible === true || 
+          producto.disponible === 'true') {
+        disponible = true;
+      }
+      
+      return {
+        ...producto,
+        precio: formatPrice(producto.precio),
+        disponible: disponible  // Asegurar que sea booleano
+      };
+    });
     
     // Obtener categorías para el formulario
     const categorias = await Categoria.getAll();
@@ -105,7 +121,7 @@ exports.getCrearProductoForm = async (req, res) => {
 };
 
 /**
- * Crea un nuevo producto con manejo mejorado de disponibilidad
+ * Crea un nuevo producto 
  */
 exports.crearProducto = async (req, res) => {
   try {
@@ -220,7 +236,7 @@ exports.getProductoById = async (req, res) => {
       });
     }
     
-    // Obtener producto (usar getById para admin, que no filtra por disponibilidad)
+    // Obtener producto 
     const producto = await Producto.getById(id);
     
     if (!producto) {
@@ -544,13 +560,32 @@ exports.getCategorias = async (req, res) => {
  */
 exports.getServicios = async (req, res) => {
   try {
-    // Obtener todos los servicios
-    const servicios = await Servicio.getAll();
+    // Obtener TODOS los servicios para el admin (disponibles y no disponibles)
+    const servicios = await Servicio.getAllForAdmin();
+    
+    // Formatear disponibilidad para asegurar consistencia
+    const serviciosFormateados = servicios.map(servicio => {
+      // Convertir el campo disponible a booleano de forma robusta
+      let disponible = false;
+      
+      // Manejar diferentes tipos de valores de disponible
+      if (servicio.disponible === 1 || 
+          servicio.disponible === '1' || 
+          servicio.disponible === true || 
+          servicio.disponible === 'true') {
+        disponible = true;
+      }
+      
+      return {
+        ...servicio,
+        disponible: disponible  // Asegurar que sea booleano
+      };
+    });
     
     res.render('admin/servicios', {
       titulo: 'Gestión de Servicios',
       admin: req.session.adminData,
-      servicios,
+      servicios: serviciosFormateados,
       current_page: { servicios: true },
       standalone: true 
     });
@@ -563,6 +598,7 @@ exports.getServicios = async (req, res) => {
     });
   }
 };
+
 exports.updateProductDisponibilidad = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
