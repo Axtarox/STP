@@ -201,7 +201,7 @@
                             <div class="service-info-item">
                                 <div class="info-label">Disponible:</div>
                                 <div>
-                                    {{#if (servicio.disponible == 1) || (servicio.disponible === true)}}
+                                    {{#if servicio.disponible}}
                                     <span class="badge badge-success">Sí</span>
                                     {{else}}
                                     <span class="badge badge-danger">No</span>

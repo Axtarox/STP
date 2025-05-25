@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/admin.css">
     <style>
-
         .price-input-container {
             position: relative;
         }
@@ -29,19 +28,16 @@
             color: #2ecc71;
         }
         
-
         .admin-form-control option:checked {
             background-color: #2ecc71;
             color: white;
         }
         
-
         .required:after {
             content: " *";
             color: #e74c3c;
         }
         
-
         .admin-form-preview {
             margin-top: 1rem;
             border: 1px solid #e0e0e0;
@@ -58,7 +54,6 @@
             margin: 0 auto;
         }
         
-
         .required-note {
             font-size: 0.85rem;
             color: #607d8b;
@@ -70,7 +65,6 @@
             color: #e74c3c;
         }
         
-
         .admin-form-control.error {
             border-color: #e74c3c;
             background-color: rgba(231, 76, 60, 0.05);
@@ -85,7 +79,6 @@
 </head>
 <body>
     <div class="admin-layout">
-
         <aside class="admin-sidebar">
             <div class="admin-sidebar-header">
                 <a href="/admin" class="admin-logo">Soluciones <span>Tecnológicas</span> Pradito</a>
@@ -133,7 +126,6 @@
             </nav>
         </aside>
         
-
         <main class="admin-main">
             <header class="admin-header">
                 <h1 class="admin-page-title">{{titulo}}</h1>
@@ -205,6 +197,7 @@
                         <div class="admin-form-group">
                             <label for="condicion" class="required">Condición</label>
                             <select id="condicion" name="condicion" class="admin-form-control" required>
+                                <option value="">-- Seleccione una condición --</option>
                                 <option value="Nuevo" {{#if (eq producto.condicion 'Nuevo')}}selected="selected"{{/if}}>Nuevo</option>
                                 <option value="Usado" {{#if (eq producto.condicion 'Usado')}}selected="selected"{{/if}}>Usado</option>
                                 <option value="Reacondicionado" {{#if (eq producto.condicion 'Reacondicionado')}}selected="selected"{{/if}}>Reacondicionado</option>
@@ -224,9 +217,9 @@
                     </div>
                     
                     <div class="admin-form-group">
-                        <label for="caracteristicas">Características (una por línea)</label>
-                        <textarea id="caracteristicas" name="caracteristicas" class="admin-form-control" rows="6">{{producto.caracteristicas}}</textarea>
-                        <small>Por ejemplo: Pantalla 15.6" HD, Procesador Intel i5, 8GB RAM, etc.</small>
+                        <label for="caracteristicas" class="required">Características</label>
+                        <textarea id="caracteristicas" name="caracteristicas" class="admin-form-control" rows="6" required>{{producto.caracteristicas}}</textarea>
+                        <small>Por ejemplo: Pantalla 15.6" HD, Procesador Intel i5, 8GB RAM, etc. (una por línea)</small>
                     </div>
                     
                     <div class="admin-form-group">
@@ -411,6 +404,7 @@
                     { id: 'precio_display', label: 'Precio' },
                     { id: 'condicion', label: 'Condición' },
                     { id: 'descripcion', label: 'Descripción' },
+                    { id: 'caracteristicas', label: 'Características' },
                     { id: 'cantidad_disponible', label: 'Cantidad disponible' }
                 ];
                 

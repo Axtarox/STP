@@ -146,7 +146,7 @@
                     <div class="admin-form-group">
                         <label for="disponible">Disponibilidad</label>
                         <div style="margin-top: 0.5rem;">
-                            <input type="checkbox" id="disponible" name="disponible" {{#if (servicio.disponible == 1) || (servicio.disponible === true)}}checked{{/if}}>
+                            <input type="checkbox" id="disponible" name="disponible" {{#if servicio.disponible}}checked{{/if}}>
                             <label for="disponible" style="display: inline-block; margin-left: 0.5rem; font-weight: normal;">Mostrar en la página web</label>
                         </div>
                     </div>

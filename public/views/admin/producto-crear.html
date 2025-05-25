@@ -187,13 +187,14 @@
                             <small>Puede usar puntos como separadores de miles (Ej: 1.500.000)</small>
                         </div>
                         
-                        <div class="admin-form-group">
+                       <div class="admin-form-group">
                             <label for="condicion" class="required">Condición</label>
                             <select id="condicion" name="condicion" class="admin-form-control" required>
-                                <option value="Nuevo" selected>Nuevo</option>
-                                <option value="Usado">Usado</option>
-                                <option value="Reacondicionado">Reacondicionado</option>
-                                <option value="Digital">Digital</option>
+                                <option value="">-- Seleccione una condición --</option>
+                                <option value="Nuevo" {{#if (eq producto.condicion 'Nuevo')}}selected="selected"{{/if}}>Nuevo</option>
+                                <option value="Usado" {{#if (eq producto.condicion 'Usado')}}selected="selected"{{/if}}>Usado</option>
+                                <option value="Reacondicionado" {{#if (eq producto.condicion 'Reacondicionado')}}selected="selected"{{/if}}>Reacondicionado</option>
+                                <option value="Digital" {{#if (eq producto.condicion 'Digital')}}selected="selected"{{/if}}>Digital</option>
                             </select>
                         </div>
                         
@@ -207,11 +208,11 @@
                         <label for="descripcion" class="required">Descripción</label>
                         <textarea id="descripcion" name="descripcion" class="admin-form-control" rows="4" required></textarea>
                     </div>
-                    
+                   
                     <div class="admin-form-group">
-                        <label for="caracteristicas">Características (una por línea)</label>
-                        <textarea id="caracteristicas" name="caracteristicas" class="admin-form-control" rows="6"></textarea>
-                        <small>Por ejemplo: Pantalla 15.6" HD, Procesador Intel i5, 8GB RAM, etc.</small>
+                        <label for="caracteristicas" class="required">Características</label>
+                        <textarea id="caracteristicas" name="caracteristicas" class="admin-form-control" rows="6" required>{{producto.caracteristicas}}</textarea>
+                        <small>Por ejemplo: Pantalla 15.6" HD, Procesador Intel i5, 8GB RAM, etc. (una por línea)</small>
                     </div>
                     
                     <div class="admin-form-group">

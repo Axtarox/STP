@@ -47,7 +47,7 @@ exports.getDashboard = async (req, res) => {
 };
 
 /**
- * Gestión de productos - Muestra TODOS los productos (disponibles y no disponibles)
+ * Gestión de productos 
  */
 exports.getProductos = async (req, res) => {
   try {
@@ -130,23 +130,53 @@ exports.crearProducto = async (req, res) => {
       nombre, 
       categoria_id, 
       precio, 
-      condicion = 'Nuevo', 
+      condicion, 
       descripcion, 
       caracteristicas,
       cantidad_disponible,
       disponible 
     } = req.body;
     
-    // Verificar campos requeridos
-    if (!nombre || !categoria_id || !precio || !descripcion) {
+    // Verificar campos requeridos - AHORA INCLUYE CARACTERÍSTICAS
+    if (!nombre || !categoria_id || !precio || !condicion || !descripcion || !caracteristicas) {
       // Obtener categorías para el formulario
+      const categorias = await Categoria.getAll();
+      
+      // Determinar qué campos específicos faltan
+      let errorMessage = 'Por favor complete todos los campos obligatorios:';
+      const missingFields = [];
+      
+      if (!nombre) missingFields.push('Nombre del producto');
+      if (!categoria_id) missingFields.push('Categoría');
+      if (!precio) missingFields.push('Precio');
+      if (!condicion) missingFields.push('Condición');
+      if (!descripcion) missingFields.push('Descripción');
+      if (!caracteristicas) missingFields.push('Características');
+      
+      if (missingFields.length > 0) {
+        errorMessage += ' ' + missingFields.join(', ');
+      }
+      
+      return res.render('admin/producto-crear', {
+        titulo: 'Crear Nuevo Producto',
+        admin: req.session.adminData,
+        categorias,
+        error: errorMessage,
+        current_page: { productos: true },
+        standalone: true
+      });
+    }
+    
+    // Validar que la condición sea válida
+    const condicionesValidas = ['Nuevo', 'Usado', 'Reacondicionado', 'Digital'];
+    if (!condicionesValidas.includes(condicion)) {
       const categorias = await Categoria.getAll();
       
       return res.render('admin/producto-crear', {
         titulo: 'Crear Nuevo Producto',
         admin: req.session.adminData,
         categorias,
-        error: 'Por favor complete todos los campos obligatorios',
+        error: 'La condición seleccionada no es válida. Por favor seleccione una opción del menú.',
         current_page: { productos: true },
         standalone: true
       });
@@ -171,10 +201,39 @@ exports.crearProducto = async (req, res) => {
     // Convertir el precio a número limpiando separadores
     const precioNumerico = parseFloat(String(precio).replace(/\./g, '').replace(/,/g, '.')) || 0;
     
+    // Validar que el precio sea válido
+    if (precioNumerico <= 0) {
+      const categorias = await Categoria.getAll();
+      
+      return res.render('admin/producto-crear', {
+        titulo: 'Crear Nuevo Producto',
+        admin: req.session.adminData,
+        categorias,
+        error: 'El precio debe ser mayor que cero.',
+        current_page: { productos: true },
+        standalone: true
+      });
+    }
+    
     // Procesar disponibilidad correctamente
     let isDisponible = false;
     if (disponible === 'on' || disponible === true || disponible === 'true' || disponible === '1') {
       isDisponible = true;
+    }
+    
+    // Validar y procesar características
+    const caracteristicasLimpias = caracteristicas.trim();
+    if (caracteristicasLimpias.length < 10) {
+      const categorias = await Categoria.getAll();
+      
+      return res.render('admin/producto-crear', {
+        titulo: 'Crear Nuevo Producto',
+        admin: req.session.adminData,
+        categorias,
+        error: 'Las características deben tener al menos 10 caracteres y ser descriptivas.',
+        current_page: { productos: true },
+        standalone: true
+      });
     }
     
     // Crear objeto de producto
@@ -184,7 +243,7 @@ exports.crearProducto = async (req, res) => {
       precio: precioNumerico,
       condicion,
       descripcion,
-      caracteristicas,
+      caracteristicas: caracteristicasLimpias,
       cantidad_disponible: parseInt(cantidad_disponible) || 0,
       disponible: isDisponible,
       imagen: imagenUrl
@@ -328,8 +387,9 @@ exports.getEditarProductoForm = async (req, res) => {
   }
 };
 
+
 /**
- * Actualiza un producto existente con manejo mejorado de disponibilidad
+ * Actualiza un producto existente con validación mejorada
  */
 exports.editarProducto = async (req, res) => {
   try {
@@ -364,9 +424,40 @@ exports.editarProducto = async (req, res) => {
       disponible 
     } = req.body;
     
-    // Verificar campos requeridos
-    if (!nombre || !categoria_id || !precio || !descripcion) {
+    // Verificar campos requeridos - AHORA INCLUYE CARACTERÍSTICAS
+    if (!nombre || !categoria_id || !precio || !condicion || !descripcion || !caracteristicas) {
       // Obtener categorías para el formulario
+      const categorias = await Categoria.getAll();
+      
+      // Determinar qué campos específicos faltan
+      let errorMessage = 'Por favor complete todos los campos obligatorios:';
+      const missingFields = [];
+      
+      if (!nombre) missingFields.push('Nombre del producto');
+      if (!categoria_id) missingFields.push('Categoría');
+      if (!precio) missingFields.push('Precio');
+      if (!condicion) missingFields.push('Condición');
+      if (!descripcion) missingFields.push('Descripción');
+      if (!caracteristicas) missingFields.push('Características');
+      
+      if (missingFields.length > 0) {
+        errorMessage += ' ' + missingFields.join(', ');
+      }
+      
+      return res.render('admin/producto-editar', {
+        titulo: 'Editar Producto',
+        admin: req.session.adminData,
+        producto: productoActual,
+        categorias,
+        error: errorMessage,
+        current_page: { productos: true },
+        standalone: true
+      });
+    }
+    
+    // Validar que la condición sea válida
+    const condicionesValidas = ['Nuevo', 'Usado', 'Reacondicionado', 'Digital'];
+    if (!condicionesValidas.includes(condicion)) {
       const categorias = await Categoria.getAll();
       
       return res.render('admin/producto-editar', {
@@ -374,7 +465,7 @@ exports.editarProducto = async (req, res) => {
         admin: req.session.adminData,
         producto: productoActual,
         categorias,
-        error: 'Por favor complete todos los campos obligatorios',
+        error: 'La condición seleccionada no es válida. Por favor seleccione una opción del menú.',
         current_page: { productos: true },
         standalone: true
       });
@@ -411,10 +502,41 @@ exports.editarProducto = async (req, res) => {
     // Convertir precio formateado a número
     const precioNumerico = parseFloat(String(precio).replace(/\./g, '').replace(/,/g, '.')) || 0;
     
+    // Validar que el precio sea válido
+    if (precioNumerico <= 0) {
+      const categorias = await Categoria.getAll();
+      
+      return res.render('admin/producto-editar', {
+        titulo: 'Editar Producto',
+        admin: req.session.adminData,
+        producto: productoActual,
+        categorias,
+        error: 'El precio debe ser mayor que cero.',
+        current_page: { productos: true },
+        standalone: true
+      });
+    }
+    
     // Procesar disponibilidad correctamente
     let isDisponible = false;
     if (disponible === 'on' || disponible === true || disponible === 'true' || disponible === '1') {
       isDisponible = true;
+    }
+    
+    // Validar y procesar características
+    const caracteristicasLimpias = caracteristicas.trim();
+    if (caracteristicasLimpias.length < 10) {
+      const categorias = await Categoria.getAll();
+      
+      return res.render('admin/producto-editar', {
+        titulo: 'Editar Producto',
+        admin: req.session.adminData,
+        producto: productoActual,
+        categorias,
+        error: 'Las características deben tener al menos 10 caracteres y ser descriptivas.',
+        current_page: { productos: true },
+        standalone: true
+      });
     }
     
     // Crear objeto de producto actualizado
@@ -424,7 +546,7 @@ exports.editarProducto = async (req, res) => {
       precio: precioNumerico,
       condicion,
       descripcion,
-      caracteristicas,
+      caracteristicas: caracteristicasLimpias,
       cantidad_disponible: parseInt(cantidad_disponible) || 0,
       disponible: isDisponible,
       imagen: imagenUrl
@@ -474,7 +596,6 @@ exports.editarProducto = async (req, res) => {
     });
   }
 };
-
 /**
  * Elimina un producto
  */
