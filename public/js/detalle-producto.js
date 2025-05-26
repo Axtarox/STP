@@ -1,6 +1,5 @@
 /**
- * Funcionalidad específica para la página de detalle de producto con validación de stock
- * Actualizado para trabajar con el nuevo sistema de carrito flotante/checkout
+ * Funcionalidad específica para la página de detalle de producto 
  */
 document.addEventListener('DOMContentLoaded', function() {
     // Inicializar selector de cantidad
@@ -22,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /**
- * Manejador para el evento click del botón añadir al carrito con validación de stock
+ * Manejador para el evento click del botón añadir al carrito 
  */
 function handleAddToCart() {
     const productId = this.getAttribute('data-id');
@@ -155,7 +154,7 @@ function getCarritoFromStorage() {
 }
 
 /**
- * Inicializa el selector de cantidad asegurando que no haya eventos duplicados
+ * Inicializa el selector de cantidad 
  */
 function initQuantitySelector() {
     const quantityMinus = document.getElementById('quantity-minus');

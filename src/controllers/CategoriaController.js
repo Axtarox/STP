@@ -1,5 +1,5 @@
 /**
- * Controlador CategoriaController.js 
+ * Controlador para el manejo de categorias
  */
 const Categoria = require('../models/Categoria');
 const Producto = require('../models/Producto');

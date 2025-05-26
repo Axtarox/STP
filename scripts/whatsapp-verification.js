@@ -3,7 +3,7 @@
  */
 
 (function() {
-    // Número de WhatsApp correcto
+    // Número de WhatsApp de pruebas
     const correctNumber = '573225865591';
     
     // Función para verificar enlaces de WhatsApp

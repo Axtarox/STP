@@ -227,6 +227,10 @@
                 window.location.href = '/productos';
             });
         }
+
+        setTimeout(() => {
+         loadCartFromCheckout();
+        }, 200);
         
         // Verificar periódicamente si hay cambios en el carrito de checkout
         setInterval(function() {
@@ -236,7 +240,7 @@
         }, 2000);
     });
     
-    // NUEVA FUNCIÓN: Cargar carrito desde checkout storage
+
     function loadCartFromCheckout() {
         console.log('Cargando carrito desde checkout storage...');
         
@@ -354,7 +358,6 @@
         });
     }
     
-    // NUEVA FUNCIÓN: Actualizar cantidad de productos en checkout
     function updateProductQuantityCheckout(productId, isIncrement) {
         console.log(`updateProductQuantityCheckout: ${productId}, incrementar: ${isIncrement}`);
         
@@ -406,7 +409,6 @@
         }
     }
     
-    // NUEVA FUNCIÓN: Eliminar producto del checkout
     function removeProductFromCheckout(productId) {
         console.log(`removeProductFromCheckout: ${productId}`);
         
@@ -439,7 +441,7 @@
         }
     }
     
-    // NUEVA FUNCIÓN: Restaurar carrito desde checkout (función local de respaldo)
+
     function restoreCarritoFromCheckoutLocal() {
         try {
             const carritoCheckout = JSON.parse(localStorage.getItem('carritoCheckout')) || { items: [], total: 0 };
@@ -503,7 +505,7 @@
         container.innerHTML = content;
     }
     
-    // Función para enviar pedido por WhatsApp con validación - MODIFICADA PARA CHECKOUT
+    // Función para enviar pedido por WhatsApp con validación 
     function enviarPedidoWhatsApp() {
         const form = document.getElementById('checkout-form');
         
@@ -606,7 +608,7 @@
         
         mensaje += `%0A*Total:* $${total.toLocaleString('es-CO')}`;
         
-        // Número de WhatsApp de la empresa
+        // Número de WhatsApp de prueba
         const whatsappNumber = '573225865591';
         
         // Crear URL de WhatsApp

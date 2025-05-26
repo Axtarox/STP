@@ -3,9 +3,6 @@ const router = express.Router();
 const productoController = require('../controllers/ProductoController');
 const authMiddleware = require('../middlewares/authMiddleware');
 
-
-
-  //Rutas públicas
  
 // Obtener todos los productos
 router.get('/', productoController.getAllProductos);

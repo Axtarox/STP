@@ -116,7 +116,7 @@ exports.sendWhatsAppMessage = (req, res) => {
     whatsappMessage += `*Asunto:* ${asunto}%0A%0A`;
     whatsappMessage += `*Mensaje:*%0A${mensaje}`;
     
-    // Número de WhatsApp de la empresa 
+    // Número de WhatsApp de la empresa(numero de prueba) 
     const whatsappNumber = '573225865591';
     
     // Crear URL de WhatsApp

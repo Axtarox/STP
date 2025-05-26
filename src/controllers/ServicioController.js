@@ -259,9 +259,7 @@ exports.getAdminServicioById = async (req, res) => {
     }
 };
 
-/**
- * Muestra el formulario para editar un servicio
- */
+
 /**
  * Muestra el formulario para editar un servicio
  */

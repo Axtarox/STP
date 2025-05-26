@@ -55,7 +55,7 @@ exports.getConfirmacion = (req, res) => {
 };
 
 /**
- * Añade un producto al carrito (para APIs)
+ * Añade un producto al carrito 
  */
 exports.addToCart = (req, res) => {
   try {
@@ -97,7 +97,7 @@ exports.addToCart = (req, res) => {
 };
 
 /**
- * Elimina un producto del carrito (para APIs)
+ * Elimina un producto del carrito 
  */
 exports.removeFromCart = (req, res) => {
   try {
@@ -128,7 +128,7 @@ exports.removeFromCart = (req, res) => {
 };
 
 /**
- * Actualiza la cantidad de un producto en el carrito (para APIs)
+ * Actualiza la cantidad de un producto en el carrito 
  */
 exports.updateCartItem = (req, res) => {
   try {
@@ -175,7 +175,7 @@ exports.updateCartItem = (req, res) => {
 };
 
 /**
- * Obtiene el contenido del carrito (para APIs)
+ * Obtiene el contenido del carrito 
  */
 exports.getCartContents = (req, res) => {
   try {
@@ -208,7 +208,7 @@ exports.getCartContents = (req, res) => {
 };
 
 /**
- * Vacía el carrito (para APIs)
+ * Vacía el carrito 
  */
 exports.clearCart = (req, res) => {
   try {

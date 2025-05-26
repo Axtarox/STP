@@ -1,5 +1,5 @@
 /**
- * Controlador para el panel de administración - Mejorado para disponibilidad
+ * Controlador para el panel de administración 
  */
 const Producto = require('../models/Producto');
 const Categoria = require('../models/Categoria');
@@ -20,7 +20,7 @@ exports.getDashboard = async (req, res) => {
     
     // Para servicios, usar getAllForAdmin para contar todos los servicios
     const allServicios = await Servicio.getAllForAdmin();
-    const availableServicios = await Servicio.getAll(); // Solo los disponibles
+    const availableServicios = await Servicio.getAll(); 
     
     // Renderizar dashboard en modo standalone
     res.render('admin/dashboard', {
@@ -51,7 +51,7 @@ exports.getDashboard = async (req, res) => {
  */
 exports.getProductos = async (req, res) => {
   try {
-    // Obtener TODOS los productos para el admin (disponibles y no disponibles)
+    // Obtener TODOS los productos para el admin 
     const productos = await Producto.getAll();
     
     // Formatear precios y asegurar tipos correctos para visualización
@@ -137,7 +137,7 @@ exports.crearProducto = async (req, res) => {
       disponible 
     } = req.body;
     
-    // Verificar campos requeridos - AHORA INCLUYE CARACTERÍSTICAS
+    // Verificar campos requeridos 
     if (!nombre || !categoria_id || !precio || !condicion || !descripcion || !caracteristicas) {
       // Obtener categorías para el formulario
       const categorias = await Categoria.getAll();
@@ -389,7 +389,7 @@ exports.getEditarProductoForm = async (req, res) => {
 
 
 /**
- * Actualiza un producto existente con validación mejorada
+ * Actualiza un producto existente 
  */
 exports.editarProducto = async (req, res) => {
   try {
@@ -424,7 +424,7 @@ exports.editarProducto = async (req, res) => {
       disponible 
     } = req.body;
     
-    // Verificar campos requeridos - AHORA INCLUYE CARACTERÍSTICAS
+    // Verificar campos requeridos 
     if (!nombre || !categoria_id || !precio || !condicion || !descripcion || !caracteristicas) {
       // Obtener categorías para el formulario
       const categorias = await Categoria.getAll();
@@ -525,7 +525,7 @@ exports.editarProducto = async (req, res) => {
     
     // Validar y procesar características
     const caracteristicasLimpias = caracteristicas.trim();
-    if (caracteristicasLimpias.length < 10) {
+    if (caracteristicasLimpias.length < 1) {
       const categorias = await Categoria.getAll();
       
       return res.render('admin/producto-editar', {
@@ -533,7 +533,7 @@ exports.editarProducto = async (req, res) => {
         admin: req.session.adminData,
         producto: productoActual,
         categorias,
-        error: 'Las características deben tener al menos 10 caracteres y ser descriptivas.',
+        error: 'Las características deben tener al menos 1 caracter',
         current_page: { productos: true },
         standalone: true
       });
@@ -681,7 +681,7 @@ exports.getCategorias = async (req, res) => {
  */
 exports.getServicios = async (req, res) => {
   try {
-    // Obtener TODOS los servicios para el admin (disponibles y no disponibles)
+    // Obtener TODOS los servicios para el admin 
     const servicios = await Servicio.getAllForAdmin();
     
     // Formatear disponibilidad para asegurar consistencia
@@ -699,7 +699,7 @@ exports.getServicios = async (req, res) => {
       
       return {
         ...servicio,
-        disponible: disponible  // Asegurar que sea booleano
+        disponible: disponible  
       };
     });
     

@@ -53,7 +53,7 @@ function initCarrito() {
                 stock: maxStock
             };
             
-            // Añadir el producto al carrito con validación de stock
+            // Añadir el producto al carrito 
             addProductToCart(producto);
             
             // Mostrar mensaje de confirmación
@@ -106,7 +106,7 @@ function initCarrito() {
                 return;
             }
             
-            // NUEVA FUNCIONALIDAD: Mover carrito a checkout y limpiar carrito flotante
+            //Mover carrito a checkout y limpiar carrito flotante
             moveCarritoToCheckout();
             
             // Cerrar carrito flotante si está abierto
@@ -173,7 +173,7 @@ function initQuantitySelectors() {
 }
 
 /**
- * NUEVA FUNCIÓN: Mueve el carrito al storage de checkout y limpia el carrito flotante
+ *  Mueve el carrito al storage de checkout y limpia el carrito flotante
  */
 function moveCarritoToCheckout() {
     try {
@@ -198,7 +198,7 @@ function moveCarritoToCheckout() {
 }
 
 /**
- * NUEVA FUNCIÓN: Restaura el carrito desde checkout al carrito flotante
+ *  Restaura el carrito desde checkout al carrito flotante
  */
 function restoreCarritoFromCheckout() {
     try {
@@ -221,7 +221,7 @@ function restoreCarritoFromCheckout() {
 }
 
 /**
- * NUEVA FUNCIÓN: Obtiene el carrito de checkout
+ * Obtiene el carrito de checkout
  */
 function getCarritoCheckoutFromStorage() {
     const carritoJSON = localStorage.getItem('carritoCheckout');
@@ -242,7 +242,7 @@ function getCarritoCheckoutFromStorage() {
 }
 
 /**
- * NUEVA FUNCIÓN: Limpia el carrito de checkout
+ *  Limpia el carrito de checkout
  */
 function clearCarritoCheckout() {
     try {
@@ -503,7 +503,7 @@ function addCartItemEventListeners() {
 }
 
 /**
- * Actualiza la cantidad de un producto con validación de stock
+ * Actualiza la cantidad de un producto 
  * @param {string} id - ID del producto
  * @param {boolean} isIncrement - Si es incremento o decremento
  */

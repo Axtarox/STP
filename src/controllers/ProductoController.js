@@ -1,6 +1,5 @@
 /**
- * Controlador optimizado para productos con soporte para precios formateados
- * Solo muestra productos disponibles en la tienda pública
+ * Controlador para el manejo de Productos completo
  */
 
 const path = require('path');
@@ -101,7 +100,7 @@ exports.getProductoById = async (req, res) => {
 };
 
 /**
- * Obtiene productos por categoría SOLO LOS DISPONIBLES
+ * Obtiene productos por categoría 
  */
 exports.getProductosByCategoria = async (req, res) => {
     try {
@@ -124,7 +123,7 @@ exports.getProductosByCategoria = async (req, res) => {
             });
         }
         
-        // Obtener productos por categoría (ya filtra por disponibles)
+        // Obtener productos por categoría 
         const productos = await Producto.getByCategoria(categoriaId);
         
         // Formatear precios para visualización
@@ -162,7 +161,7 @@ exports.getProductosByCategoria = async (req, res) => {
 };
 
 /**
- * Busca productos por términos SOLO ENTRE LOS DISPONIBLES
+ * Busca productos por términos 
  */
 exports.searchProductos = async (req, res) => {
     try {
@@ -172,7 +171,7 @@ exports.searchProductos = async (req, res) => {
             return res.redirect('/productos');
         }
         
-        // Buscar productos que coincidan con la consulta (ya filtra por disponibles)
+        // Buscar productos que coincidan con la consulta 
         const productos = await Producto.search(query);
         
         // Formatear precios para visualización
@@ -204,11 +203,11 @@ exports.searchProductos = async (req, res) => {
 };
 
 /**
- * Obtiene productos destacados SOLO LOS DISPONIBLES
+ * Obtiene productos destacados 
  */
 exports.getProductosDestacados = async (req, res) => {
     try {
-        // Obtener los productos destacados (ya filtra por disponibles)
+        // Obtener los productos destacados 
         const productos = await Producto.getFeatured(8);
         
         // Formatear precios para visualización

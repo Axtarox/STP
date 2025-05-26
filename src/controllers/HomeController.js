@@ -1,11 +1,11 @@
 /**
- * Controlador principal optimizado - Solo muestra productos disponibles
+ * Controlador principal optimizado 
  */
 const Producto = require('../models/Producto');
 const Servicio = require('../models/Servicio');
 
 /**
- * Página principal con productos aleatorios DISPONIBLES y servicios destacados
+ * Página principal con productos aleatorios 
  */
 exports.getIndex = async (req, res) => {
   try {

@@ -29,7 +29,7 @@ class Servicio {
   }
 
   /**
-   * Obtiene TODOS los servicios (disponibles y no disponibles) - PARA ADMIN
+   * Obtiene TODOS los servicios  - PARA ADMIN
    * @param {number} limit - Límite opcional de servicios a retornar
    * @returns {Promise<Array>} Lista de todos los servicios
    */
@@ -73,7 +73,7 @@ class Servicio {
   }
 
   /**
-   * Obtiene servicios destacados (todos los servicios disponibles hasta el límite especificado)
+   * Obtiene servicios destacados 
    * @param {number} limit - Número máximo de servicios a retornar
    * @returns {Promise<Array>} Lista de servicios destacados
    */

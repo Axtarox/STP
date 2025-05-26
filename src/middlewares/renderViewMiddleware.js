@@ -155,7 +155,7 @@ function processEachBlocks(html, data) {
 }
 
 /**
- * Procesa bloques {{#if}} con soporte para operadores de comparación
+ * Procesa bloques {{#if}} 
  */
 function processIfBlocks(html, data) {
     // Expresión regular mejorada para capturar comparaciones con operadores
