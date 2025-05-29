@@ -704,7 +704,6 @@ function initWhatsAppFunctionality() {
         });
     }
 }
-
 function enviarPedidoWhatsApp() {
     const form = document.getElementById('checkout-form');
     
@@ -731,8 +730,27 @@ function enviarPedidoWhatsApp() {
         }
     });
     
+    // Validar mayoría de edad (18 años)
+    const fechaNacimiento = form.querySelector('[name="fecha_nacimiento"]');
+    if (fechaNacimiento && fechaNacimiento.value) {
+        const fechaNac = new Date(fechaNacimiento.value);
+        const hoy = new Date();
+        let edad = hoy.getFullYear() - fechaNac.getFullYear();
+        const m = hoy.getMonth() - fechaNac.getMonth();
+        
+        if (m < 0 || (m === 0 && hoy.getDate() < fechaNac.getDate())) {
+            edad--;
+        }
+        
+        if (edad < 18) {
+            fechaNacimiento.classList.add('error');
+            showToast('Debe ser mayor de 18 años para realizar un pedido', 'error');
+            formularioValido = false;
+        }
+    }
+    
     if (!formularioValido) {
-        showToast('Por favor, completa todos los campos obligatorios', 'error');
+        showToast('Por favor, completa todos los campos obligatorios correctamente', 'error');
         return;
     }
     
@@ -741,7 +759,7 @@ function enviarPedidoWhatsApp() {
     const apellidos = form.querySelector('[name="apellidos"]').value;
     const tipoDocumento = form.querySelector('[name="tipo_documento"]').value;
     const numDocumento = form.querySelector('[name="num_documento"]').value;
-    const fechaNacimiento = form.querySelector('[name="fecha_nacimiento"]').value;
+    const fechaNacimientoValue = form.querySelector('[name="fecha_nacimiento"]').value;
     const ciudad = form.querySelector('[name="ciudad"]').value;
     const direccion = form.querySelector('[name="direccion"]').value;
     const telefonoMovil = form.querySelector('[name="telefono_movil"]').value;
@@ -749,15 +767,26 @@ function enviarPedidoWhatsApp() {
     const metodoPago = form.querySelector('[name="metodo_pago"]:checked').value;
     
     // Campos opcionales
-    const sexo = form.querySelector('[name="sexo"]')?.value || '';
-    const estadoCivil = form.querySelector('[name="estado_civil"]')?.value || '';
-    const telefonoFijo = form.querySelector('[name="telefono_fijo"]')?.value || '';
+    const sexo = form.querySelector('[name="sexo"]')?.value || 'No especificado';
+    const estadoCivil = form.querySelector('[name="estado_civil"]')?.value || 'No especificado';
+    const telefonoFijo = form.querySelector('[name="telefono_fijo"]')?.value || 'No proporcionado';
     
-    // Obtener carrito
-    const carrito = getCarritoFromStorage();
+    // Detectar si estamos en la página del carrito o en otra página
+    const isCartPage = window.location.pathname.includes('/carrito') || 
+                      document.querySelector('#cart-items-list') !== null;
     
-    if (carrito.items.length === 0) {
-        showToast('El carrito está vacío', 'error');
+    // Obtener carrito según el contexto
+    let carrito;
+    if (isCartPage) {
+        // En la página del carrito, usar carrito de checkout
+        carrito = getCarritoCheckoutFromStorage();
+    } else {
+        // En otras páginas, usar carrito flotante
+        carrito = getCarritoFromStorage();
+    }
+    
+    if (!carrito.items || carrito.items.length === 0) {
+        showToast('El carrito está vacío. Por favor, añade productos antes de confirmar el pedido.', 'error');
         return;
     }
     
@@ -766,35 +795,37 @@ function enviarPedidoWhatsApp() {
     mensaje += `Nombres: ${nombres}\n`;
     mensaje += `Apellidos: ${apellidos}\n`;
     mensaje += `Documento: ${tipoDocumento} ${numDocumento}\n`;
-    mensaje += `Fecha Nacimiento: ${fechaNacimiento}\n`;
+    mensaje += `Fecha Nacimiento: ${fechaNacimientoValue}\n`;
     mensaje += `Ciudad: ${ciudad}\n`;
     mensaje += `Dirección: ${direccion}\n`;
     mensaje += `Teléfono Móvil: ${telefonoMovil}\n`;
     mensaje += `Email: ${email}\n`;
     
-    if (telefonoFijo) {
+    if (telefonoFijo && telefonoFijo !== 'No proporcionado') {
         mensaje += `Teléfono Fijo: ${telefonoFijo}\n`;
     }
     
-    if (sexo) {
+    if (sexo && sexo !== 'No especificado') {
         mensaje += `Sexo: ${sexo}\n`;
     }
     
-    if (estadoCivil) {
+    if (estadoCivil && estadoCivil !== 'No especificado') {
         mensaje += `Estado Civil: ${estadoCivil}\n`;
     }
     
     mensaje += `Método de Pago: ${metodoPago}\n\n`;
     mensaje += `Productos:\n`;
     
+    let total = 0;
     carrito.items.forEach(item => {
         const precio = parseFloat(item.precio) || 0;
         const cantidad = parseInt(item.cantidad) || 0;
         const subtotal = precio * cantidad;
+        total += subtotal;
         mensaje += `- ${cantidad}x ${item.nombre} - $${subtotal.toLocaleString('es-CO')}\n`;
     });
     
-    mensaje += `\nTotal: $${carrito.total.toLocaleString('es-CO')}`;
+    mensaje += `\nTotal: ${total.toLocaleString('es-CO')}`;
     
     // Número de WhatsApp de la empresa 
     const whatsappNumber = '573225865591';
@@ -808,8 +839,9 @@ function enviarPedidoWhatsApp() {
     // Abrir WhatsApp en una nueva ventana
     window.open(whatsappUrl, '_blank');
     
-    // Limpiar carrito después de enviar
+    // Limpiar carritos después de enviar
     localStorage.removeItem('carrito');
+    localStorage.removeItem('carritoCheckout');
     
     // Redirigir a la página de confirmación
     setTimeout(() => {

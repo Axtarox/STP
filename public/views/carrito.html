@@ -505,7 +505,8 @@
         container.innerHTML = content;
     }
     
-    // Función para enviar pedido por WhatsApp con validación 
+
+  // Función para enviar pedido por WhatsApp con validación 
     function enviarPedidoWhatsApp() {
         const form = document.getElementById('checkout-form');
         
@@ -573,11 +574,11 @@
         const estadoCivil = form.querySelector('[name="estado_civil"]') ? form.querySelector('[name="estado_civil"]').value : 'No especificado';
         const telefonoFijo = form.querySelector('[name="telefono_fijo"]') ? form.querySelector('[name="telefono_fijo"]').value : 'No proporcionado';
         
-        // Obtener carrito de checkout
+        // Obtener carrito de checkout (no el carrito flotante)
         const carrito = getCarritoCheckoutFromStorage();
         
-        if (carrito.items.length === 0) {
-            showToast('El carrito está vacío', 'error');
+        if (!carrito.items || carrito.items.length === 0) {
+            showToast('El carrito está vacío. Por favor, añade productos antes de confirmar el pedido.', 'error');
             return;
         }
         
@@ -608,7 +609,7 @@
         
         mensaje += `%0A*Total:* $${total.toLocaleString('es-CO')}`;
         
-        // Número de WhatsApp de prueba
+        // Número de WhatsApp de la empresa
         const whatsappNumber = '573225865591';
         
         // Crear URL de WhatsApp
@@ -629,7 +630,6 @@
             window.location.href = '/pedidos/confirmacion';
         }, 2000);
     }
-    
     function getCarritoCheckoutFromStorage() {
         const carritoJSON = localStorage.getItem('carritoCheckout');
         

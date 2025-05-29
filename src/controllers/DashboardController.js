@@ -223,14 +223,14 @@ exports.crearProducto = async (req, res) => {
     
     // Validar y procesar características
     const caracteristicasLimpias = caracteristicas.trim();
-    if (caracteristicasLimpias.length < 10) {
+    if (caracteristicasLimpias.length < 1) {
       const categorias = await Categoria.getAll();
       
       return res.render('admin/producto-crear', {
         titulo: 'Crear Nuevo Producto',
         admin: req.session.adminData,
         categorias,
-        error: 'Las características deben tener al menos 10 caracteres y ser descriptivas.',
+        error: 'Las características deben tener al menos 1 caracter.',
         current_page: { productos: true },
         standalone: true
       });
