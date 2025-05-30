@@ -71,10 +71,10 @@ app.use(async (req, res, next) => {
       // Definir categorías por defecto en caso de error
       res.locals.categorias = [
         { id: 1, nombre: 'Computadores' },
-        { id: 2, nombre: 'Periféricos' },
+        { id: 2, nombre: 'Accesorios para celulares' },
         { id: 3, nombre: 'Accesorios' },
-        { id: 4, nombre: 'Redes' },
-        { id: 5, nombre: 'Software' }
+        { id: 4, nombre: 'Celulares' },
+        { id: 5, nombre: 'otros' }
       ];
     }
 
