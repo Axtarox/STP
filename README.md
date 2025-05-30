@@ -91,8 +91,8 @@ Navegador: Chrome 90+, Firefox 88+, Safari 14+, Edge 90+
 Pasos de Instalación
 
 Clonar el repositorio:
-bashgit clone https://github.com/Axtarox/STP.git
-cd STP
+bashgit clone https://github.com/Axtarox/proyecto-pradito.git
+cd proyecto-pradito
 
 Instalar dependencias:
 bashnpm install
@@ -150,7 +150,7 @@ Titular: Leidy Yohanna Montoya
 NIT: 1046666351-7
 
 📂 Estructura del Proyecto
-STP/
+proyecto-pradito/
 ├── public/                     # Archivos estáticos y vistas
 │   ├── css/                   # Hojas de estilo
 │   │   ├── style.css          # Estilos principales
