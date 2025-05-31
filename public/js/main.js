@@ -53,11 +53,14 @@ function initCarrito() {
                 stock: maxStock
             };
             
-            // Añadir el producto al carrito 
-            addProductToCart(producto);
+            // Añadir el producto al carrito (CON validaciones normales)
+            const success = addProductToCart(producto, false); // false = hacer validaciones
             
-            // Mostrar mensaje de confirmación
-            showToast(`${productName} ha sido añadido al carrito`);
+            // Solo mostrar mensaje de confirmación si fue exitoso
+            if (success) {
+                // Mostrar mensaje de confirmación
+                showToast(`${productName} ha sido añadido al carrito`);
+            }
         });
     });
     
@@ -267,8 +270,11 @@ function createCartOverlay() {
 /**
  * Añade un producto al carrito con validación de stock
  * @param {Object} producto - Producto a añadir
+ * @param {boolean} skipValidation - Si se deben saltar los MENSAJES DE ERROR (las restricciones siempre se respetan)
+ * @returns {boolean} - True si se agregó exitosamente, false si no
  */
-function addProductToCart(producto) {
+function addProductToCart(producto, skipValidation = false) {
+    console.log('addProductToCart llamada con skipValidation:', skipValidation);
     console.log('Añadiendo producto al carrito:', producto);
     
     // Obtener carrito actual
@@ -278,29 +284,42 @@ function addProductToCart(producto) {
     const existingProductIndex = carrito.items.findIndex(item => String(item.id) === String(producto.id));
     
     if (existingProductIndex !== -1) {
-        // Calcular nueva cantidad
+        // SIEMPRE verificar que no exceda el stock, independiente de skipValidation
         const newQuantity = carrito.items[existingProductIndex].cantidad + producto.cantidad;
         const maxStock = producto.stock || carrito.items[existingProductIndex].stock || 999;
         
-        // Validar que no exceda el stock
         if (newQuantity <= maxStock) {
+            // Solo aquí es seguro añadir
             carrito.items[existingProductIndex].cantidad = newQuantity;
             // Actualizar stock si se proporciona
             if (producto.stock) {
                 carrito.items[existingProductIndex].stock = producto.stock;
             }
+            console.log(`Producto existente actualizado: ${carrito.items[existingProductIndex].cantidad}/${maxStock}`);
         } else {
-            showToast(`Solo hay ${maxStock} unidades disponibles de ${producto.nombre}`, 'error');
-            return;
+            // NUNCA exceder el stock, incluso con skipValidation
+            console.log(`BLOQUEADO: Intentó añadir ${producto.cantidad}, pero excedería stock. Actual: ${carrito.items[existingProductIndex].cantidad}, Máximo: ${maxStock}`);
+            
+            // Solo mostrar error si NO se saltean validaciones
+            if (!skipValidation) {
+                showToast(`Solo hay ${maxStock} unidades disponibles de ${producto.nombre}`, 'error');
+            }
+            return false; // Operación falló
         }
     } else {
-        // Validar stock antes de añadir
-        if (producto.cantidad > producto.stock) {
-            showToast(`Solo hay ${producto.stock} unidades disponibles de ${producto.nombre}`, 'error');
-            return;
+        // Nuevo producto: verificar que la cantidad inicial no exceda stock
+        if (producto.cantidad <= producto.stock) {
+            carrito.items.push(producto);
+            console.log(`Nuevo producto añadido: ${producto.cantidad}/${producto.stock}`);
+        } else {
+            console.log(`BLOQUEADO: Nuevo producto excede stock inicial. Cantidad: ${producto.cantidad}, Stock: ${producto.stock}`);
+            
+            // Solo mostrar error si NO se saltean validaciones
+            if (!skipValidation) {
+                showToast(`Solo hay ${producto.stock} unidades disponibles de ${producto.nombre}`, 'error');
+            }
+            return false; // Operación falló
         }
-        // Añadir nuevo producto
-        carrito.items.push(producto);
     }
     
     // Recalcular total
@@ -330,6 +349,9 @@ function addProductToCart(producto) {
             floatingCart.classList.remove('cart-bounce');
         }, 750);
     }
+    
+    console.log('addProductToCart completado exitosamente');
+    return true; // Operación exitosa
 }
 
 /**
@@ -338,7 +360,28 @@ function addProductToCart(producto) {
  * @returns {number} Total de items
  */
 function getTotalItemsInCart(carrito) {
-    return carrito.items.reduce((total, item) => total + (parseInt(item.cantidad) || 0), 0);
+    if (!carrito || !carrito.items || !Array.isArray(carrito.items)) {
+        console.warn('Carrito inválido en getTotalItemsInCart:', carrito);
+        return 0;
+    }
+    
+    const total = carrito.items.reduce((sum, item) => {
+        if (!item || typeof item.cantidad === 'undefined') {
+            console.warn('Item inválido en carrito:', item);
+            return sum;
+        }
+        
+        const cantidad = parseInt(item.cantidad) || 0;
+        if (cantidad < 0) {
+            console.warn('Cantidad negativa detectada:', cantidad, 'en item:', item);
+            return sum;
+        }
+        
+        return sum + cantidad;
+    }, 0);
+    
+    console.log(`Total de items en carrito calculado: ${total}`);
+    return total;
 }
 
 /**
@@ -347,19 +390,43 @@ function getTotalItemsInCart(carrito) {
  */
 function updateCartCount(count) {
     const cartCount = document.querySelector('.cart-count');
-    if (cartCount) {
-        cartCount.textContent = count;
-        
-        console.log(`Actualizando contador del carrito a: ${count}`);
-        
-        // Mostrar/ocultar el contador según haya items
-        if (count > 0) {
-            cartCount.classList.remove('hidden');
-            cartCount.style.display = 'flex';
-        } else {
-            cartCount.classList.add('hidden');
-            cartCount.style.display = 'none';
+    if (!cartCount) {
+        console.log('No se encontró elemento .cart-count');
+        return;
+    }
+    
+    // Si no se proporciona count, calcularlo desde el carrito
+    if (typeof count === 'undefined') {
+        try {
+            const carrito = getCarritoFromStorage();
+            count = getTotalItemsInCart(carrito);
+            console.log('Count calculado automáticamente:', count);
+        } catch (e) {
+            console.error('Error al calcular count automáticamente:', e);
+            count = 0;
         }
+    }
+    
+    console.log(`Actualizando contador del carrito a: ${count}`);
+    
+    // Validar que count sea un número válido
+    if (isNaN(count) || count < 0) {
+        console.warn('Count inválido, estableciendo a 0:', count);
+        count = 0;
+    }
+    
+    // Actualizar número
+    cartCount.textContent = count;
+    
+    // Mostrar/ocultar el contador según haya items
+    if (count > 0) {
+        cartCount.classList.remove('hidden');
+        cartCount.style.display = 'flex';
+        console.log(`Contador mostrado con ${count} items`);
+    } else {
+        cartCount.classList.add('hidden');
+        cartCount.style.display = 'none';
+        console.log('Contador oculto - carrito vacío');
     }
 }
 

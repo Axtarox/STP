@@ -166,12 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Guardar carrito actualizado
             localStorage.setItem('cart', JSON.stringify(cart));
             
-            // Actualizar contador del carrito en el header (si existe)
-            const cartCount = document.querySelector('.cart-count');
-            if (cartCount) {
-                const totalItems = cart.reduce((total, item) => total + item.cantidad, 0);
-                cartCount.textContent = totalItems;
-            }
+           
         
         });
     }

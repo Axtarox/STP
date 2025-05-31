@@ -71,8 +71,10 @@ function handleAddToCart() {
         stock: maxStock
     };
     
-    // Añadir al carrito usando la función global
-    if (typeof addProductToCart === 'function') {
+    // Usar la función global de main.js si está disponible
+    if (typeof window.addProductToCart === 'function') {
+        window.addProductToCart(producto);
+    } else if (typeof addProductToCart === 'function') {
         addProductToCart(producto);
     } else {
         // Función de respaldo si no está disponible la global
@@ -127,8 +129,8 @@ function addProductToCartLocal(producto) {
     // Guardar carrito
     localStorage.setItem('carrito', JSON.stringify(carrito));
     
-    // Actualizar contador
-    updateCartCount();
+    // Actualizar contador usando la función global o local
+    updateCartCountGlobal();
 }
 
 /**
@@ -151,6 +153,28 @@ function getCarritoFromStorage() {
         items: [],
         total: 0
     };
+}
+
+
+/**
+ * Función local de respaldo para actualizar el contador
+ * @param {number} count - Número de items
+ */
+function updateCartCountLocal(count) {
+    const cartCount = document.querySelector('.cart-count');
+    if (!cartCount) return;
+    
+    cartCount.textContent = count;
+    console.log(`Actualizando contador del carrito a: ${count}`);
+    
+    // Mostrar/ocultar el contador según haya items
+    if (count > 0) {
+        cartCount.classList.remove('hidden');
+        cartCount.style.display = 'flex';
+    } else {
+        cartCount.classList.add('hidden');
+        cartCount.style.display = 'none';
+    }
 }
 
 /**
@@ -349,6 +373,7 @@ function updateStockDisplay(maxStock, usedStock, availableStock) {
     
     stockElement.innerHTML = stockHTML;
 }
+
 /**
  * Muestra una notificación tipo toast
  * @param {string} mensaje - Mensaje a mostrar
@@ -430,34 +455,6 @@ function animateCartIcon() {
     }
 }
 
-/**
- * Actualiza el contador del carrito
- */
-function updateCartCount() {
-    const cartCount = document.querySelector('.cart-count');
-    if (!cartCount) return;
-    
-    try {
-        const carrito = JSON.parse(localStorage.getItem('carrito')) || { items: [] };
-        
-        // Calcular número total de ítems 
-        const totalItems = carrito.items.reduce((sum, item) => sum + item.cantidad, 0);
-        
-        // Actualizar número
-        cartCount.textContent = totalItems;
-        
-        // Mostrar contador si hay elementos
-        if (carrito.items.length > 0) {
-            cartCount.style.display = 'flex';
-        } else {
-            cartCount.style.display = 'none';
-        }
-    } catch (e) {
-        cartCount.textContent = '0';
-        cartCount.style.display = 'none';
-    }
-}
-
 // Actualizar botones de cantidad cuando se carga la página y cuando cambia el carrito
 document.addEventListener('DOMContentLoaded', function() {
     // Actualizar cada vez que cambie el localStorage del carrito flotante
@@ -489,3 +486,16 @@ setInterval(function() {
         updateQuantityButtons(maxStock);
     }
 }, 2000); // Verificar cada 2 segundos si la página tiene el foco
+
+// Escuchar eventos del carrito para sincronizar
+window.addEventListener('cartUpdated', function(e) {
+    console.log('Evento cartUpdated recibido en detalle producto:', e.detail);
+    updateCartCountGlobal();
+    
+    // Actualizar botones de cantidad si estamos en una página de detalle
+    const quantityInput = document.getElementById('product-quantity');
+    if (quantityInput) {
+        const maxStock = parseInt(quantityInput.getAttribute('max')) || 999;
+        updateQuantityButtons(maxStock);
+    }
+});
