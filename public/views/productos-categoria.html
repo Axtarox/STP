@@ -51,8 +51,14 @@
                     <div class="product-info">
                         <h3 class="product-title">{{nombre}}</h3>
                         <p class="product-price">${{precio}}</p>
+                        <p class="product-stock">Disponibles: {{cantidad_disponible}}</p>
+                        <div class="quantity-selector">
+                            <button class="quantity-btn minus" data-id="{{id}}">-</button>
+                            <input type="number" class="quantity-input" value="1" min="1" max="{{cantidad_disponible}}">
+                            <button class="quantity-btn plus" data-id="{{id}}">+</button>
+                        </div>
                         <div class="product-actions">
-                            <a href="/productos/{{id}}" class="btn btn-secondary">Ver detalles</a>
+                            <a href="/productos/{{id}}" class="btn btn-secondary">Ver Detalles</a>
                             <button class="add-to-cart" data-id="{{id}}">Añadir</button>
                         </div>
                     </div>

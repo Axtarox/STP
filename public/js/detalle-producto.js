@@ -323,14 +323,32 @@ function updateStockDisplay(maxStock, usedStock, availableStock) {
         }
     }
     
-    let stockText = `Stock total: ${maxStock}`;
+    // Crear HTML organizado en renglones
+    let stockHTML = `
+        <div class="stock-info-container">
+            <div class="stock-item">
+                <span class="stock-label">Stock total:</span>
+                <span class="stock-value">${maxStock}</span>
+            </div>
+    `;
+    
     if (usedStock > 0) {
-        stockText += ` | En carrito: ${usedStock} | Disponible: ${availableStock}`;
+        stockHTML += `
+            <div class="stock-item">
+                <span class="stock-label">En carrito:</span>
+                <span class="stock-value cart-stock">${usedStock}</span>
+            </div>
+            <div class="stock-item">
+                <span class="stock-label">Disponible:</span>
+                <span class="stock-value available-stock">${availableStock}</span>
+            </div>
+        `;
     }
     
-    stockElement.innerHTML = `<small style="color: #666; font-size: 0.85rem;">${stockText}</small>`;
+    stockHTML += `</div>`;
+    
+    stockElement.innerHTML = stockHTML;
 }
-
 /**
  * Muestra una notificación tipo toast
  * @param {string} mensaje - Mensaje a mostrar

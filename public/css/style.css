@@ -865,3 +865,69 @@ pre {
     position: relative;
     z-index: 2;
 }
+.product-detail .quantity-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1.2rem;
+}
+
+.product-detail .quantity-input {
+    width: 60px;
+    height: 36px;
+    font-size: 1rem;
+}
+
+/* Estilos para la información de stock organizada */
+.product-stock-info {
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.stock-info-container {
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    padding: 0.75rem;
+    border-left: 3px solid var(--color-primary);
+}
+
+.stock-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+}
+
+.stock-item:last-child {
+    margin-bottom: 0;
+}
+
+.stock-label {
+    color: #666;
+    font-weight: 500;
+}
+
+.stock-value {
+    color: var(--color-dark);
+    font-weight: 600;
+}
+
+.stock-value.cart-stock {
+    color: var(--color-primary);
+}
+
+.stock-value.available-stock {
+    color: #27ae60;
+}
+
+/* Responsivo para información de stock */
+@media (max-width: 480px) {
+    .stock-info-container {
+        padding: 0.5rem;
+        font-size: 0.85rem;
+    }
+    
+    .stock-item {
+        font-size: 0.85rem;
+    }
+}
