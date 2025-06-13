@@ -29,11 +29,11 @@
             </div>
             
             <div class="product-availability">
-                <span class="stock in-stock">
+                <span class="stock {{#if producto.cantidad_disponible}}in-stock{{else}}out-of-stock{{/if}}">
                     {{#if producto.cantidad_disponible}}
                     En stock ({{producto.cantidad_disponible}} disponibles)
                     {{else}}
-                    Agotado
+                    Agotado (0 disponibles)
                     {{/if}}
                 </span>
             </div>
@@ -55,6 +55,7 @@
             </div>
             
             <div class="product-actions">
+                {{#if producto.cantidad_disponible}}
                 <div class="quantity-selector">
                     <button class="quantity-btn minus" id="quantity-minus">-</button>
                     <input type="number" id="product-quantity" class="quantity-input" value="1" min="1" max="{{producto.cantidad_disponible}}">
@@ -68,6 +69,15 @@
                         data-imagen="{{producto.imagen}}">
                     Añadir al Carrito
                 </button>
+                {{else}}
+                <div class="out-of-stock-message">
+                    <p><i class="fas fa-exclamation-triangle"></i> Producto agotado</p>
+                </div>
+                <button class="btn btn-disabled" disabled>
+                    Producto no disponible
+                </button>
+                {{/if}}
+                
                 <a href="https://wa.me/573225865591?text=Hola, estoy interesado en el producto: {{producto.nombre}}" 
                    target="_blank" class="btn btn-secondary">
                     <i class="fab fa-whatsapp"></i> Consultar por WhatsApp
@@ -89,96 +99,78 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Manejar los botones de cantidad
-    const quantityMinus = document.getElementById('quantity-minus');
-    const quantityPlus = document.getElementById('quantity-plus');
-    const quantityInput = document.getElementById('product-quantity');
-
-    if (quantityMinus && quantityPlus && quantityInput) {
-        quantityMinus.addEventListener('click', function() {
-            let value = parseInt(quantityInput.value);
-            if (value > 1) {
-                quantityInput.value = value - 1;
-            }
-        });
-        
-        quantityPlus.addEventListener('click', function() {
-            let value = parseInt(quantityInput.value);
-            const max = parseInt(quantityInput.getAttribute('max'));
-            if (value < max) {
-                quantityInput.value = value + 1;
-            }
-        });
-        
-        // Validar entrada directa
-        quantityInput.addEventListener('change', function() {
-            let value = parseInt(this.value);
-            const max = parseInt(this.getAttribute('max'));
-            
-            if (isNaN(value) || value < 1) {
-                this.value = 1;
-            } else if (value > max) {
-                this.value = max;
-            }
-        });
-    }
-    
-    // Manejar click en botón de añadir al carrito
-    const btnAddToCart = document.getElementById('btnAddToCart');
-    if (btnAddToCart) {
-        btnAddToCart.addEventListener('click', function() {
-            const productId = this.getAttribute('data-id');
-            const productName = this.getAttribute('data-nombre');
-            const productPrice = this.getAttribute('data-precio');
-            const productImage = this.getAttribute('data-imagen');
-            
-            // Obtener la cantidad seleccionada
-            const quantity = parseInt(document.getElementById('product-quantity').value) || 1;
-            
-            console.log('Añadiendo al carrito:', {
-                id: productId,
-                nombre: productName,
-                precio: productPrice,
-                imagen: productImage,
-                cantidad: quantity
-            });
-            
-            // Obtener el carrito actual o crear uno nuevo
-            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-            
-            // Verificar si el producto ya está en el carrito
-            const existingProductIndex = cart.findIndex(item => item.id === productId);
-            
-            if (existingProductIndex !== -1) {
-                // Si ya existe, incrementar cantidad
-                cart[existingProductIndex].cantidad += quantity;
-            } else {
-                // Si no existe, añadir como nuevo
-                cart.push({
-                    id: productId,
-                    nombre: productName,
-                    precio: productPrice,
-                    imagen: productImage,
-                    cantidad: quantity
-                });
-            }
-            
-            // Guardar carrito actualizado
-            localStorage.setItem('cart', JSON.stringify(cart));
-            
-           
-        
-        });
-    }
+    // NOTA: Los event listeners para cantidad y carrito se manejan en detalle-producto.js
+    // para evitar duplicados. Este script solo maneja la lógica básica de la vista.
     
     // Depuración para verificar los datos del producto
-    console.log('Datos del producto:', {
+    console.log('Vista de detalle cargada. Datos del producto:', {
         id: document.querySelector('#btnAddToCart')?.getAttribute('data-id'),
         nombre: document.querySelector('.product-title')?.textContent,
         precio: document.querySelector('.price')?.textContent,
         descripcion: document.querySelector('.product-description p')?.textContent,
-        imagen: document.querySelector('.main-image img')?.getAttribute('src')
+        imagen: document.querySelector('.main-image img')?.getAttribute('src'),
+        stock: document.querySelector('#product-quantity')?.getAttribute('max')
     });
 });
 </script>
-<script src="/js/debug.js"></script>
+
+<style>
+.out-of-stock {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.out-of-stock-message {
+    padding: 10px;
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    color: #856404;
+}
+
+.out-of-stock-message i {
+    margin-right: 8px;
+    color: #f39c12;
+}
+
+.btn-disabled {
+    background-color: #6c757d !important;
+    cursor: not-allowed !important;
+    opacity: 0.6;
+}
+
+.btn-disabled:hover {
+    background-color: #6c757d !important;
+    transform: none !important;
+}
+
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 24px;
+    border-radius: 4px;
+    z-index: 9999;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.toast.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.toast-error {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.toast-success {
+    background-color: #2ecc71;
+    color: white;
+}
+</style>
